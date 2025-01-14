@@ -31,20 +31,11 @@ public:
   virtual void enterParameter(LMlangGrammarParser::ParameterContext * /*ctx*/) override { }
   virtual void exitParameter(LMlangGrammarParser::ParameterContext * /*ctx*/) override { }
 
-  virtual void enterStructDecl(LMlangGrammarParser::StructDeclContext * /*ctx*/) override { }
-  virtual void exitStructDecl(LMlangGrammarParser::StructDeclContext * /*ctx*/) override { }
-
-  virtual void enterFieldDecl(LMlangGrammarParser::FieldDeclContext * /*ctx*/) override { }
-  virtual void exitFieldDecl(LMlangGrammarParser::FieldDeclContext * /*ctx*/) override { }
-
   virtual void enterType(LMlangGrammarParser::TypeContext * /*ctx*/) override { }
   virtual void exitType(LMlangGrammarParser::TypeContext * /*ctx*/) override { }
 
   virtual void enterPrimitiveType(LMlangGrammarParser::PrimitiveTypeContext * /*ctx*/) override { }
   virtual void exitPrimitiveType(LMlangGrammarParser::PrimitiveTypeContext * /*ctx*/) override { }
-
-  virtual void enterStructType(LMlangGrammarParser::StructTypeContext * /*ctx*/) override { }
-  virtual void exitStructType(LMlangGrammarParser::StructTypeContext * /*ctx*/) override { }
 
   virtual void enterBlock(LMlangGrammarParser::BlockContext * /*ctx*/) override { }
   virtual void exitBlock(LMlangGrammarParser::BlockContext * /*ctx*/) override { }
@@ -60,9 +51,6 @@ public:
 
   virtual void enterIfStatement(LMlangGrammarParser::IfStatementContext * /*ctx*/) override { }
   virtual void exitIfStatement(LMlangGrammarParser::IfStatementContext * /*ctx*/) override { }
-
-  virtual void enterWhileStatement(LMlangGrammarParser::WhileStatementContext * /*ctx*/) override { }
-  virtual void exitWhileStatement(LMlangGrammarParser::WhileStatementContext * /*ctx*/) override { }
 
   virtual void enterBreakStatement(LMlangGrammarParser::BreakStatementContext * /*ctx*/) override { }
   virtual void exitBreakStatement(LMlangGrammarParser::BreakStatementContext * /*ctx*/) override { }
@@ -85,14 +73,8 @@ public:
   virtual void enterArrayInit(LMlangGrammarParser::ArrayInitContext * /*ctx*/) override { }
   virtual void exitArrayInit(LMlangGrammarParser::ArrayInitContext * /*ctx*/) override { }
 
-  virtual void enterStructInit(LMlangGrammarParser::StructInitContext * /*ctx*/) override { }
-  virtual void exitStructInit(LMlangGrammarParser::StructInitContext * /*ctx*/) override { }
-
   virtual void enterArgumentList(LMlangGrammarParser::ArgumentListContext * /*ctx*/) override { }
   virtual void exitArgumentList(LMlangGrammarParser::ArgumentListContext * /*ctx*/) override { }
-
-  virtual void enterFieldAccess(LMlangGrammarParser::FieldAccessContext * /*ctx*/) override { }
-  virtual void exitFieldAccess(LMlangGrammarParser::FieldAccessContext * /*ctx*/) override { }
 
   virtual void enterArrayAccess(LMlangGrammarParser::ArrayAccessContext * /*ctx*/) override { }
   virtual void exitArrayAccess(LMlangGrammarParser::ArrayAccessContext * /*ctx*/) override { }

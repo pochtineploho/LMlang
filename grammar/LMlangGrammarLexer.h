@@ -13,11 +13,11 @@ class  LMlangGrammarLexer : public antlr4::Lexer {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, FUNC = 5, VOID = 6, RETURN = 7, 
-    PRINT = 8, FOR = 9, WHILE = 10, IF = 11, ELSE = 12, STRUCT = 13, BREAK = 14, 
-    CONTINUE = 15, BOOL = 16, INT = 17, DOUBLE = 18, CHAR = 19, ID = 20, 
-    NEG = 21, MULT = 22, ADD = 23, COMPOP = 24, NOT = 25, AND = 26, OR = 27, 
-    ASSIGN = 28, LPAREN = 29, RPAREN = 30, LBRACE = 31, RBRACE = 32, LBRACK = 33, 
-    RBRACK = 34, SEMI = 35, COMMA = 36, DOT = 37, WS = 38, COMMENT = 39
+    PRINT = 8, IF = 9, ELSE = 10, BREAK = 11, CONTINUE = 12, BOOL = 13, 
+    INT = 14, DOUBLE = 15, CHAR = 16, ID = 17, NEG = 18, MULT = 19, ADD = 20, 
+    COMPOP = 21, NOT = 22, AND = 23, OR = 24, ASSIGN = 25, LPAREN = 26, 
+    RPAREN = 27, LBRACE = 28, RBRACE = 29, LBRACK = 30, RBRACK = 31, SEMI = 32, 
+    COMMA = 33, DOT = 34, WS = 35, COMMENT = 36
   };
 
   explicit LMlangGrammarLexer(antlr4::CharStream *input);

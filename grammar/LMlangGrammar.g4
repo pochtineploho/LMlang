@@ -1,19 +1,15 @@
 grammar LMlangGrammar;
 
 // Parser
-program: (functionDecl | structDecl | statement)* EOF;
+program: (functionDecl | statement)* EOF;
 
 functionDecl: FUNC returnType ID LPAREN parameterList? RPAREN block;
 returnType: type | VOID;
 parameterList: parameter (COMMA parameter)*;
 parameter: type ID;
 
-structDecl: STRUCT structType LBRACE fieldDecl+ RBRACE SEMI;
-fieldDecl: type ID SEMI;
-
-type: primitiveType | type LBRACK INT RBRACK | structType;
+type: primitiveType | type LBRACK INT RBRACK;
 primitiveType: 'int' | 'double' | 'char' | 'bool';
-structType: ID;
 
 block: LBRACE statement* RBRACE;
 
@@ -24,7 +20,6 @@ statement:
     | printStatement SEMI
     | expression SEMI
     | ifStatement
-    | whileStatement
     | breakStatement SEMI
     | continueStatement SEMI
     | block;
@@ -33,7 +28,6 @@ varDecl: type ID (ASSIGN expression)?;
 assignment: assignable ASSIGN expression;
 
 ifStatement: IF LPAREN expression RPAREN statement (ELSE statement)?;
-whileStatement: WHILE LPAREN expression RPAREN statement;
 
 breakStatement: BREAK;
 continueStatement: CONTINUE;
@@ -56,7 +50,6 @@ expression:
 
 primaryExpression:
       ID
-    | fieldAccess
     | arrayAccess
     | functionCall
     | INT
@@ -64,28 +57,22 @@ primaryExpression:
     | CHAR
     | BOOL
     | LPAREN expression RPAREN
-    | arrayInit
-    | structInit;
+    | arrayInit;
 
 arrayInit: LBRACE (expression (COMMA expression)*)? RBRACE;
-structInit: ID LPAREN argumentList? RPAREN;
 argumentList: expression (COMMA expression)*;
 
-fieldAccess: ID (DOT ID)+;
 arrayAccess: ID LBRACK expression RBRACK;
 functionCall: ID LPAREN argumentList? RPAREN;
-assignable: ID | fieldAccess | arrayAccess;
+assignable: ID | arrayAccess;
 
 // Lexer
 FUNC: 'func';
 VOID: 'void';
 RETURN: 'return';
 PRINT: 'print';
-FOR: 'for';
-WHILE: 'while';
 IF: 'if';
 ELSE: 'else';
-STRUCT: 'struct';
 BREAK: 'break';
 CONTINUE: 'continue';
 

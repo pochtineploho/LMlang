@@ -29,20 +29,11 @@ public:
   virtual void enterParameter(LMlangGrammarParser::ParameterContext *ctx) = 0;
   virtual void exitParameter(LMlangGrammarParser::ParameterContext *ctx) = 0;
 
-  virtual void enterStructDecl(LMlangGrammarParser::StructDeclContext *ctx) = 0;
-  virtual void exitStructDecl(LMlangGrammarParser::StructDeclContext *ctx) = 0;
-
-  virtual void enterFieldDecl(LMlangGrammarParser::FieldDeclContext *ctx) = 0;
-  virtual void exitFieldDecl(LMlangGrammarParser::FieldDeclContext *ctx) = 0;
-
   virtual void enterType(LMlangGrammarParser::TypeContext *ctx) = 0;
   virtual void exitType(LMlangGrammarParser::TypeContext *ctx) = 0;
 
   virtual void enterPrimitiveType(LMlangGrammarParser::PrimitiveTypeContext *ctx) = 0;
   virtual void exitPrimitiveType(LMlangGrammarParser::PrimitiveTypeContext *ctx) = 0;
-
-  virtual void enterStructType(LMlangGrammarParser::StructTypeContext *ctx) = 0;
-  virtual void exitStructType(LMlangGrammarParser::StructTypeContext *ctx) = 0;
 
   virtual void enterBlock(LMlangGrammarParser::BlockContext *ctx) = 0;
   virtual void exitBlock(LMlangGrammarParser::BlockContext *ctx) = 0;
@@ -58,9 +49,6 @@ public:
 
   virtual void enterIfStatement(LMlangGrammarParser::IfStatementContext *ctx) = 0;
   virtual void exitIfStatement(LMlangGrammarParser::IfStatementContext *ctx) = 0;
-
-  virtual void enterWhileStatement(LMlangGrammarParser::WhileStatementContext *ctx) = 0;
-  virtual void exitWhileStatement(LMlangGrammarParser::WhileStatementContext *ctx) = 0;
 
   virtual void enterBreakStatement(LMlangGrammarParser::BreakStatementContext *ctx) = 0;
   virtual void exitBreakStatement(LMlangGrammarParser::BreakStatementContext *ctx) = 0;
@@ -83,14 +71,8 @@ public:
   virtual void enterArrayInit(LMlangGrammarParser::ArrayInitContext *ctx) = 0;
   virtual void exitArrayInit(LMlangGrammarParser::ArrayInitContext *ctx) = 0;
 
-  virtual void enterStructInit(LMlangGrammarParser::StructInitContext *ctx) = 0;
-  virtual void exitStructInit(LMlangGrammarParser::StructInitContext *ctx) = 0;
-
   virtual void enterArgumentList(LMlangGrammarParser::ArgumentListContext *ctx) = 0;
   virtual void exitArgumentList(LMlangGrammarParser::ArgumentListContext *ctx) = 0;
-
-  virtual void enterFieldAccess(LMlangGrammarParser::FieldAccessContext *ctx) = 0;
-  virtual void exitFieldAccess(LMlangGrammarParser::FieldAccessContext *ctx) = 0;
 
   virtual void enterArrayAccess(LMlangGrammarParser::ArrayAccessContext *ctx) = 0;
   virtual void exitArrayAccess(LMlangGrammarParser::ArrayAccessContext *ctx) = 0;
