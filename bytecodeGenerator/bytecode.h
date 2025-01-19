@@ -2,6 +2,8 @@
 // Created by admin on 17.01.2025.
 //
 
+#include <cstdint>
+
 #ifndef MYANTLRPROJECT_BYTECODE_H
 #define MYANTLRPROJECT_BYTECODE_H
 
@@ -43,10 +45,11 @@ enum class Bytecode {
 
     // Functionality
     Print = 20,     // 20: Print the top of the stack to the console
+    Call = 21,     // 21: Call function
 
     // Special markers
-    NoOp = 21,      // 21: No operation
-    Halt = 22       // 22: Halt the program
+    NoOp = 22,      // 22: No operation
+    Halt = 23       // 23: Halt the program
 };
 
 // Primitive type IDs for variable handling (optional, for LLVM translation)
