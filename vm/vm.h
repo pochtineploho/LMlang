@@ -241,7 +241,7 @@ public:
         execEngine->runFunction(jitFunc, {});
     }
 
-private:
+private:  // TODO: Написать Array table и подержку массивов
 
     std::unordered_map<int, int> LoopCounters; // Map to track loop instruction usage
     const int HotLoopThreshold = 10;          // Threshold for marking a loop as hot
