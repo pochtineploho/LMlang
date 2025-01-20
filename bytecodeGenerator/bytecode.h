@@ -46,10 +46,11 @@ enum class Bytecode {
     // Functionality
     Print = 20,     // 20: Print the top of the stack to the console
     Call = 21,     // 21: Call function
+    Return = 22,  // 22: Return from function
 
     // Special markers
-    NoOp = 22,      // 22: No operation
-    Halt = 23       // 23: Halt the program
+    NoOp = 23,      // 23: No operation
+    Halt = 24       // 24: Halt the program
 };
 
 // Primitive type IDs for variable handling (optional, for LLVM translation)

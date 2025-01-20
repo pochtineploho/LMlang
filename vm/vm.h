@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <stack>
 #include "boehmGC/bdwgc/include/gc/gc.h"
+#include "../bytecodeGenerator/bytecode.h"
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
@@ -49,25 +50,28 @@ public:
     }
 };
 
-/// Function class - Представление функции в VM
 class Function {
-public:
     std::string Name;
-    std::vector<int> Bytecode; // Bytecode instructions
-    size_t EntryPoint;         // Entry point in bytecode
-    std::vector<std::string> Args;
+    std::vector<std::pair<std::string, std::string>> Args;
+    std::string ReturnType;
+    int BytecodeAddress;
 
-    Function(const std::string &name, const std::vector<std::string> &args, size_t entry)
-            : Name(name), EntryPoint(entry), Args(args) {}
+public:
+    Function(const std::string &name,
+             const std::vector<std::pair<std::string, std::string>> &args,
+             const std::string &returnType,
+             int bytecodeAddress)
+            : Name(name), Args(args), ReturnType(returnType), BytecodeAddress(bytecodeAddress) {}
 
-    void EmitBytecode(const std::vector<int> &bytecode) {
-        Bytecode.insert(Bytecode.end(), bytecode.begin(), bytecode.end());
+    const std::string &GetName() const {
+        return Name;
     }
 
-    const std::vector<int> &GetBytecode() const {
-        return Bytecode;
+    const int &GetAddress() const {
+        return BytecodeAddress;
     }
 };
+
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
@@ -84,61 +88,92 @@ public:
 };
 
 /// Виртуальная машина для исполнения байткода.
-/// Виртуальная машина для исполнения байткода.
 class VM {
 public:
-    /// Байткод-инструкции
-    enum Bytecode {
-        Push,       // Загрузка значения в стек
-        Pop,        // Удаление значения из стека
-        Add,        // Сложение
-        Subtract,   // Вычитание
-        Multiply,   // Умножение
-        Divide,     // Деление
-        StoreVar,   // Сохранение переменной
-        LoadVar,    // Загрузка переменной
-        Call,       // Вызов функции
-        Jump,       // Безусловный переход
-        JumpIfFalse,// Переход, если условие ложно
-        LessOrEqual // Оператор <=
-    };
+//    /// Байткод-инструкции
+//    enum Bytecode {
+//        Push,       // Загрузка значения в стек
+//        Pop,        // Удаление значения из стека
+//        Add,        // Сложение
+//        Subtract,   // Вычитание
+//        Multiply,   // Умножение
+//        Divide,     // Деление
+//        StoreVar,   // Сохранение переменной
+//        LoadVar,    // Загрузка переменной
+//        Call,       // Вызов функции
+//        Jump,       // Безусловный переход
+//        JumpIfFalse,// Переход, если условие ложно
+//        LessOrEqual // Оператор <=
+//    };
 
     /// Конструктор
-    VM() : gc(), context(), module("jit_module", context), builder(context) {
+    VM() : gc(), context(), module("jit_module", context), builder(context) { // TODO: Настроить подключение к LLVM и дать инструкции, откуда его качать
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
         llvm::InitializeNativeTargetAsmParser();
     }
 
     /// Выполнение байткода
-    void Execute(const std::vector<int> &bytecode) {
+    void Execute(const std::vector<uint8_t> &bytecode) {
         size_t pc = 0; // Программный счётчик
         while (pc < bytecode.size()) {
             Bytecode instruction = static_cast<Bytecode>(bytecode[pc++]);
-            switch (instruction) {
-                case Push: {
+
+            if (instruction == Bytecode::Jump || instruction == Bytecode::JumpIfFalse) { // TODO: Вычленить кусок байткода с циклом и отправить в функцию
+                LoopCounters[pc]++;
+                if (LoopCounters[pc] > HotLoopThreshold) {
+                    std::cout << "Hot loop detected at PC: " << pc << std::endl;
+                    JITCompile(bytecode); // Compile hot loop
+                    break; // Exit execution to use optimized code
+                }
+            }
+
+            switch (instruction) { // TODO: Дописать обработку инструкций
+                case Bytecode::Push: {
                     int value = bytecode[pc++];
                     stack.push(Value(value));
                     break;
                 }
-                case Pop: {
+                case Bytecode::Pop: {
                     stack.pop();
                     break;
                 }
-                case Add: {
+                case Bytecode::Add: {
                     auto rhs = stack.top(); stack.pop();
                     auto lhs = stack.top(); stack.pop();
                     stack.push(Value(lhs.Data.IntVal + rhs.Data.IntVal));
                     break;
                 }
-                case StoreVar: {
+                case Bytecode::StoreVar: {
                     std::string name = GetStringFromPool(bytecode[pc++]);
                     variables[name] = stack.top();
                     break;
                 }
-                case LoadVar: {
+                case Bytecode::LoadVar: {
                     std::string name = GetStringFromPool(bytecode[pc++]);
                     stack.push(variables[name]);
+                    break;
+                }
+                case Bytecode::Call: {
+                    std::string funcName = GetStringFromPool(bytecode[pc++]); // Fetch function name
+                    int argCount = bytecode[pc++];                           // Fetch argument count
+
+                    // Look up function address (not shown in your example but assumed)
+                    int funcAddress = FunctionTable.find(funcName)->second.GetAddress();
+                    if (funcAddress == -1) {
+                        throw std::runtime_error("Undefined function: " + funcName);
+                    }
+
+                    stack.push(Value(static_cast<int>(pc)));// Push return address onto the call stack
+                    pc = funcAddress;    // Jump to function address
+                    break;
+                }
+                case Bytecode::Return: {
+                    if (stack.empty()) {
+                        throw std::runtime_error("Call stack underflow: Return without Call");
+                    }
+                    pc = stack.top().Int; // Set program counter to the return address
+                    stack.pop();      // Pop the return address
                     break;
                 }
                 default:
@@ -148,7 +183,7 @@ public:
     }
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<int> &bytecode) {
+    void JITCompile(const std::vector<uint8_t> &bytecode) {
         llvm::Function *jitFunc = llvm::Function::Create(
                 llvm::FunctionType::get(builder.getVoidTy(), false),
                 llvm::Function::ExternalLinkage,
@@ -207,6 +242,10 @@ public:
     }
 
 private:
+
+    std::unordered_map<int, int> LoopCounters; // Map to track loop instruction usage
+    const int HotLoopThreshold = 10;          // Threshold for marking a loop as hot
+
     GC gc; // Сборщик мусора
     std::stack<Value> stack; // Стек выполнения
     std::unordered_map<std::string, Value> variables; // Таблица переменных
@@ -217,6 +256,9 @@ private:
 
     /// Таблица строк для оптимизации хранения строк
     std::unordered_map<int, std::string> stringPool;
+
+
+    std::unordered_map<std::string, Function> FunctionTable;
 
     /// Получение строки из пула
     std::string GetStringFromPool(int id) {

@@ -8,6 +8,8 @@ public:
     virtual ~ExprAST() {}
     virtual Value *Codegen() = 0;
     virtual std::string GetType() const = 0; // Тип выражения
+protected:
+    byteCodeGener bCG;
 };
 
 /// NumberExprAST - Узел выражения для числовых литералов (double).
@@ -17,8 +19,8 @@ public:
     NumberExprAST(double val) : Val(val) {}
     virtual Value *Codegen() override {
         // Генерируем инструкцию Push для числа
-        EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
-        EmitDouble(Val); // Добавляем само число
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
+        bCG.EmitDouble(Val); // Добавляем само число
         return nullptr;
     }
     virtual std::string GetType() const override { return "double"; }
@@ -31,8 +33,8 @@ public:
     IntegerExprAST(int val) : Val(val) {}
     virtual Value *Codegen() override {
         // Генерируем инструкцию Push для целого числа
-        EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
-        EmitInt(Val); // Добавляем само число
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
+        bCG.EmitInt(Val); // Добавляем само число
         return nullptr;
     }
     virtual std::string GetType() const override { return "int"; }
@@ -45,8 +47,8 @@ public:
     StringExprAST(const std::string &val) : Val(val) {}
     virtual Value *Codegen() override {
         // Генерируем инструкцию Push для строки
-        EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
-        EmitString(Val); // Добавляем саму строку
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
+        bCG.EmitString(Val); // Добавляем саму строку
         return nullptr;
     }
     virtual std::string GetType() const override { return "string"; }
@@ -59,8 +61,8 @@ public:
     BoolExprAST(bool val) : Val(val) {}
     virtual Value *Codegen() override {
         // Генерируем инструкцию Push для булевого значения
-        EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
-        EmitBool(Val); // Добавляем значение true/false
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Push));
+        bCG.EmitBool(Val); // Добавляем значение true/false
         return nullptr;
     }
     virtual std::string GetType() const override { return "bool"; }
@@ -75,8 +77,8 @@ public:
             : Name(name), Type(type) {}
     virtual Value *Codegen() override {
         // Генерируем инструкцию LoadVar
-        EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
-        EmitString(Name); // Добавляем имя переменной
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
+        bCG.EmitString(Name); // Добавляем имя переменной
         return nullptr;
     }
     virtual std::string GetType() const override { return Type; }
@@ -96,10 +98,10 @@ public:
 
         // Генерируем инструкцию для операции
         switch (Op) {
-            case '+': EmitBytecode(static_cast<uint8_t>(Bytecode::Add)); break;
-            case '-': EmitBytecode(static_cast<uint8_t>(Bytecode::Subtract)); break;
-            case '*': EmitBytecode(static_cast<uint8_t>(Bytecode::Multiply)); break;
-            case '/': EmitBytecode(static_cast<uint8_t>(Bytecode::Divide)); break;
+            case '+': bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Add)); break;
+            case '-': bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Subtract)); break;
+            case '*': bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Multiply)); break;
+            case '/': bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Divide)); break;
             default: throw std::runtime_error("Unknown binary operator");
         }
         return nullptr;
@@ -122,9 +124,9 @@ public:
             Arg->Codegen();
         }
         // Генерируем инструкцию вызова функции
-        EmitBytecode(static_cast<uint8_t>(Bytecode::Call));
-        EmitString(Callee); // Добавляем имя функции
-        EmitInt(Args.size()); // Добавляем количество аргументов
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Call));
+        bCG.EmitString(Callee); // Добавляем имя функции
+        bCG.EmitInt(Args.size()); // Добавляем количество аргументов
         return nullptr;
     }
     virtual std::string GetType() const override { return "unknown"; }
@@ -140,21 +142,21 @@ public:
         Cond->Codegen(); // Генерируем условие
 
         // Генерируем JumpIfFalse для ветки Else
-        EmitBytecode(static_cast<uint8_t>(Bytecode::JumpIfFalse));
-        int ElseJumpPos = ReserveJump();
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::JumpIfFalse));
+        int ElseJumpPos = bCG.ReserveJump();
 
         Then->Codegen(); // Генерируем Then
 
         // Генерируем Jump для выхода из ветвления
-        EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
-        int EndJumpPos = ReserveJump();
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
+        int EndJumpPos = bCG.ReserveJump();
 
-        FixJump(ElseJumpPos); // Исправляем адрес Else
+        bCG.FixJump(ElseJumpPos); // Исправляем адрес Else
         if (Else) {
             Else->Codegen(); // Генерируем Else
         }
 
-        FixJump(EndJumpPos); // Исправляем адрес выхода
+        bCG.FixJump(EndJumpPos); // Исправляем адрес выхода
         return nullptr;
     }
     virtual std::string GetType() const override { return Then->GetType(); }
@@ -177,41 +179,41 @@ public:
     virtual Value *Codegen() override {
         // Генерируем начальное значение
         Start->Codegen();
-        EmitBytecode(static_cast<uint8_t>(Bytecode::StoreVar));
-        EmitString(VarName);
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::StoreVar));
+        bCG.EmitString(VarName);
 
         // Метка начала цикла
-        int LoopStartPos = CurrentBytecodePosition();
+        int LoopStartPos = bCG.CurrentBytecodePosition();
 
         // Генерируем условие
-        EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
-        EmitString(VarName);
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
+        bCG.EmitString(VarName);
         End->Codegen();
-        EmitBytecode(static_cast<uint8_t>(Bytecode::LessOrEqual));
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::LessOrEqual));
 
         // Генерируем JumpIfFalse для выхода из цикла
-        EmitBytecode(static_cast<uint8_t>(Bytecode::JumpIfFalse));
-        int ExitJumpPos = ReserveJump();
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::JumpIfFalse));
+        int ExitJumpPos = bCG.ReserveJump();
 
         // Генерируем тело цикла
         Body->Codegen();
 
         // Генерируем шаг
         if (Step) {
-            EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
-            EmitString(VarName);
+            bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
+            bCG.EmitString(VarName);
             Step->Codegen();
-            EmitBytecode(static_cast<uint8_t>(Bytecode::Add));
-            EmitBytecode(static_cast<uint8_t>(Bytecode::StoreVar));
-            EmitString(VarName);
+            bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Add));
+            bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::StoreVar));
+            bCG.EmitString(VarName);
         }
 
         // Переход в начало цикла
-        EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
-        EmitJump(LoopStartPos);
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
+        bCG.EmitJump(LoopStartPos);
 
         // Исправляем адрес выхода
-        FixJump(ExitJumpPos);
+        bCG.FixJump(ExitJumpPos);
         return nullptr;
     }
     virtual std::string GetType() const override { return "void"; }
@@ -222,28 +224,28 @@ class PrototypeAST {
     std::string Name;
     std::vector<std::pair<std::string, std::string>> Args; // (Имя, Тип)
     std::string ReturnType;
+    byteCodeGener bCG;
 
 public:
     PrototypeAST(const std::string &name,
                  const std::vector<std::pair<std::string, std::string>> &args,
-                 const std::string &returnType)
-            : Name(name), Args(args), ReturnType(returnType) {}
+                 const std::string &returnType,
+                 const byteCodeGener bCG)
+            : Name(name), Args(args), ReturnType(returnType), bCG(bCG) {}
 
     /// Generate function prototype bytecode
     Function *Codegen() {
-        // Emit function signature for the virtual machine
-        std::vector<int> bytecode;
-
+        int funcAddress = bCG.CurrentBytecodePosition();
         // Emit function declaration as `Function` instruction
-        EmitFunctionStart(bytecode, Name);
+        bCG.EmitFunctionStart(Name);
 
         // Emit arguments (variable declarations for VM)
         for (const auto &[argName, argType] : Args) {
-            EmitVariableDeclaration(bytecode, argName, argType);
+            bCG.EmitVariableDeclaration(argName, argType);
         }
 
         // Return the generated Function object
-        return new Function(Name, Args, ReturnType, bytecode);
+        return new Function(Name, Args, ReturnType, funcAddress);
     }
 };
 
@@ -251,13 +253,14 @@ public:
 class FunctionAST {
     PrototypeAST *Proto;
     ExprAST *Body;
+    byteCodeGener bCG;
 
 public:
     FunctionAST(PrototypeAST *proto, ExprAST *body)
             : Proto(proto), Body(body) {}
 
     /// Generate function body bytecode
-    Function *Codegen() {
+    Function *Codegen() { // TODO: Написать оператора, который будет вызывать Codegen
         // Generate prototype bytecode
         Function *function = Proto->Codegen();
         if (!function) {
@@ -266,11 +269,11 @@ public:
 
         // Generate body bytecode and append to function bytecode
         if (Body) {
-            Body->Emit(function->bytecode);
+            Body->Codegen();
         }
 
         // Emit function end instruction
-        EmitFunctionEnd(function->bytecode);
+        bCG.EmitFunctionEnd();
 
         return function;
     }
