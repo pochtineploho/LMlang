@@ -9,7 +9,7 @@ parameterList: parameter (COMMA parameter)*;
 parameter: type ID;
 
 type: primitiveType | type LBRACK INT RBRACK;
-primitiveType: 'int' | 'double' | 'char' | 'bool';
+primitiveType: 'int' | 'double' | 'char' | 'bool' | 'string';
 
 block: LBRACE statement* RBRACE;
 
@@ -56,6 +56,7 @@ primaryExpression:
     | DOUBLE
     | CHAR
     | BOOL
+    | STRING
     | LPAREN expression RPAREN
     | arrayInit;
 
@@ -80,6 +81,7 @@ BOOL: 'true' | 'false';
 INT: [0-9]+;
 DOUBLE: [0-9]+ DOT [0-9]*;
 CHAR: '\'' . '\'';
+STRING: '"' ( ~['"'] | '""' )* '"';
 ID: [a-zA-Z_][a-zA-Z_0-9]*;
 
 NEG: '--';

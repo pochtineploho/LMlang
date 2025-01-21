@@ -23,6 +23,9 @@ set(SOURCES
         gcMemoryManager/gcMemoryManager.cpp
         vm/vm.cpp
         main.cpp
+        grammar/ASTNode.h
+        grammar/ASTBuilder.h
+        grammar/ASTBuilder.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
