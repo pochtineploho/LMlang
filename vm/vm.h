@@ -11,17 +11,19 @@
 #include <vector>
 #include <unordered_map>
 #include <stack>
-#include "boehmGC/bdwgc/include/gc/gc.h"
+#include "gc/gc.h"
 #include "../bytecodeGenerator/bytecode.h"
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
-#include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/ExecutionEngine/MCJIT.h>
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Support/InitLLVM.h>
-#include <llvm/Support/raw_ostream.h>
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/MCJIT.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/InitLLVM.h"
+#include "llvm/Support/raw_ostream.h"
 #include <memory>
 
+using namespace std;
 /// Тип Value для хранения данных виртуальной машины.
 class Value {
 public:
@@ -197,13 +199,13 @@ public:
         while (pc < bytecode.size()) {
             Bytecode instruction = static_cast<Bytecode>(bytecode[pc++]);
             switch (instruction) {
-                case Push: {
+                case Bytecode::Push: {
                     int value = bytecode[pc++];
                     llvm::Value *llvmValue = llvm::ConstantInt::get(context, llvm::APInt(32, value));
                     stack.push(Value(value));
                     break;
                 }
-                case Add: {
+                case Bytecode::Add: {
                     auto rhs = stack.top(); stack.pop();
                     auto lhs = stack.top(); stack.pop();
 

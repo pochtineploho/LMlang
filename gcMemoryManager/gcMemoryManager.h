@@ -2,7 +2,7 @@
 // Created by admin on 18.01.2025.
 //
 
-#include "boehmGC/bdwgc/include/gc/gc.h"
+#include "gc/gc.h"
 
 #ifndef MYANTLRPROJECT_GC_H
 #define MYANTLRPROJECT_GC_H
