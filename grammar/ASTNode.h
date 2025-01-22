@@ -203,6 +203,11 @@ public:
     rhs(std::move(rhs)) {}
 
     [[nodiscard]]
+    std::string getTypeName() const override {
+        return "AssignmentNode";
+    }
+
+    [[nodiscard]]
     ASTNodePtr getLhs() const {
         return lhs;
     }
@@ -246,6 +251,11 @@ public:
     values(std::move(values)) {}
 
     [[nodiscard]]
+    std::string getTypeName() const override {
+        return "ArrayInitializerNode";
+    }
+
+    [[nodiscard]]
     std::vector<ASTNodePtr> getValues() const {
         return values;
     }
@@ -266,6 +276,11 @@ public:
     ArrayAccessNode(ASTNodePtr index, ASTNodePtr array) :
     index(std::move(index)),
     array(std::move(array)) {}
+
+    [[nodiscard]]
+    std::string getTypeName() const override {
+        return "ArrayAccessNode";
+    }
 
     [[nodiscard]]
     ASTNodePtr getIndex() const {
@@ -429,6 +444,11 @@ public:
     explicit ReturnNode(ASTNodePtr returnExpression) : returnExpression(std::move(returnExpression)) {}
 
     [[nodiscard]]
+    std::string getTypeName() const override {
+        return "ReturnNode";
+    }
+
+    [[nodiscard]]
     ASTNodePtr getReturnExpression() const {
         return returnExpression;
     }
@@ -559,6 +579,11 @@ class PrintNode : public ASTNode {
     ASTNodePtr expression;
 public:
     explicit PrintNode(ASTNodePtr expression) : expression(std::move(expression)) {}
+
+    [[nodiscard]]
+    std::string getTypeName() const override {
+        return "PrintNode";
+    }
 
     void setExpression(ASTNodePtr expression) {
         this->expression = std::move(expression);
