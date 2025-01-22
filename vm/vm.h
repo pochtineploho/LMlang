@@ -17,6 +17,7 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/ExecutionEngine/MCJIT.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/InitLLVM.h"
@@ -230,7 +231,7 @@ public:
 
         // Optimize and prepare the function for execution
         std::string errStr;
-        llvm::ExecutionEngine *execEngine = llvm::EngineBuilder(std::make_unique<llvm::Module>(module))
+        llvm::ExecutionEngine *execEngine = llvm::EngineBuilder(std::make_unique<llvm::Module>("jit_module", context))
                 .setErrorStr(&errStr)
                 .setEngineKind(llvm::EngineKind::JIT)
                 .create();
@@ -240,7 +241,8 @@ public:
         }
 
         execEngine->finalizeObject();
-        execEngine->runFunction(jitFunc, {});
+        auto arrRef = llvm::ArrayRef<llvm::GenericValue>();
+        execEngine->runFunction(jitFunc, arrRef);
     }
 
 private:  // TODO: Написать Array table и подержку массивов
