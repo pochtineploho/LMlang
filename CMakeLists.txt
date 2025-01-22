@@ -5,9 +5,11 @@ project(MyANTLRProject)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-find_library(GC_LIB
-        NAMES gc bdwgc GC
-        PATHS "D:\\1_5sem\\ПиСВЯП\\LMLang\\LMlang\\lib\\boehmGC\\bdwgc")
+#find_library(GC_LIB
+#        NAMES gc bdwgc GC
+#         ".\\lib\\boehmGC\\bdwgc\\")
+
+find_package(BDWgc 8.2.0 REQUIRED PATHS "D://1_5sem//PISVJAP//boehmGC//bdwgcInstall")
 
 include_directories(${CMAKE_SOURCE_DIR}/lib)
 
@@ -27,10 +29,10 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+target_link_libraries(${PROJECT_NAME} PRIVATE antlr4-runtime BDWgc::gc)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${GC_LIB} antlr4-runtime)
 
-find_package(LLVM REQUIRED CONFIG PATHS "")
+find_package(LLVM REQUIRED CONFIG PATHS "D:\\1_5sem\\PISVJAP\\LLVM\\build")
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
@@ -45,7 +47,8 @@ add_definitions(${LLVM_DEFINITIONS})
 
 # Find the libraries that correspond to the LLVM components
 # that we wish to use
-llvm_map_components_to_libnames(llvm_libs support core irreader)
+#llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against LLVM libraries
-target_link_libraries(${PROJECT_NAME} ${llvm_libs})
+#target_link_libraries(${PROJECT_NAME} PRIVATE ${GC_LIB})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${llvm_libs})
