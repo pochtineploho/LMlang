@@ -21,7 +21,7 @@ std::any ASTBuilder::visitFunctionDecl(LMlangGrammarParser::FunctionDeclContext 
     auto functionNode = std::make_shared<FunctionNode>(returnType, name);
     std::vector<ASTNodePtr> arguments;
     if (context->parameterList()) {
-        for (const auto &param: context->parameterList()) {
+        for (const auto &param: context->parameterList()->children) {
             auto argumentNode = std::any_cast<ASTNodePtr>(visit(param));
             arguments.push_back(argumentNode);
         }
@@ -185,8 +185,6 @@ std::any ASTBuilder::visitPrimaryExpression(LMlangGrammarParser::PrimaryExpressi
     if (context->BOOL()) {
         return std::make_shared<BooleanNode>(context->BOOL()->getText() == "true");
     }
-
-    if ()
 
     if (context->ID()) {
         return std::make_shared<IdentifierNode>(context->ID()->getText());
