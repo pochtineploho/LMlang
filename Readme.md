@@ -66,6 +66,8 @@ find_package(BDWgc 8.2.0 REQUIRED PATHS "D://1_5sem//PISVJAP//boehmGC//bdwgcInst
 
 Antlr4:-----------------------------------------------------------------------------------------
 
+В папке: D:/1_5sem/PISVJAP/antlr4/
+
 git clone https://github.com/antlr/antlr4
 
 mkdir install

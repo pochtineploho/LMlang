@@ -43,30 +43,14 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# Set your project compile flags.
-# E.g. if using the C++ header files
-# you will need to enable C++11 support
-# for your compiler.
+
 
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-# Find the libraries that correspond to the LLVM components
-# that we wish to use
+
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
-# Link against LLVM libraries
-#if (antlr4-runtime_FOUND)
-#    target_include_directories(${PROJECT_NAME} PRIVATE ${antlr4-runtime_INCLUDE_DIRS})
-#    target_link_libraries(${PROJECT_NAME} PRIVATE ${antlr4-runtime_LIBRARIES})
-#else()
-#    message(FATAL_ERROR "Antlr4 runtime package not found!")
-#endif()
-
-
-#target_include_directories(${PROJECT_NAME} PRIVATE "D:/1_5sem/PISVJAP/antlr4/install/include/antlr4-runtime")
-
 target_link_libraries(${PROJECT_NAME} PRIVATE antlr4-runtime)
-#target_link_libraries(${PROJECT_NAME} PRIVATE "D:/1_5sem/PISVJAP/antlr4/install/lib/antlr4-runtime.lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE BDWgc::gc)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${llvm_libs})
