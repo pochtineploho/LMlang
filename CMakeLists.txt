@@ -11,8 +11,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(BDWgc 8.2.0 REQUIRED PATHS "D://1_5sem//PISVJAP//boehmGC//bdwgcInstall")
 
+#find_library(ANTLR4_RUNTIME_LIB NAMES antlr4-runtime PATHS "D://1_5sem//PISVJAP//antlr4//install//lib")
+#if (NOT ANTLR4_RUNTIME_LIB)
+#    message(FATAL_ERROR "antlr4-runtime library not found")
+#endif()
+find_package(antlr4-runtime REQUIRED CONFIG PATHS "D:\\1_5sem\\PISVJAP\\antlr4\\install\\")
+
+if (antlr4-runtime_FOUND)
+    message(STATUS "Antlr4 runtime include directories: ${antlr4-runtime_INCLUDE_DIRS}")
+    message(STATUS "Antlr4 runtime libraries: ${antlr4-runtime_LIBRARIES}")
+else()
+    message(FATAL_ERROR "Antlr4 runtime package not found!")
+endif()
+
+find_package(LLVM REQUIRED CONFIG PATHS "D:\\1_5sem\\PISVJAP\\LLVM\\clang+llvm-19.1.0-x86_64-pc-windows-msvc\\")
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
 include_directories(${CMAKE_SOURCE_DIR}/lib)
 
+#link_directories("D:/1_5sem/PISVJAP/antlr4/install/lib")
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 set(SOURCES
@@ -32,14 +51,7 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE antlr4-runtime BDWgc::gc)
-
-
-find_package(LLVM REQUIRED CONFIG PATHS "D:\\1_5sem\\PISVJAP\\LLVM\\clang+llvm-19.1.0-x86_64-pc-windows-msvc\\")
-
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-
+include_directories("D:/1_5sem/PISVJAP/antlr4/install/include")
 # Set your project compile flags.
 # E.g. if using the C++ header files
 # you will need to enable C++11 support
@@ -50,8 +62,14 @@ add_definitions(${LLVM_DEFINITIONS})
 
 # Find the libraries that correspond to the LLVM components
 # that we wish to use
-#llvm_map_components_to_libnames(llvm_libs support core irreader)
+llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against LLVM libraries
-#target_link_libraries(${PROJECT_NAME} PRIVATE ${GC_LIB})
+#target_link_libraries(${PROJECT_NAME} PRIVATE ${ANTLR4_RUNTIME_LIB})
+if (antlr4-runtime_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${antlr4-runtime_INCLUDE_DIRS})
+endif()
+#target_link_libraries(${PROJECT_NAME} PRIVATE antlr4-runtime)
+#target_link_libraries(${PROJECT_NAME} PRIVATE "D://1_5sem//PISVJAP//antlr4//install//lib//antlr4-runtime.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE BDWgc::gc)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${llvm_libs})

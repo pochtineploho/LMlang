@@ -1,6 +1,5 @@
-#include "../bytecodeGenerator/bytecode.h"
 #include "../vm/vm.h"
-#include "../bytecodeGenerator/byteCodeGener.h"
+
 
 /// ExprAST - Базовый класс для всех узлов выражений.
 class ExprAST {

@@ -2,6 +2,8 @@
 // Created by admin on 18.01.2025.
 //
 
+#pragma once
+
 #ifndef MYANTLRPROJECT_BYTECODEGENER_H
 #define MYANTLRPROJECT_BYTECODEGENER_H
 
@@ -12,6 +14,7 @@
 #include <unordered_map>
 #include <cstdint>
 #include <iostream>
+
 #include "bytecode.h"
 
 class byteCodeGener {

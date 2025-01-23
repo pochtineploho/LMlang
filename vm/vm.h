@@ -1,7 +1,7 @@
 //
 // Created by admin on 18.01.2025.
 //
-
+#pragma once
 #ifndef MYANTLRPROJECT_VM_H
 #define MYANTLRPROJECT_VM_H
 
@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <stack>
 #include "gc/gc.h"
-#include "../bytecodeGenerator/bytecode.h"
+#include "../bytecodeGenerator/byteCodeGener.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"

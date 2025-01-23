@@ -60,11 +60,7 @@ cd bdwgc
 
 mkdir build && cd build
 
-cmake -DCMAKE_PREFIX_PATH=D:/path/to/install/libatomic .. - это папка для бинарей libatomic
-
-cmake --build .
-
-cmake -DCMAKE_INSTALL_PREFIX=D:/path/to/install/bdwgc
+cmake -DCMAKE_PREFIX_PATH=D:/path/to/install/libatomic -DCMAKE_INSTALL_PREFIX=D:/path/to/install/bdwgc .. - это папка для бинарей libatomic
 
 cmake --build . --target install
 
