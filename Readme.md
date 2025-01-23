@@ -64,6 +64,28 @@ cmake --build . --target install
 
 find_package(BDWgc 8.2.0 REQUIRED PATHS "D://1_5sem//PISVJAP//boehmGC//bdwgcInstall") - это как раз D:/path/to/install/bdwgc
 
+Antlr4:-----------------------------------------------------------------------------------------
+
+git clone https://github.com/antlr/antlr4
+
+mkdir install
+
+mkdir build && cd build
+
+cmake -DCMAKE_INSTALL_PREFIX=D:/1_5sem/PISVJAP/antlr4/install -DCMAKE_BUILD_TYPE=Debug -DANTLR4_INSTALL=ON D:/1_5sem/PISVJAP/antlr4/antlr4/runtime/Cpp - это папка сурс файлов с CmakeLists.txt
+
+cmake --build . --target install
+
+Подвязываете в CmakeLists:
+
+Пуллите/Копируете CmakeLists.txt (ну или только то, что соотносится с antlr4)
+
+После этого папку antlr4 можно будет удалить из проекта
+
+Compiler(если дефолтный(скорее всего MinGW) не работает):-----------------------------------------------------------------------------------------
+
+В File > Settings > Build, Execution, Deployment > Toolchains находите(или добавляете если нет) Visual Studio и тащите её наверх, чтобы стала дефолтным компилятором
+
 P.S.---------------------------------------------------------------------------------------------
 
 Внимательно смотрите на пути установки и генерации бинарей! Если что-то будет не получаться - зовите.
