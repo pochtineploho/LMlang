@@ -23,8 +23,15 @@ include_directories("D:/1_5sem/PISVJAP/antlr4/install/lib")
 link_directories("D:/1_5sem/PISVJAP/antlr4/install/include/antlr4-runtime")
 link_directories("D:/1_5sem/PISVJAP/antlr4/install/lib")
 link_directories(${CMAKE_SOURCE_DIR}/lib)
+link_directories("C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\DIA SDK\\lib\\amd64")
 
 
+llvm_map_components_to_libnames(
+        llvm_libs
+        support
+        core
+        mcjit
+)
 
 set(SOURCES
         grammar/LMlangGrammarListener.cpp
@@ -49,7 +56,7 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 
-llvm_map_components_to_libnames(llvm_libs support core irreader)
+
 
 target_link_libraries(${PROJECT_NAME} PRIVATE antlr4-runtime)
 target_link_libraries(${PROJECT_NAME} PRIVATE BDWgc::gc)

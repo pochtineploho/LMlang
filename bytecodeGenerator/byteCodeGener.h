@@ -17,7 +17,7 @@
 
 #include "bytecode.h"
 
-class byteCodeGener {
+class byteCodeGener { ///TODO: возможно не хватает функции для генерации массивов
     // Простой поток байткода
     std::vector<uint8_t> BytecodeStream;
 

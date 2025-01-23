@@ -131,7 +131,7 @@ public:
                 }
             }
 
-            switch (instruction) { // TODO: Дописать обработку инструкций
+            switch (instruction) { // TODO: Дописать обработку оставшихся инструкций(смотри bytecode.h)
                 case Bytecode::Push: {
                     int value = bytecode[pc++];
                     stack.push(Value(value));
@@ -199,7 +199,7 @@ public:
         size_t pc = 0;
         while (pc < bytecode.size()) {
             Bytecode instruction = static_cast<Bytecode>(bytecode[pc++]);
-            switch (instruction) {
+            switch (instruction) { /// TODO: дописать трансляцию для всех инструкций bytecode.h
                 case Bytecode::Push: {
                     int value = bytecode[pc++];
                     llvm::Value *llvmValue = llvm::ConstantInt::get(context, llvm::APInt(32, value));
