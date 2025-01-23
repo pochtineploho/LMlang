@@ -44,11 +44,7 @@ cd libatomic_ops
 
 mkdir build && cd build
 
-cmake ..
-
-cmake --build .
-
-cmake -DCMAKE_INSTALL_PREFIX=D:/path/to/install/libatomic .. - это папка для бинарей
+cmake -DCMAKE_INSTALL_PREFIX=D:/path/to/install/libatomic .. - это папка для бинарей libatomic
 
 cmake --build . --target install
 
