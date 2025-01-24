@@ -157,16 +157,103 @@ public:
                     stack.push(Value(value));
                     break;
                 }
+
                 case Bytecode::Pop: {
                     stack.pop();
                     break;
                 }
+
                 case Bytecode::Add: {
                     auto rhs = stack.top(); stack.pop();
                     auto lhs = stack.top(); stack.pop();
-                    stack.push(Value(lhs.Data.IntVal + rhs.Data.IntVal));
+                    stack.emplace(lhs.Data.IntVal + rhs.Data.IntVal);
                     break;
                 }
+
+                case Bytecode::Subtract: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal - rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::Multiply: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal * rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::Divide: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal / rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::And: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal && rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::Or: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal || rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::Not: {
+                    auto value = stack.top(); stack.pop();
+                    if (value.Type != Value::Bool) {
+                        throw std::runtime_error("Unsupported type for logical NOT. Expected Bool.");
+                    }
+                    stack.emplace(!value.Data.BoolVal);
+                    break;
+                }
+
+                case Bytecode::Equal: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal == rhs.Data.IntVal);
+                }
+
+                case Bytecode::NotEqual: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal != rhs.Data.IntVal);
+                }
+
+                case Bytecode::GreaterThan: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal > rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::GreaterOrEqual: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal >= rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::LessThan: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal < rhs.Data.IntVal);
+                    break;
+                }
+
+                case Bytecode::LessOrEqual: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+                    stack.emplace(lhs.Data.IntVal <= rhs.Data.IntVal);
+                    break;
+                }
+
                 case Bytecode::LoadVar: {
                     int stringID = bytecode[pc++];
                     std::string varName = GetStringByID(stringID);
@@ -197,7 +284,7 @@ public:
                         throw std::runtime_error("Undefined function: " + funcName);
                     }
 
-                    stack.push(Value(static_cast<int>(pc)));// Push return address onto the call stack
+                    stack.emplace(static_cast<int>(pc));// Push return address onto the call stack
                     pc = funcAddress;    // Jump to function address
                     break;
                 }
@@ -225,6 +312,50 @@ public:
                     int index = stack.top().Data.IntVal; stack.pop();
                     int arrayID = stack.top().Data.IntVal; stack.pop();
                     ArrayTable[arrayID][index] = value;
+                    break;
+                }
+
+                case Bytecode::DeleteArray: {
+                    int index = stack.top().Data.IntVal; stack.pop();
+                    int arrayID = stack.top().Data.IntVal; stack.pop();
+                    if (ArrayTable.find(arrayID) != ArrayTable.end()) {
+                        auto& array = ArrayTable[arrayID];
+                        if (index >= 0 && index < array.size()) {
+                            array.erase(array.begin() + index);
+                        } else {
+                            throw std::out_of_range("Invalid index for DeleteArray operation");
+                        }
+
+                        if (array.empty()) {
+                            ArrayTable.erase(arrayID);
+                        }
+                    } else {
+                        throw std::runtime_error("Array with the given ID does not exist");
+                    }
+                }
+
+                case Bytecode::Jump: {
+                    auto value = stack.top(); stack.pop();
+                    pc = stack.top().Data.IntVal;
+                    break;
+                }
+
+                case Bytecode::JumpIfFalse: {
+                    auto value = stack.top(); stack.pop();
+                    if (!stack.top().Data.BoolVal) {
+                        pc = stack.top().Data.IntVal;
+                    }
+                }
+
+                case Bytecode::JumpIfTrue: {
+                    auto value = stack.top(); stack.pop();
+                    if (stack.top().Data.BoolVal) {
+                        pc = stack.top().Data.IntVal;
+                    }
+                }
+
+                case Bytecode::NoOp: {
+                    pc++;
                     break;
                 }
 
