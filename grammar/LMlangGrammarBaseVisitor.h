@@ -51,6 +51,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitForStatement(LMlangGrammarParser::ForStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitForInit(LMlangGrammarParser::ForInitContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitVarDecl(LMlangGrammarParser::VarDeclContext *ctx) override {
     return visitChildren(ctx);
   }

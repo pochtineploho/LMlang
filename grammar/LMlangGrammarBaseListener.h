@@ -43,6 +43,12 @@ public:
   virtual void enterStatement(LMlangGrammarParser::StatementContext * /*ctx*/) override { }
   virtual void exitStatement(LMlangGrammarParser::StatementContext * /*ctx*/) override { }
 
+  virtual void enterForStatement(LMlangGrammarParser::ForStatementContext * /*ctx*/) override { }
+  virtual void exitForStatement(LMlangGrammarParser::ForStatementContext * /*ctx*/) override { }
+
+  virtual void enterForInit(LMlangGrammarParser::ForInitContext * /*ctx*/) override { }
+  virtual void exitForInit(LMlangGrammarParser::ForInitContext * /*ctx*/) override { }
+
   virtual void enterVarDecl(LMlangGrammarParser::VarDeclContext * /*ctx*/) override { }
   virtual void exitVarDecl(LMlangGrammarParser::VarDeclContext * /*ctx*/) override { }
 

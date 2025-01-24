@@ -4,6 +4,8 @@
 
 #ifndef ASTBUILDER_H
 #define ASTBUILDER_H
+#include <any>
+
 #include "LMlangGrammarVisitor.h"
 
 class ASTBuilder : public LMlangGrammarVisitor {
@@ -35,6 +37,10 @@ public:
     std::any visitAssignment(LMlangGrammarParser::AssignmentContext *context) override;
 
     std::any visitIfStatement(LMlangGrammarParser::IfStatementContext *context) override;
+
+    virtual std::any visitForStatement(LMlangGrammarParser::ForStatementContext *context) = 0;
+
+    virtual std::any visitForInit(LMlangGrammarParser::ForInitContext *context) = 0;
 
     std::any visitBreakStatement(LMlangGrammarParser::BreakStatementContext *context) override;
 
