@@ -47,11 +47,8 @@ public:
   virtual void enterForInit(LMlangGrammarParser::ForInitContext *ctx) = 0;
   virtual void exitForInit(LMlangGrammarParser::ForInitContext *ctx) = 0;
 
-  virtual void enterForIncrement(LMlangGrammarParser::ForIncrementContext *ctx) = 0;
-  virtual void exitForIncrement(LMlangGrammarParser::ForIncrementContext *ctx) = 0;
-
-  virtual void enterRangeClause(LMlangGrammarParser::RangeClauseContext *ctx) = 0;
-  virtual void exitRangeClause(LMlangGrammarParser::RangeClauseContext *ctx) = 0;
+  virtual void enterForPost(LMlangGrammarParser::ForPostContext *ctx) = 0;
+  virtual void exitForPost(LMlangGrammarParser::ForPostContext *ctx) = 0;
 
   virtual void enterVarDecl(LMlangGrammarParser::VarDeclContext *ctx) = 0;
   virtual void exitVarDecl(LMlangGrammarParser::VarDeclContext *ctx) = 0;

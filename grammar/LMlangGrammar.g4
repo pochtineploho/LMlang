@@ -29,19 +29,13 @@ statement:
     ;
 
 forStatement:
-    FOR LPAREN forInit? SEMI expression? SEMI forIncrement? RPAREN block  // Explicitly include block
-    | FOR LPAREN forInit? SEMI expression? SEMI forIncrement? RPAREN statement
-    | FOR rangeClause block                                                // Explicitly include block
-    | FOR rangeClause statement
-    | FOR expression block                                                 // Explicitly include block
+    FOR (LPAREN forInit? SEMI expression? SEMI forPost? RPAREN statement)
     | FOR expression statement
-    | FOR block                                                            // Explicitly include block
-    | FOR statement;
-
+    | FOR statement
+    ;
 
 forInit: varDecl | assignment | expression;
-forIncrement: expression;
-rangeClause: ID (COMMA ID)? RANGE expression;
+forPost: assignment | expression;
 
 varDecl: type ID (ASSIGN expression)?;
 assignment: assignable ASSIGN expression;

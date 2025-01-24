@@ -59,11 +59,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitForIncrement(LMlangGrammarParser::ForIncrementContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual std::any visitRangeClause(LMlangGrammarParser::RangeClauseContext *ctx) override {
+  virtual std::any visitForPost(LMlangGrammarParser::ForPostContext *ctx) override {
     return visitChildren(ctx);
   }
 

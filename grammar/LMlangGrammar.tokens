@@ -37,7 +37,6 @@ COMMA=36
 DOT=37
 WS=38
 COMMENT=39
-RANGE=40
 'int'=1
 'double'=2
 'char'=3
