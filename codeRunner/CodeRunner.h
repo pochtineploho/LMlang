@@ -42,7 +42,7 @@ byteCodeGener GetBytecodeGenerator(std::istream& input) {
 
     tree = parser.program();
 
-    ProgramNode programNode = std::any_cast<ProgramNode>(ASTBuilder().visitProgram(tree)));
+    ProgramNode programNode = std::any_cast<ProgramNode>(ASTBuilder().visitProgram(tree));
     byteCodeGener bytecodeGenerator;
     programNode.Codegen(bytecodeGenerator);
 

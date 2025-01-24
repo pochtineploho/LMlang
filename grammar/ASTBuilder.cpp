@@ -238,6 +238,25 @@ std::any ASTBuilder::visitAssignable(LMlangGrammarParser::AssignableContext *con
 }
 
 std::any ASTBuilder::visitForStatement(LMlangGrammarParser::ForStatementContext *context) {
+    if (context->rangeClause()) {
+        auto rangeClause = context->rangeClause();
+
+        std::optional<std::string> rangeVar1;
+        std::optional<std::string> rangeVar2;
+
+        if (rangeClause->ID(0)) {
+            rangeVar1 = rangeClause->ID(0)->getText();
+        }
+        if (rangeClause->ID(1)) {
+            rangeVar2 = rangeClause->ID(1)->getText();
+        }
+
+        auto rangeExpr = std::any_cast<ASTNodePtr>(visit(rangeClause->expression()));
+
+        auto body = std::any_cast<ASTNodePtr>(visit(context->block()));
+
+        return std::make_shared<ForNode>(rangeVar1, rangeVar2, rangeExpr, body);
+    }
     ASTNodePtr init = nullptr;
     if (context->forInit()) {
         init = std::any_cast<ASTNodePtr>(visit(context->forInit()));
@@ -248,14 +267,14 @@ std::any ASTBuilder::visitForStatement(LMlangGrammarParser::ForStatementContext 
         condition = std::any_cast<ASTNodePtr>(visit(context->expression()));
     }
 
-    ASTNodePtr post = nullptr;
-    if (context->forPost()) {
-        post = std::any_cast<ASTNodePtr>(visit(context->forPost()));
+    ASTNodePtr increment = nullptr;
+    if (context->forIncrement()) {
+        increment = std::any_cast<ASTNodePtr>(visit(context->forIncrement()));
     }
 
-    ASTNodePtr body = std::any_cast<ASTNodePtr>(visit(context->statement()));
+    auto body = std::any_cast<ASTNodePtr>(visit(context->block()));
 
-    return std::make_shared<ForNode>(init, condition, post, body);
+    return std::make_shared<ForNode>(init, condition, increment, body);
 }
 
 
