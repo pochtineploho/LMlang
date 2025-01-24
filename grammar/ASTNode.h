@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -510,16 +511,31 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ForNode : public ASTNode {
+    ASTNodePtr init;
     ASTNodePtr condition;
     ASTNodePtr increment;
-    ASTNodePtr step;
+    ASTNodePtr rangeExpr;
     ASTNodePtr body;
+    std::optional<std::string> rangeVar1;
+    std::optional<std::string> rangeVar2;
+
 public:
-    ForNode(ASTNodePtr condition, ASTNodePtr increment, ASTNodePtr step, ASTNodePtr body) : \
-    condition(std::move(condition)),
-    increment(std::move(increment)),
-    step(std::move(step)),
-    body(std::move(body)) {}
+    ForNode(ASTNodePtr init, ASTNodePtr condition, ASTNodePtr increment, ASTNodePtr body)
+        : init(std::move(init)),
+          condition(std::move(condition)),
+          increment(std::move(increment)),
+          rangeExpr(nullptr),
+          body(std::move(body)) {}
+
+    ForNode(const std::optional<std::string>& rangeVar1, const std::optional<std::string>& rangeVar2,
+            ASTNodePtr rangeExpr, ASTNodePtr body)
+        : init(nullptr),
+          condition(nullptr),
+          increment(nullptr),
+          rangeExpr(std::move(rangeExpr)),
+          rangeVar1(rangeVar1),
+          rangeVar2(rangeVar2),
+          body(std::move(body)) {}
 
     [[nodiscard]]
     std::string getTypeName() const override {
@@ -529,17 +545,32 @@ public:
     void print(int indent) const override {
         ASTNode::print(indent);
 
-        if (condition) {
-            std::cout << std::string(indent + 2, ' ') << "Condition: " << condition << "\n";
-        }
-
-        if (step) {
-            std::cout << std::string(indent + 2, ' ') << "Step: " << step << "\n";
+        if (rangeExpr) {
+            std::cout << std::string(indent + 2, ' ') << "Range For:\n";
+            if (rangeVar1) {
+                std::cout << std::string(indent + 4, ' ') << "RangeVar1: " << *rangeVar1 << "\n";
+            }
+            if (rangeVar2) {
+                std::cout << std::string(indent + 4, ' ') << "RangeVar2: " << *rangeVar2 << "\n";
+            }
+            std::cout << std::string(indent + 4, ' ') << "RangeExpr: " << rangeExpr << "\n";
+        } else {
+            std::cout << std::string(indent + 2, ' ') << "Classic For:\n";
+            if (init) {
+                std::cout << std::string(indent + 4, ' ') << "Init: " << init << "\n";
+            }
+            if (condition) {
+                std::cout << std::string(indent + 4, ' ') << "Condition: " << condition << "\n";
+            }
+            if (increment) {
+                std::cout << std::string(indent + 4, ' ') << "Increment: " << increment << "\n";
+            }
         }
 
         std::cout << std::string(indent + 2, ' ') << "Body: " << body << "\n";
     }
 };
+
 
 class BreakNode : public ASTNode {
 public:
