@@ -42,7 +42,7 @@ set(SOURCES
         grammar/LMlangGrammarBaseListener.cpp
         grammar/LMlangGrammarLexer.cpp
         grammar/LMlangGrammarBaseVisitor.cpp
-        AST_Vlad_version/AST.cpp
+        grammar/CustomErrorListener.cpp
         bytecodeGenerator/byteCodeGener.cpp
         gcMemoryManager/gcMemoryManager.cpp
         vm/vm.cpp

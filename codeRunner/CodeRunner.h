@@ -7,7 +7,9 @@
 #include "grammar/LMlangGrammarLexer.h"
 #include "grammar/ASTBuilder.h"
 #include "grammar/ASTNode.h"
+#include "grammar/ASTNode.h"
 #include "vm/vm.h"
+#include "grammar/CustomErrorListener.h"
 
 #ifndef MYANTLRPROJECT_CODERUNNER_H
 #define MYANTLRPROJECT_CODERUNNER_H
@@ -27,12 +29,17 @@ byteCodeGener GetBytecodeGenerator(std::istream& input) {
             "append"};
 
     LMlangGrammarParser::ProgramContext* tree;
+    auto* error_listener = new CustomErrorListener();
 
     antlr4::ANTLRInputStream inputStream(input);
     LMlangGrammarLexer lexer(&inputStream);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(error_listener);
 
     antlr4::CommonTokenStream tokens(&lexer);
     LMlangGrammarParser parser(&tokens);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(error_listener);
 
     tree = parser.program();
 
