@@ -126,8 +126,12 @@ public:
                 LoopCounters[pc]++;
                 if (LoopCounters[pc] > HotLoopThreshold) {
                     std::cout << "Hot loop detected at PC: " << pc << std::endl;
-                    JITCompile(bytecode); // Compile hot loop
-                    break; // Exit execution to use optimized code
+
+                    size_t loopStart = FindLoopStart(bytecode, pc); // loop start
+                    size_t loopEnd = FindLoopEnd(bytecode, pc); // loop end
+                    std::vector<uint8_t> loop = loopBytecode(bytecode, loopStart, loopEnd);
+                    JITCompile(loop);
+                    break;
                 }
             }
 
@@ -183,6 +187,35 @@ public:
                     throw std::runtime_error("Unknown instruction");
             }
         }
+    }
+
+    size_t FindLoopStart(const std::vector<uint8_t> &bytecode, size_t pc) {
+        size_t jumpTarget = bytecode[pc - 1];
+        return jumpTarget;
+    }
+
+    size_t FindLoopEnd(const std::vector<uint8_t> &bytecode, size_t pc) {
+        size_t loopEnd = pc;
+
+        while (loopEnd < bytecode.size()) {
+            Bytecode instruction = static_cast<Bytecode>(bytecode[loopEnd]);
+
+            if (instruction == Bytecode::Jump || instruction == Bytecode::JumpIfFalse) {
+                return loopEnd + 1;
+            }
+
+            loopEnd++;
+        }
+
+        return bytecode.size();
+    }
+
+    std::vector<uint8_t> loopBytecode(const std::vector<uint8_t> &bytecode, size_t loopStart, size_t jumpTarget) {
+        if (jumpTarget >= loopStart || loopStart >= bytecode.size()) {
+            throw std::runtime_error("Invalid loop bounds");
+        }
+
+        return std::vector<uint8_t>{bytecode.begin() + jumpTarget, bytecode.begin() + loopStart};
     }
 
     /// Трансляция в LLVM IR
