@@ -49,11 +49,8 @@ public:
   virtual void enterForInit(LMlangGrammarParser::ForInitContext * /*ctx*/) override { }
   virtual void exitForInit(LMlangGrammarParser::ForInitContext * /*ctx*/) override { }
 
-  virtual void enterForIncrement(LMlangGrammarParser::ForIncrementContext * /*ctx*/) override { }
-  virtual void exitForIncrement(LMlangGrammarParser::ForIncrementContext * /*ctx*/) override { }
-
-  virtual void enterRangeClause(LMlangGrammarParser::RangeClauseContext * /*ctx*/) override { }
-  virtual void exitRangeClause(LMlangGrammarParser::RangeClauseContext * /*ctx*/) override { }
+  virtual void enterForPost(LMlangGrammarParser::ForPostContext * /*ctx*/) override { }
+  virtual void exitForPost(LMlangGrammarParser::ForPostContext * /*ctx*/) override { }
 
   virtual void enterVarDecl(LMlangGrammarParser::VarDeclContext * /*ctx*/) override { }
   virtual void exitVarDecl(LMlangGrammarParser::VarDeclContext * /*ctx*/) override { }

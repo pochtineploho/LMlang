@@ -31,13 +31,17 @@ llvm_map_components_to_libnames(
         support
         core
         mcjit
-)
+        x86codegen
+        x86desc
+        x86info
+        x86asmparser)
 
 set(SOURCES
         grammar/LMlangGrammarListener.cpp
         grammar/LMlangGrammarParser.cpp
         grammar/LMlangGrammarBaseListener.cpp
         grammar/LMlangGrammarLexer.cpp
+        grammar/LMlangGrammarBaseVisitor.cpp
         AST_Vlad_version/AST.cpp
         bytecodeGenerator/byteCodeGener.cpp
         gcMemoryManager/gcMemoryManager.cpp
@@ -47,7 +51,6 @@ set(SOURCES
         grammar/ASTBuilder.h
         grammar/ASTBuilder.cpp
         codeRunner/CodeRunner.h
-        grammar/CustomErrorListener.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

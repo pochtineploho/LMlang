@@ -18,18 +18,18 @@ public:
     ID = 20, NEG = 21, MULT = 22, ADD = 23, COMPOP = 24, NOT = 25, AND = 26, 
     OR = 27, ASSIGN = 28, LPAREN = 29, RPAREN = 30, LBRACE = 31, RBRACE = 32, 
     LBRACK = 33, RBRACK = 34, SEMI = 35, COMMA = 36, DOT = 37, WS = 38, 
-    COMMENT = 39, RANGE = 40
+    COMMENT = 39
   };
 
   enum {
     RuleProgram = 0, RuleFunctionDecl = 1, RuleReturnType = 2, RuleParameterList = 3, 
     RuleParameter = 4, RuleType = 5, RulePrimitiveType = 6, RuleBlock = 7, 
-    RuleStatement = 8, RuleForStatement = 9, RuleForInit = 10, RuleForIncrement = 11, 
-    RuleRangeClause = 12, RuleVarDecl = 13, RuleAssignment = 14, RuleIfStatement = 15, 
-    RuleBreakStatement = 16, RuleContinueStatement = 17, RuleReturnStatement = 18, 
-    RulePrintStatement = 19, RuleExpression = 20, RulePrimaryExpression = 21, 
-    RuleArrayInit = 22, RuleArgumentList = 23, RuleArrayAccess = 24, RuleFunctionCall = 25, 
-    RuleAssignable = 26
+    RuleStatement = 8, RuleForStatement = 9, RuleForInit = 10, RuleForPost = 11, 
+    RuleVarDecl = 12, RuleAssignment = 13, RuleIfStatement = 14, RuleBreakStatement = 15, 
+    RuleContinueStatement = 16, RuleReturnStatement = 17, RulePrintStatement = 18, 
+    RuleExpression = 19, RulePrimaryExpression = 20, RuleArrayInit = 21, 
+    RuleArgumentList = 22, RuleArrayAccess = 23, RuleFunctionCall = 24, 
+    RuleAssignable = 25
   };
 
   explicit LMlangGrammarParser(antlr4::TokenStream *input);
@@ -60,8 +60,7 @@ public:
   class StatementContext;
   class ForStatementContext;
   class ForInitContext;
-  class ForIncrementContext;
-  class RangeClauseContext;
+  class ForPostContext;
   class VarDeclContext;
   class AssignmentContext;
   class IfStatementContext;
@@ -252,12 +251,10 @@ public:
     std::vector<antlr4::tree::TerminalNode *> SEMI();
     antlr4::tree::TerminalNode* SEMI(size_t i);
     antlr4::tree::TerminalNode *RPAREN();
-    BlockContext *block();
+    StatementContext *statement();
     ForInitContext *forInit();
     ExpressionContext *expression();
-    ForIncrementContext *forIncrement();
-    StatementContext *statement();
-    RangeClauseContext *rangeClause();
+    ForPostContext *forPost();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -285,10 +282,11 @@ public:
 
   ForInitContext* forInit();
 
-  class  ForIncrementContext : public antlr4::ParserRuleContext {
+  class  ForPostContext : public antlr4::ParserRuleContext {
   public:
-    ForIncrementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    ForPostContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    AssignmentContext *assignment();
     ExpressionContext *expression();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -298,26 +296,7 @@ public:
    
   };
 
-  ForIncrementContext* forIncrement();
-
-  class  RangeClauseContext : public antlr4::ParserRuleContext {
-  public:
-    RangeClauseContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> ID();
-    antlr4::tree::TerminalNode* ID(size_t i);
-    antlr4::tree::TerminalNode *RANGE();
-    ExpressionContext *expression();
-    antlr4::tree::TerminalNode *COMMA();
-
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
-
-  RangeClauseContext* rangeClause();
+  ForPostContext* forPost();
 
   class  VarDeclContext : public antlr4::ParserRuleContext {
   public:

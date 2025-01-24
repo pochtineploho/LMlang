@@ -41,9 +41,7 @@ public:
 
     virtual std::any visitForInit(LMlangGrammarParser::ForInitContext *context) = 0;
 
-    virtual std::any visitForIncrement(LMlangGrammarParser::ForIncrementContext *context) = 0;
-
-    virtual std::any visitRangeClause(LMlangGrammarParser::RangeClauseContext *context) = 0;
+    virtual std::any visitForPost(LMlangGrammarParser::ForPostContext *context) = 0;
 
     virtual std::any visitVarDecl(LMlangGrammarParser::VarDeclContext *context) = 0;
 
