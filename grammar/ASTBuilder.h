@@ -44,10 +44,6 @@ public:
 
     std::any visitForPost(LMlangGrammarParser::ForPostContext *context) override;
 
-//    std::any visitForIncrement(LMlangGrammarParser::ForIncrementContext *context) override;
-//
-//    std::any visitRangeClause(LMlangGrammarParser::RangeClauseContext *context) override;
-
     std::any visitBreakStatement(LMlangGrammarParser::BreakStatementContext *context) override;
 
     std::any visitContinueStatement(LMlangGrammarParser::ContinueStatementContext *context) override;

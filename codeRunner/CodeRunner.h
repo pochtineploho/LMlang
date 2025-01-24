@@ -16,6 +16,7 @@
 #endif //MYANTLRPROJECT_CODERUNNER_H
 
 byteCodeGener GetBytecodeGenerator(std::istream& input) {
+
     LMlangGrammarParser::ProgramContext* tree;
     auto* error_listener = new CustomErrorListener();
 
