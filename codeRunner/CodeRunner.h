@@ -7,7 +7,6 @@
 #include "grammar/LMlangGrammarLexer.h"
 #include "grammar/ASTBuilder.h"
 #include "grammar/ASTNode.h"
-#include "grammar/ASTNode.h"
 #include "vm/vm.h"
 #include "grammar/CustomErrorListener.h"
 
@@ -17,17 +16,6 @@
 #endif //MYANTLRPROJECT_CODERUNNER_H
 
 byteCodeGener GetBytecodeGenerator(std::istream& input) {
-    static std::unordered_set<std::string> builtinFunctions = {
-            "print",
-            "append",
-            "len",
-            "rand",
-            "randint"};
-
-    static std::array<std::string, 2> voidFunctions = {
-            "print",
-            "append"};
-
     LMlangGrammarParser::ProgramContext* tree;
     auto* error_listener = new CustomErrorListener();
 
@@ -51,9 +39,7 @@ byteCodeGener GetBytecodeGenerator(std::istream& input) {
 }
 
 void RunCode(std::ifstream& input){
-    std::stringstream stringStream;
-    stringStream << input.rdbuf();
-    auto bytecodeGenerator = GetBytecodeGenerator(stringStream);
+    auto bytecodeGenerator = GetBytecodeGenerator(input);
 
     VM virtualMachine;
     virtualMachine.LoadArrayTable(bytecodeGenerator.GetArrayTable());
