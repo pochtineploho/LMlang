@@ -22,7 +22,18 @@ statement:
     | ifStatement
     | breakStatement SEMI
     | continueStatement SEMI
-    | block;
+    | block
+    | forStatement
+    ;
+
+forStatement:
+    FOR (LPAREN forInit? SEMI expression? SEMI expression? RPAREN statement)
+    | FOR expression statement
+    | FOR statement
+    | FOR ID (COMMA ID)? RANGE expression statement
+    ;
+
+forInit: varDecl | assignment | expression;
 
 varDecl: type ID (ASSIGN expression)?;
 assignment: assignable ASSIGN expression;
@@ -76,6 +87,8 @@ IF: 'if';
 ELSE: 'else';
 BREAK: 'break';
 CONTINUE: 'continue';
+FOR: 'for';
+RANGE: 'range';
 
 BOOL: 'true' | 'false';
 INT: [0-9]+;

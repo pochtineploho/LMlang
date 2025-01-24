@@ -4,7 +4,7 @@
 #pragma once
 
 
-#include "antlr4/antlr4-runtime.h"
+#include "antlr4-runtime.h"
 #include "LMlangGrammarParser.h"
 
 
@@ -40,6 +40,12 @@ public:
 
   virtual void enterStatement(LMlangGrammarParser::StatementContext *ctx) = 0;
   virtual void exitStatement(LMlangGrammarParser::StatementContext *ctx) = 0;
+
+  virtual void enterForStatement(LMlangGrammarParser::ForStatementContext *ctx) = 0;
+  virtual void exitForStatement(LMlangGrammarParser::ForStatementContext *ctx) = 0;
+
+  virtual void enterForInit(LMlangGrammarParser::ForInitContext *ctx) = 0;
+  virtual void exitForInit(LMlangGrammarParser::ForInitContext *ctx) = 0;
 
   virtual void enterVarDecl(LMlangGrammarParser::VarDeclContext *ctx) = 0;
   virtual void exitVarDecl(LMlangGrammarParser::VarDeclContext *ctx) = 0;

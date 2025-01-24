@@ -4,7 +4,7 @@
 #pragma once
 
 
-#include "antlr4/antlr4-runtime.h"
+#include "antlr4-runtime.h"
 
 
 
@@ -14,20 +14,22 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, FUNC = 6, VOID = 7, 
     RETURN = 8, PRINT = 9, IF = 10, ELSE = 11, BREAK = 12, CONTINUE = 13, 
-    BOOL = 14, INT = 15, DOUBLE = 16, CHAR = 17, STRING = 18, ID = 19, NEG = 20, 
-    MULT = 21, ADD = 22, COMPOP = 23, NOT = 24, AND = 25, OR = 26, ASSIGN = 27, 
-    LPAREN = 28, RPAREN = 29, LBRACE = 30, RBRACE = 31, LBRACK = 32, RBRACK = 33, 
-    SEMI = 34, COMMA = 35, DOT = 36, WS = 37, COMMENT = 38
+    FOR = 14, RANGE = 15, BOOL = 16, INT = 17, DOUBLE = 18, CHAR = 19, STRING = 20, 
+    ID = 21, NEG = 22, MULT = 23, ADD = 24, COMPOP = 25, NOT = 26, AND = 27, 
+    OR = 28, ASSIGN = 29, LPAREN = 30, RPAREN = 31, LBRACE = 32, RBRACE = 33, 
+    LBRACK = 34, RBRACK = 35, SEMI = 36, COMMA = 37, DOT = 38, WS = 39, 
+    COMMENT = 40
   };
 
   enum {
     RuleProgram = 0, RuleFunctionDecl = 1, RuleReturnType = 2, RuleParameterList = 3, 
     RuleParameter = 4, RuleType = 5, RulePrimitiveType = 6, RuleBlock = 7, 
-    RuleStatement = 8, RuleVarDecl = 9, RuleAssignment = 10, RuleIfStatement = 11, 
-    RuleBreakStatement = 12, RuleContinueStatement = 13, RuleReturnStatement = 14, 
-    RulePrintStatement = 15, RuleExpression = 16, RulePrimaryExpression = 17, 
-    RuleArrayInit = 18, RuleArgumentList = 19, RuleArrayAccess = 20, RuleFunctionCall = 21, 
-    RuleAssignable = 22
+    RuleStatement = 8, RuleForStatement = 9, RuleForInit = 10, RuleVarDecl = 11, 
+    RuleAssignment = 12, RuleIfStatement = 13, RuleBreakStatement = 14, 
+    RuleContinueStatement = 15, RuleReturnStatement = 16, RulePrintStatement = 17, 
+    RuleExpression = 18, RulePrimaryExpression = 19, RuleArrayInit = 20, 
+    RuleArgumentList = 21, RuleArrayAccess = 22, RuleFunctionCall = 23, 
+    RuleAssignable = 24
   };
 
   explicit LMlangGrammarParser(antlr4::TokenStream *input);
@@ -56,6 +58,8 @@ public:
   class PrimitiveTypeContext;
   class BlockContext;
   class StatementContext;
+  class ForStatementContext;
+  class ForInitContext;
   class VarDeclContext;
   class AssignmentContext;
   class IfStatementContext;
@@ -226,6 +230,7 @@ public:
     BreakStatementContext *breakStatement();
     ContinueStatementContext *continueStatement();
     BlockContext *block();
+    ForStatementContext *forStatement();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -235,6 +240,50 @@ public:
   };
 
   StatementContext* statement();
+
+  class  ForStatementContext : public antlr4::ParserRuleContext {
+  public:
+    ForStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *FOR();
+    antlr4::tree::TerminalNode *LPAREN();
+    std::vector<antlr4::tree::TerminalNode *> SEMI();
+    antlr4::tree::TerminalNode* SEMI(size_t i);
+    antlr4::tree::TerminalNode *RPAREN();
+    StatementContext *statement();
+    ForInitContext *forInit();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    std::vector<antlr4::tree::TerminalNode *> ID();
+    antlr4::tree::TerminalNode* ID(size_t i);
+    antlr4::tree::TerminalNode *RANGE();
+    antlr4::tree::TerminalNode *COMMA();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ForStatementContext* forStatement();
+
+  class  ForInitContext : public antlr4::ParserRuleContext {
+  public:
+    ForInitContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    VarDeclContext *varDecl();
+    AssignmentContext *assignment();
+    ExpressionContext *expression();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ForInitContext* forInit();
 
   class  VarDeclContext : public antlr4::ParserRuleContext {
   public:

@@ -4,7 +4,7 @@
 #pragma once
 
 
-#include "antlr4/antlr4-runtime.h"
+#include "antlr4-runtime.h"
 #include "LMlangGrammarVisitor.h"
 
 
@@ -48,6 +48,14 @@ public:
   }
 
   virtual std::any visitStatement(LMlangGrammarParser::StatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitForStatement(LMlangGrammarParser::ForStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitForInit(LMlangGrammarParser::ForInitContext *ctx) override {
     return visitChildren(ctx);
   }
 
