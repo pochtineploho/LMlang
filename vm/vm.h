@@ -93,22 +93,6 @@ public:
 /// Виртуальная машина для исполнения байткода.
 class VM {
 public:
-//    /// Байткод-инструкции
-//    enum Bytecode {
-//        Push,       // Загрузка значения в стек
-//        Pop,        // Удаление значения из стека
-//        Add,        // Сложение
-//        Subtract,   // Вычитание
-//        Multiply,   // Умножение
-//        Divide,     // Деление
-//        StoreVar,   // Сохранение переменной
-//        LoadVar,    // Загрузка переменной
-//        Call,       // Вызов функции
-//        Jump,       // Безусловный переход
-//        JumpIfFalse,// Переход, если условие ложно
-//        LessOrEqual // Оператор <=
-//    };
-
     /// Конструктор
     VM() : gc(), context(), module("jit_module", context), builder(context) {
         llvm::InitializeNativeTarget();
@@ -151,7 +135,7 @@ public:
                 }
             }
 
-            switch (instruction) { // TODO: Дописать обработку оставшихся инструкций(смотри bytecode.h)
+            switch (instruction) {
                 case Bytecode::Push: {
                     int value = bytecode[pc++];
                     stack.push(Value(value));
@@ -359,6 +343,11 @@ public:
                     break;
                 }
 
+                case Bytecode::Halt: {
+                    gc.Collect();
+                    return;
+                }
+
                 default:
                     throw std::runtime_error("Unknown instruction");
             }
@@ -415,6 +404,7 @@ public:
                     stack.push(Value(value));
                     break;
                 }
+
                 case Bytecode::Add: {
                     auto rhs = stack.top(); stack.pop();
                     auto lhs = stack.top(); stack.pop();
@@ -431,6 +421,206 @@ public:
                     stack.push(Value(lhs.Data.IntVal + rhs.Data.IntVal));
                     break;
                 }
+
+                case Bytecode::Subtract: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for subtraction in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *diff = builder.CreateSub(lhsVal, rhsVal, "subtmp");
+
+                    stack.push(Value(lhs.Data.IntVal - rhs.Data.IntVal));
+                    break;
+                }
+
+                case Bytecode::Multiply: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for multiplication in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *prod = builder.CreateMul(lhsVal, rhsVal, "multmp");
+
+                    stack.push(Value(lhs.Data.IntVal * rhs.Data.IntVal));
+                    break;
+                }
+
+                case Bytecode::Divide: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for division in JIT");
+                    }
+                    if (rhs.Data.IntVal == 0) {
+                        throw std::runtime_error("Division by zero");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *quotient = builder.CreateSDiv(lhsVal, rhsVal, "divtmp");
+
+                    stack.push(Value(lhs.Data.IntVal / rhs.Data.IntVal));
+                    break;
+                }
+
+                case Bytecode::Equal: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for equality comparison in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *isEqual = builder.CreateICmpEQ(lhsVal, rhsVal, "eqtmp");
+                    llvm::Value *result = builder.CreateZExt(isEqual, llvm::Type::getInt32Ty(context), "eqext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+                case Bytecode::NotEqual: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for inequality comparison in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *isNotEqual = builder.CreateICmpNE(lhsVal, rhsVal, "netmp");
+                    llvm::Value *result = builder.CreateZExt(isNotEqual, llvm::Type::getInt32Ty(context), "neext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+                case Bytecode::LessThan: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for less-than comparison in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *isLess = builder.CreateICmpSLT(lhsVal, rhsVal, "lttmp");
+                    llvm::Value *result = builder.CreateZExt(isLess, llvm::Type::getInt32Ty(context), "ltext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+                case Bytecode::GreaterThan: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for greater-than comparison in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *isGreater = builder.CreateICmpSGT(lhsVal, rhsVal, "gttmp");
+                    llvm::Value *result = builder.CreateZExt(isGreater, llvm::Type::getInt32Ty(context), "gtext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+                case Bytecode::LessOrEqual: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for less-or-equal comparison in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *isLessOrEqual = builder.CreateICmpSLE(lhsVal, rhsVal, "letmp");
+                    llvm::Value *result = builder.CreateZExt(isLessOrEqual, llvm::Type::getInt32Ty(context), "leext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+                case Bytecode::GreaterOrEqual: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for greater-or-equal comparison in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *isGreaterOrEqual = builder.CreateICmpSGE(lhsVal, rhsVal, "getmp");
+                    llvm::Value *result = builder.CreateZExt(isGreaterOrEqual, llvm::Type::getInt32Ty(context), "geext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+
+                case Bytecode::And: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for logical AND in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *lhsBool = builder.CreateICmpNE(lhsVal, llvm::ConstantInt::get(context, llvm::APInt(32, 0)), "lhsbool");
+                    llvm::Value *rhsBool = builder.CreateICmpNE(rhsVal, llvm::ConstantInt::get(context, llvm::APInt(32, 0)), "rhsbool");
+                    llvm::Value *andResult = builder.CreateAnd(lhsBool, rhsBool, "andtmp");
+                    llvm::Value *result = builder.CreateZExt(andResult, llvm::Type::getInt32Ty(context), "andext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+                case Bytecode::Or: {
+                    auto rhs = stack.top(); stack.pop();
+                    auto lhs = stack.top(); stack.pop();
+
+                    if (lhs.Type != Value::Int || rhs.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported types for logical OR in JIT");
+                    }
+
+                    llvm::Value *lhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, lhs.Data.IntVal));
+                    llvm::Value *rhsVal = llvm::ConstantInt::get(context, llvm::APInt(32, rhs.Data.IntVal));
+                    llvm::Value *lhsBool = builder.CreateICmpNE(lhsVal, llvm::ConstantInt::get(context, llvm::APInt(32, 0)), "lhsbool");
+                    llvm::Value *rhsBool = builder.CreateICmpNE(rhsVal, llvm::ConstantInt::get(context, llvm::APInt(32, 0)), "rhsbool");
+                    llvm::Value *orResult = builder.CreateOr(lhsBool, rhsBool, "ortmp");
+                    llvm::Value *result = builder.CreateZExt(orResult, llvm::Type::getInt32Ty(context), "orext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+                case Bytecode::Not: {
+                    auto value = stack.top(); stack.pop();
+
+                    if (value.Type != Value::Int) {
+                        throw std::runtime_error("Unsupported type for logical NOT in JIT");
+                    }
+
+                    llvm::Value *valueVal = llvm::ConstantInt::get(context, llvm::APInt(32, value.Data.IntVal));
+                    llvm::Value *isZero = builder.CreateICmpEQ(valueVal, llvm::ConstantInt::get(context, llvm::APInt(32, 0)), "notcond");
+                    llvm::Value *result = builder.CreateZExt(isZero, llvm::Type::getInt32Ty(context), "notext");
+
+                    stack.push(Value(static_cast<int>(llvm::cast<llvm::ConstantInt>(result)->getSExtValue())));
+                    break;
+                }
+
                 default:
                     throw std::runtime_error("Unknown instruction in JITCompile");
             }

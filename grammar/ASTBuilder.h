@@ -38,9 +38,15 @@ public:
 
     std::any visitIfStatement(LMlangGrammarParser::IfStatementContext *context) override;
 
-    virtual std::any visitForStatement(LMlangGrammarParser::ForStatementContext *context) = 0;
+    std::any visitForStatement(LMlangGrammarParser::ForStatementContext *context) override;
 
-    virtual std::any visitForInit(LMlangGrammarParser::ForInitContext *context) = 0;
+    std::any visitForInit(LMlangGrammarParser::ForInitContext *context) override;
+
+    std::any visitForPost(LMlangGrammarParser::ForPostContext *context) override;
+
+//    std::any visitForIncrement(LMlangGrammarParser::ForIncrementContext *context) override;
+//
+//    std::any visitRangeClause(LMlangGrammarParser::RangeClauseContext *context) override;
 
     std::any visitBreakStatement(LMlangGrammarParser::BreakStatementContext *context) override;
 

@@ -49,7 +49,7 @@ std::any ASTBuilder::visitParameterList(LMlangGrammarParser::ParameterListContex
 
 std::any ASTBuilder::visitParameter(LMlangGrammarParser::ParameterContext *context) {
     return std::make_shared<ParameterNode>(
-        context->type()->getText(), context->ID()->getText()
+            context->type()->getText(), context->ID()->getText()
     );
 }
 
@@ -104,8 +104,8 @@ std::any ASTBuilder::visitVarDecl(LMlangGrammarParser::VarDeclContext *context) 
 
 std::any ASTBuilder::visitAssignment(LMlangGrammarParser::AssignmentContext *context) {
     return std::make_shared<AssignmentNode>(
-        std::any_cast<ASTNodePtr>(visit(context->assignable())),
-        std::any_cast<ASTNodePtr>(visit(context->expression()))
+            std::any_cast<ASTNodePtr>(visit(context->assignable())),
+            std::any_cast<ASTNodePtr>(visit(context->expression()))
     );
 }
 
@@ -136,13 +136,13 @@ std::any ASTBuilder::visitContinueStatement(LMlangGrammarParser::ContinueStateme
 
 std::any ASTBuilder::visitReturnStatement(LMlangGrammarParser::ReturnStatementContext *context) {
     return std::make_shared<ReturnNode>(
-        std::any_cast<ASTNodePtr>(visit(context->expression()))
+            std::any_cast<ASTNodePtr>(visit(context->expression()))
     );
 }
 
 std::any ASTBuilder::visitPrintStatement(LMlangGrammarParser::PrintStatementContext *context) {
     return std::make_shared<PrintNode>(
-        std::any_cast<ASTNodePtr>(visit(context->expression()))
+            std::any_cast<ASTNodePtr>(visit(context->expression()))
     );
 }
 
@@ -158,9 +158,9 @@ std::any ASTBuilder::visitExpression(LMlangGrammarParser::ExpressionContext *con
         }
 
         return std::make_shared<BinaryOperatorNode>(
-            binaryOp,
-            std::any_cast<ASTNodePtr>(visit(context->expression(0))),
-            std::any_cast<ASTNodePtr>(visit(context->expression(1)))
+                binaryOp,
+                std::any_cast<ASTNodePtr>(visit(context->expression(0))),
+                std::any_cast<ASTNodePtr>(visit(context->expression(1)))
         );
     }
 
@@ -215,15 +215,15 @@ std::any ASTBuilder::visitArgumentList(LMlangGrammarParser::ArgumentListContext 
 
 std::any ASTBuilder::visitArrayAccess(LMlangGrammarParser::ArrayAccessContext *context) {
     return std::make_shared<ArrayAccessNode>(
-        std::any_cast<ASTNodePtr>(visit(context->expression())),
-        std::any_cast<ASTNodePtr>(visit(context->ID()))
+            std::any_cast<ASTNodePtr>(visit(context->expression())),
+            std::any_cast<ASTNodePtr>(visit(context->ID()))
     );
 }
 
 std::any ASTBuilder::visitFunctionCall(LMlangGrammarParser::FunctionCallContext *context) {
     return std::make_shared<CallFunctionNode>(
-        context->ID()->getText(),
-        std::any_cast<std::vector<ASTNodePtr>>(visit(context->argumentList()))
+            context->ID()->getText(),
+            std::any_cast<std::vector<ASTNodePtr>>(visit(context->argumentList()))
     );
 }
 
@@ -269,3 +269,13 @@ std::any ASTBuilder::visitForInit(LMlangGrammarParser::ForInitContext *context) 
     }
 }
 
+std::any ASTBuilder::visitForPost(LMlangGrammarParser::ForPostContext *context) {
+    if (context->assignment()) {
+        // Visit the assignment node and return its AST representation
+        return visit(context->assignment());
+    } else if (context->expression()) {
+        // Visit the expression node and return its AST representation
+        return visit(context->expression());
+    }
+    return nullptr; // If neither is present, return nullptr
+}
