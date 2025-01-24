@@ -55,10 +55,10 @@ void lmlanggrammarParserInitialize() {
     std::vector<std::string>{
       "program", "functionDecl", "returnType", "parameterList", "parameter", 
       "type", "primitiveType", "block", "statement", "forStatement", "forInit", 
-      "forPost", "varDecl", "assignment", "ifStatement", "breakStatement", 
-      "continueStatement", "returnStatement", "printStatement", "expression", 
-      "primaryExpression", "arrayInit", "argumentList", "arrayAccess", "functionCall", 
-      "assignable"
+      "forIncrement", "rangeClause", "varDecl", "assignment", "ifStatement", 
+      "breakStatement", "continueStatement", "returnStatement", "printStatement", 
+      "expression", "primaryExpression", "arrayInit", "argumentList", "arrayAccess", 
+      "functionCall", "assignable"
     },
     std::vector<std::string>{
       "", "'int'", "'double'", "'char'", "'bool'", "'string'", "'func'", 
@@ -72,106 +72,119 @@ void lmlanggrammarParserInitialize() {
       "BREAK", "CONTINUE", "FOR", "BOOL", "INT", "DOUBLE", "CHAR", "STRING", 
       "ID", "NEG", "MULT", "ADD", "COMPOP", "NOT", "AND", "OR", "ASSIGN", 
       "LPAREN", "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "SEMI", 
-      "COMMA", "DOT", "WS", "COMMENT"
+      "COMMA", "DOT", "WS", "COMMENT", "RANGE"
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,39,289,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+  	4,1,40,326,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
   	7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,2,14,7,
   	14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,7,20,2,21,7,
-  	21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,1,0,1,0,5,0,55,8,0,10,0,12,
-  	0,58,9,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,3,1,67,8,1,1,1,1,1,1,1,1,2,1,2,3,
-  	2,74,8,2,1,3,1,3,1,3,5,3,79,8,3,10,3,12,3,82,9,3,1,4,1,4,1,4,1,5,1,5,
-  	1,5,1,5,1,5,1,5,1,5,5,5,94,8,5,10,5,12,5,97,9,5,1,6,1,6,1,7,1,7,5,7,103,
-  	8,7,10,7,12,7,106,9,7,1,7,1,7,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
-  	1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,3,8,134,8,8,1,
-  	9,1,9,1,9,3,9,139,8,9,1,9,1,9,3,9,143,8,9,1,9,1,9,3,9,147,8,9,1,9,1,9,
-  	1,9,1,9,1,9,1,9,1,9,1,9,3,9,157,8,9,1,10,1,10,1,10,3,10,162,8,10,1,11,
-  	1,11,3,11,166,8,11,1,12,1,12,1,12,1,12,3,12,172,8,12,1,13,1,13,1,13,1,
-  	13,1,14,1,14,1,14,1,14,1,14,1,14,1,14,3,14,185,8,14,1,15,1,15,1,16,1,
-  	16,1,17,1,17,3,17,193,8,17,1,18,1,18,1,18,1,18,1,18,1,19,1,19,1,19,1,
-  	19,1,19,1,19,1,19,1,19,1,19,1,19,3,19,210,8,19,1,19,1,19,1,19,1,19,1,
-  	19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,19,1,
-  	19,1,19,5,19,232,8,19,10,19,12,19,235,9,19,1,20,1,20,1,20,1,20,1,20,1,
-  	20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,3,20,250,8,20,1,21,1,21,1,21,1,
-  	21,5,21,256,8,21,10,21,12,21,259,9,21,3,21,261,8,21,1,21,1,21,1,22,1,
-  	22,1,22,5,22,268,8,22,10,22,12,22,271,9,22,1,23,1,23,1,23,1,23,1,23,1,
-  	24,1,24,1,24,3,24,281,8,24,1,24,1,24,1,25,1,25,3,25,287,8,25,1,25,0,2,
-  	10,38,26,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,
-  	44,46,48,50,0,1,1,0,1,5,312,0,56,1,0,0,0,2,61,1,0,0,0,4,73,1,0,0,0,6,
-  	75,1,0,0,0,8,83,1,0,0,0,10,86,1,0,0,0,12,98,1,0,0,0,14,100,1,0,0,0,16,
-  	133,1,0,0,0,18,156,1,0,0,0,20,161,1,0,0,0,22,165,1,0,0,0,24,167,1,0,0,
-  	0,26,173,1,0,0,0,28,177,1,0,0,0,30,186,1,0,0,0,32,188,1,0,0,0,34,190,
-  	1,0,0,0,36,194,1,0,0,0,38,209,1,0,0,0,40,249,1,0,0,0,42,251,1,0,0,0,44,
-  	264,1,0,0,0,46,272,1,0,0,0,48,277,1,0,0,0,50,286,1,0,0,0,52,55,3,2,1,
-  	0,53,55,3,16,8,0,54,52,1,0,0,0,54,53,1,0,0,0,55,58,1,0,0,0,56,54,1,0,
-  	0,0,56,57,1,0,0,0,57,59,1,0,0,0,58,56,1,0,0,0,59,60,5,0,0,1,60,1,1,0,
-  	0,0,61,62,5,6,0,0,62,63,3,4,2,0,63,64,5,20,0,0,64,66,5,29,0,0,65,67,3,
-  	6,3,0,66,65,1,0,0,0,66,67,1,0,0,0,67,68,1,0,0,0,68,69,5,30,0,0,69,70,
-  	3,14,7,0,70,3,1,0,0,0,71,74,3,10,5,0,72,74,5,7,0,0,73,71,1,0,0,0,73,72,
-  	1,0,0,0,74,5,1,0,0,0,75,80,3,8,4,0,76,77,5,36,0,0,77,79,3,8,4,0,78,76,
-  	1,0,0,0,79,82,1,0,0,0,80,78,1,0,0,0,80,81,1,0,0,0,81,7,1,0,0,0,82,80,
-  	1,0,0,0,83,84,3,10,5,0,84,85,5,20,0,0,85,9,1,0,0,0,86,87,6,5,-1,0,87,
-  	88,3,12,6,0,88,95,1,0,0,0,89,90,10,1,0,0,90,91,5,33,0,0,91,92,5,16,0,
-  	0,92,94,5,34,0,0,93,89,1,0,0,0,94,97,1,0,0,0,95,93,1,0,0,0,95,96,1,0,
-  	0,0,96,11,1,0,0,0,97,95,1,0,0,0,98,99,7,0,0,0,99,13,1,0,0,0,100,104,5,
-  	31,0,0,101,103,3,16,8,0,102,101,1,0,0,0,103,106,1,0,0,0,104,102,1,0,0,
-  	0,104,105,1,0,0,0,105,107,1,0,0,0,106,104,1,0,0,0,107,108,5,32,0,0,108,
-  	15,1,0,0,0,109,110,3,24,12,0,110,111,5,35,0,0,111,134,1,0,0,0,112,113,
-  	3,26,13,0,113,114,5,35,0,0,114,134,1,0,0,0,115,116,3,34,17,0,116,117,
-  	5,35,0,0,117,134,1,0,0,0,118,119,3,36,18,0,119,120,5,35,0,0,120,134,1,
-  	0,0,0,121,122,3,38,19,0,122,123,5,35,0,0,123,134,1,0,0,0,124,134,3,28,
-  	14,0,125,126,3,30,15,0,126,127,5,35,0,0,127,134,1,0,0,0,128,129,3,32,
-  	16,0,129,130,5,35,0,0,130,134,1,0,0,0,131,134,3,14,7,0,132,134,3,18,9,
-  	0,133,109,1,0,0,0,133,112,1,0,0,0,133,115,1,0,0,0,133,118,1,0,0,0,133,
-  	121,1,0,0,0,133,124,1,0,0,0,133,125,1,0,0,0,133,128,1,0,0,0,133,131,1,
-  	0,0,0,133,132,1,0,0,0,134,17,1,0,0,0,135,136,5,14,0,0,136,138,5,29,0,
-  	0,137,139,3,20,10,0,138,137,1,0,0,0,138,139,1,0,0,0,139,140,1,0,0,0,140,
-  	142,5,35,0,0,141,143,3,38,19,0,142,141,1,0,0,0,142,143,1,0,0,0,143,144,
-  	1,0,0,0,144,146,5,35,0,0,145,147,3,22,11,0,146,145,1,0,0,0,146,147,1,
-  	0,0,0,147,148,1,0,0,0,148,149,5,30,0,0,149,157,3,16,8,0,150,151,5,14,
-  	0,0,151,152,3,38,19,0,152,153,3,16,8,0,153,157,1,0,0,0,154,155,5,14,0,
-  	0,155,157,3,16,8,0,156,135,1,0,0,0,156,150,1,0,0,0,156,154,1,0,0,0,157,
-  	19,1,0,0,0,158,162,3,24,12,0,159,162,3,26,13,0,160,162,3,38,19,0,161,
-  	158,1,0,0,0,161,159,1,0,0,0,161,160,1,0,0,0,162,21,1,0,0,0,163,166,3,
-  	26,13,0,164,166,3,38,19,0,165,163,1,0,0,0,165,164,1,0,0,0,166,23,1,0,
-  	0,0,167,168,3,10,5,0,168,171,5,20,0,0,169,170,5,28,0,0,170,172,3,38,19,
-  	0,171,169,1,0,0,0,171,172,1,0,0,0,172,25,1,0,0,0,173,174,3,50,25,0,174,
-  	175,5,28,0,0,175,176,3,38,19,0,176,27,1,0,0,0,177,178,5,10,0,0,178,179,
-  	5,29,0,0,179,180,3,38,19,0,180,181,5,30,0,0,181,184,3,16,8,0,182,183,
-  	5,11,0,0,183,185,3,16,8,0,184,182,1,0,0,0,184,185,1,0,0,0,185,29,1,0,
-  	0,0,186,187,5,12,0,0,187,31,1,0,0,0,188,189,5,13,0,0,189,33,1,0,0,0,190,
-  	192,5,8,0,0,191,193,3,38,19,0,192,191,1,0,0,0,192,193,1,0,0,0,193,35,
-  	1,0,0,0,194,195,5,9,0,0,195,196,5,29,0,0,196,197,3,38,19,0,197,198,5,
-  	30,0,0,198,37,1,0,0,0,199,200,6,19,-1,0,200,201,5,29,0,0,201,202,3,38,
-  	19,0,202,203,5,30,0,0,203,210,1,0,0,0,204,205,5,21,0,0,205,210,3,38,19,
-  	9,206,207,5,25,0,0,207,210,3,38,19,8,208,210,3,40,20,0,209,199,1,0,0,
-  	0,209,204,1,0,0,0,209,206,1,0,0,0,209,208,1,0,0,0,210,233,1,0,0,0,211,
-  	212,10,7,0,0,212,213,5,26,0,0,213,232,3,38,19,8,214,215,10,6,0,0,215,
-  	216,5,27,0,0,216,232,3,38,19,7,217,218,10,5,0,0,218,219,5,22,0,0,219,
-  	232,3,38,19,6,220,221,10,4,0,0,221,222,5,23,0,0,222,232,3,38,19,5,223,
-  	224,10,3,0,0,224,225,5,24,0,0,225,232,3,38,19,4,226,227,10,1,0,0,227,
-  	228,5,33,0,0,228,229,3,38,19,0,229,230,5,34,0,0,230,232,1,0,0,0,231,211,
-  	1,0,0,0,231,214,1,0,0,0,231,217,1,0,0,0,231,220,1,0,0,0,231,223,1,0,0,
-  	0,231,226,1,0,0,0,232,235,1,0,0,0,233,231,1,0,0,0,233,234,1,0,0,0,234,
-  	39,1,0,0,0,235,233,1,0,0,0,236,250,5,20,0,0,237,250,3,46,23,0,238,250,
-  	3,48,24,0,239,250,5,16,0,0,240,250,5,17,0,0,241,250,5,18,0,0,242,250,
-  	5,15,0,0,243,250,5,19,0,0,244,245,5,29,0,0,245,246,3,38,19,0,246,247,
-  	5,30,0,0,247,250,1,0,0,0,248,250,3,42,21,0,249,236,1,0,0,0,249,237,1,
-  	0,0,0,249,238,1,0,0,0,249,239,1,0,0,0,249,240,1,0,0,0,249,241,1,0,0,0,
-  	249,242,1,0,0,0,249,243,1,0,0,0,249,244,1,0,0,0,249,248,1,0,0,0,250,41,
-  	1,0,0,0,251,260,5,31,0,0,252,257,3,38,19,0,253,254,5,36,0,0,254,256,3,
-  	38,19,0,255,253,1,0,0,0,256,259,1,0,0,0,257,255,1,0,0,0,257,258,1,0,0,
-  	0,258,261,1,0,0,0,259,257,1,0,0,0,260,252,1,0,0,0,260,261,1,0,0,0,261,
-  	262,1,0,0,0,262,263,5,32,0,0,263,43,1,0,0,0,264,269,3,38,19,0,265,266,
-  	5,36,0,0,266,268,3,38,19,0,267,265,1,0,0,0,268,271,1,0,0,0,269,267,1,
-  	0,0,0,269,270,1,0,0,0,270,45,1,0,0,0,271,269,1,0,0,0,272,273,5,20,0,0,
-  	273,274,5,33,0,0,274,275,3,38,19,0,275,276,5,34,0,0,276,47,1,0,0,0,277,
-  	278,5,20,0,0,278,280,5,29,0,0,279,281,3,44,22,0,280,279,1,0,0,0,280,281,
-  	1,0,0,0,281,282,1,0,0,0,282,283,5,30,0,0,283,49,1,0,0,0,284,287,5,20,
-  	0,0,285,287,3,46,23,0,286,284,1,0,0,0,286,285,1,0,0,0,287,51,1,0,0,0,
-  	26,54,56,66,73,80,95,104,133,138,142,146,156,161,165,171,184,192,209,
-  	231,233,249,257,260,269,280,286
+  	21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,1,0,1,0,5,0,57,8,
+  	0,10,0,12,0,60,9,0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,3,1,69,8,1,1,1,1,1,1,1,
+  	1,2,1,2,3,2,76,8,2,1,3,1,3,1,3,5,3,81,8,3,10,3,12,3,84,9,3,1,4,1,4,1,
+  	4,1,5,1,5,1,5,1,5,1,5,1,5,1,5,5,5,96,8,5,10,5,12,5,99,9,5,1,6,1,6,1,7,
+  	1,7,5,7,105,8,7,10,7,12,7,108,9,7,1,7,1,7,1,8,1,8,1,8,1,8,1,8,1,8,1,8,
+  	1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,1,8,3,
+  	8,136,8,8,1,9,1,9,1,9,3,9,141,8,9,1,9,1,9,3,9,145,8,9,1,9,1,9,3,9,149,
+  	8,9,1,9,1,9,1,9,1,9,1,9,3,9,156,8,9,1,9,1,9,3,9,160,8,9,1,9,1,9,3,9,164,
+  	8,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,9,1,
+  	9,1,9,1,9,1,9,1,9,1,9,3,9,188,8,9,1,10,1,10,1,10,3,10,193,8,10,1,11,1,
+  	11,1,12,1,12,1,12,3,12,200,8,12,1,12,1,12,1,12,1,13,1,13,1,13,1,13,3,
+  	13,209,8,13,1,14,1,14,1,14,1,14,1,15,1,15,1,15,1,15,1,15,1,15,1,15,3,
+  	15,222,8,15,1,16,1,16,1,17,1,17,1,18,1,18,3,18,230,8,18,1,19,1,19,1,19,
+  	1,19,1,19,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,3,20,247,
+  	8,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,
+  	1,20,1,20,1,20,1,20,1,20,1,20,1,20,5,20,269,8,20,10,20,12,20,272,9,20,
+  	1,21,1,21,1,21,1,21,1,21,1,21,1,21,1,21,1,21,1,21,1,21,1,21,1,21,3,21,
+  	287,8,21,1,22,1,22,1,22,1,22,5,22,293,8,22,10,22,12,22,296,9,22,3,22,
+  	298,8,22,1,22,1,22,1,23,1,23,1,23,5,23,305,8,23,10,23,12,23,308,9,23,
+  	1,24,1,24,1,24,1,24,1,24,1,25,1,25,1,25,3,25,318,8,25,1,25,1,25,1,26,
+  	1,26,3,26,324,8,26,1,26,0,2,10,40,27,0,2,4,6,8,10,12,14,16,18,20,22,24,
+  	26,28,30,32,34,36,38,40,42,44,46,48,50,52,0,1,1,0,1,5,356,0,58,1,0,0,
+  	0,2,63,1,0,0,0,4,75,1,0,0,0,6,77,1,0,0,0,8,85,1,0,0,0,10,88,1,0,0,0,12,
+  	100,1,0,0,0,14,102,1,0,0,0,16,135,1,0,0,0,18,187,1,0,0,0,20,192,1,0,0,
+  	0,22,194,1,0,0,0,24,196,1,0,0,0,26,204,1,0,0,0,28,210,1,0,0,0,30,214,
+  	1,0,0,0,32,223,1,0,0,0,34,225,1,0,0,0,36,227,1,0,0,0,38,231,1,0,0,0,40,
+  	246,1,0,0,0,42,286,1,0,0,0,44,288,1,0,0,0,46,301,1,0,0,0,48,309,1,0,0,
+  	0,50,314,1,0,0,0,52,323,1,0,0,0,54,57,3,2,1,0,55,57,3,16,8,0,56,54,1,
+  	0,0,0,56,55,1,0,0,0,57,60,1,0,0,0,58,56,1,0,0,0,58,59,1,0,0,0,59,61,1,
+  	0,0,0,60,58,1,0,0,0,61,62,5,0,0,1,62,1,1,0,0,0,63,64,5,6,0,0,64,65,3,
+  	4,2,0,65,66,5,20,0,0,66,68,5,29,0,0,67,69,3,6,3,0,68,67,1,0,0,0,68,69,
+  	1,0,0,0,69,70,1,0,0,0,70,71,5,30,0,0,71,72,3,14,7,0,72,3,1,0,0,0,73,76,
+  	3,10,5,0,74,76,5,7,0,0,75,73,1,0,0,0,75,74,1,0,0,0,76,5,1,0,0,0,77,82,
+  	3,8,4,0,78,79,5,36,0,0,79,81,3,8,4,0,80,78,1,0,0,0,81,84,1,0,0,0,82,80,
+  	1,0,0,0,82,83,1,0,0,0,83,7,1,0,0,0,84,82,1,0,0,0,85,86,3,10,5,0,86,87,
+  	5,20,0,0,87,9,1,0,0,0,88,89,6,5,-1,0,89,90,3,12,6,0,90,97,1,0,0,0,91,
+  	92,10,1,0,0,92,93,5,33,0,0,93,94,5,16,0,0,94,96,5,34,0,0,95,91,1,0,0,
+  	0,96,99,1,0,0,0,97,95,1,0,0,0,97,98,1,0,0,0,98,11,1,0,0,0,99,97,1,0,0,
+  	0,100,101,7,0,0,0,101,13,1,0,0,0,102,106,5,31,0,0,103,105,3,16,8,0,104,
+  	103,1,0,0,0,105,108,1,0,0,0,106,104,1,0,0,0,106,107,1,0,0,0,107,109,1,
+  	0,0,0,108,106,1,0,0,0,109,110,5,32,0,0,110,15,1,0,0,0,111,112,3,26,13,
+  	0,112,113,5,35,0,0,113,136,1,0,0,0,114,115,3,28,14,0,115,116,5,35,0,0,
+  	116,136,1,0,0,0,117,118,3,36,18,0,118,119,5,35,0,0,119,136,1,0,0,0,120,
+  	121,3,38,19,0,121,122,5,35,0,0,122,136,1,0,0,0,123,124,3,40,20,0,124,
+  	125,5,35,0,0,125,136,1,0,0,0,126,136,3,30,15,0,127,128,3,32,16,0,128,
+  	129,5,35,0,0,129,136,1,0,0,0,130,131,3,34,17,0,131,132,5,35,0,0,132,136,
+  	1,0,0,0,133,136,3,14,7,0,134,136,3,18,9,0,135,111,1,0,0,0,135,114,1,0,
+  	0,0,135,117,1,0,0,0,135,120,1,0,0,0,135,123,1,0,0,0,135,126,1,0,0,0,135,
+  	127,1,0,0,0,135,130,1,0,0,0,135,133,1,0,0,0,135,134,1,0,0,0,136,17,1,
+  	0,0,0,137,138,5,14,0,0,138,140,5,29,0,0,139,141,3,20,10,0,140,139,1,0,
+  	0,0,140,141,1,0,0,0,141,142,1,0,0,0,142,144,5,35,0,0,143,145,3,40,20,
+  	0,144,143,1,0,0,0,144,145,1,0,0,0,145,146,1,0,0,0,146,148,5,35,0,0,147,
+  	149,3,22,11,0,148,147,1,0,0,0,148,149,1,0,0,0,149,150,1,0,0,0,150,151,
+  	5,30,0,0,151,188,3,14,7,0,152,153,5,14,0,0,153,155,5,29,0,0,154,156,3,
+  	20,10,0,155,154,1,0,0,0,155,156,1,0,0,0,156,157,1,0,0,0,157,159,5,35,
+  	0,0,158,160,3,40,20,0,159,158,1,0,0,0,159,160,1,0,0,0,160,161,1,0,0,0,
+  	161,163,5,35,0,0,162,164,3,22,11,0,163,162,1,0,0,0,163,164,1,0,0,0,164,
+  	165,1,0,0,0,165,166,5,30,0,0,166,188,3,16,8,0,167,168,5,14,0,0,168,169,
+  	3,24,12,0,169,170,3,14,7,0,170,188,1,0,0,0,171,172,5,14,0,0,172,173,3,
+  	24,12,0,173,174,3,16,8,0,174,188,1,0,0,0,175,176,5,14,0,0,176,177,3,40,
+  	20,0,177,178,3,14,7,0,178,188,1,0,0,0,179,180,5,14,0,0,180,181,3,40,20,
+  	0,181,182,3,16,8,0,182,188,1,0,0,0,183,184,5,14,0,0,184,188,3,14,7,0,
+  	185,186,5,14,0,0,186,188,3,16,8,0,187,137,1,0,0,0,187,152,1,0,0,0,187,
+  	167,1,0,0,0,187,171,1,0,0,0,187,175,1,0,0,0,187,179,1,0,0,0,187,183,1,
+  	0,0,0,187,185,1,0,0,0,188,19,1,0,0,0,189,193,3,26,13,0,190,193,3,28,14,
+  	0,191,193,3,40,20,0,192,189,1,0,0,0,192,190,1,0,0,0,192,191,1,0,0,0,193,
+  	21,1,0,0,0,194,195,3,40,20,0,195,23,1,0,0,0,196,199,5,20,0,0,197,198,
+  	5,36,0,0,198,200,5,20,0,0,199,197,1,0,0,0,199,200,1,0,0,0,200,201,1,0,
+  	0,0,201,202,5,40,0,0,202,203,3,40,20,0,203,25,1,0,0,0,204,205,3,10,5,
+  	0,205,208,5,20,0,0,206,207,5,28,0,0,207,209,3,40,20,0,208,206,1,0,0,0,
+  	208,209,1,0,0,0,209,27,1,0,0,0,210,211,3,52,26,0,211,212,5,28,0,0,212,
+  	213,3,40,20,0,213,29,1,0,0,0,214,215,5,10,0,0,215,216,5,29,0,0,216,217,
+  	3,40,20,0,217,218,5,30,0,0,218,221,3,16,8,0,219,220,5,11,0,0,220,222,
+  	3,16,8,0,221,219,1,0,0,0,221,222,1,0,0,0,222,31,1,0,0,0,223,224,5,12,
+  	0,0,224,33,1,0,0,0,225,226,5,13,0,0,226,35,1,0,0,0,227,229,5,8,0,0,228,
+  	230,3,40,20,0,229,228,1,0,0,0,229,230,1,0,0,0,230,37,1,0,0,0,231,232,
+  	5,9,0,0,232,233,5,29,0,0,233,234,3,40,20,0,234,235,5,30,0,0,235,39,1,
+  	0,0,0,236,237,6,20,-1,0,237,238,5,29,0,0,238,239,3,40,20,0,239,240,5,
+  	30,0,0,240,247,1,0,0,0,241,242,5,21,0,0,242,247,3,40,20,9,243,244,5,25,
+  	0,0,244,247,3,40,20,8,245,247,3,42,21,0,246,236,1,0,0,0,246,241,1,0,0,
+  	0,246,243,1,0,0,0,246,245,1,0,0,0,247,270,1,0,0,0,248,249,10,7,0,0,249,
+  	250,5,26,0,0,250,269,3,40,20,8,251,252,10,6,0,0,252,253,5,27,0,0,253,
+  	269,3,40,20,7,254,255,10,5,0,0,255,256,5,22,0,0,256,269,3,40,20,6,257,
+  	258,10,4,0,0,258,259,5,23,0,0,259,269,3,40,20,5,260,261,10,3,0,0,261,
+  	262,5,24,0,0,262,269,3,40,20,4,263,264,10,1,0,0,264,265,5,33,0,0,265,
+  	266,3,40,20,0,266,267,5,34,0,0,267,269,1,0,0,0,268,248,1,0,0,0,268,251,
+  	1,0,0,0,268,254,1,0,0,0,268,257,1,0,0,0,268,260,1,0,0,0,268,263,1,0,0,
+  	0,269,272,1,0,0,0,270,268,1,0,0,0,270,271,1,0,0,0,271,41,1,0,0,0,272,
+  	270,1,0,0,0,273,287,5,20,0,0,274,287,3,48,24,0,275,287,3,50,25,0,276,
+  	287,5,16,0,0,277,287,5,17,0,0,278,287,5,18,0,0,279,287,5,15,0,0,280,287,
+  	5,19,0,0,281,282,5,29,0,0,282,283,3,40,20,0,283,284,5,30,0,0,284,287,
+  	1,0,0,0,285,287,3,44,22,0,286,273,1,0,0,0,286,274,1,0,0,0,286,275,1,0,
+  	0,0,286,276,1,0,0,0,286,277,1,0,0,0,286,278,1,0,0,0,286,279,1,0,0,0,286,
+  	280,1,0,0,0,286,281,1,0,0,0,286,285,1,0,0,0,287,43,1,0,0,0,288,297,5,
+  	31,0,0,289,294,3,40,20,0,290,291,5,36,0,0,291,293,3,40,20,0,292,290,1,
+  	0,0,0,293,296,1,0,0,0,294,292,1,0,0,0,294,295,1,0,0,0,295,298,1,0,0,0,
+  	296,294,1,0,0,0,297,289,1,0,0,0,297,298,1,0,0,0,298,299,1,0,0,0,299,300,
+  	5,32,0,0,300,45,1,0,0,0,301,306,3,40,20,0,302,303,5,36,0,0,303,305,3,
+  	40,20,0,304,302,1,0,0,0,305,308,1,0,0,0,306,304,1,0,0,0,306,307,1,0,0,
+  	0,307,47,1,0,0,0,308,306,1,0,0,0,309,310,5,20,0,0,310,311,5,33,0,0,311,
+  	312,3,40,20,0,312,313,5,34,0,0,313,49,1,0,0,0,314,315,5,20,0,0,315,317,
+  	5,29,0,0,316,318,3,46,23,0,317,316,1,0,0,0,317,318,1,0,0,0,318,319,1,
+  	0,0,0,319,320,5,30,0,0,320,51,1,0,0,0,321,324,5,20,0,0,322,324,3,48,24,
+  	0,323,321,1,0,0,0,323,322,1,0,0,0,324,53,1,0,0,0,29,56,58,68,75,82,97,
+  	106,135,140,144,148,155,159,163,187,192,199,208,221,229,246,268,270,286,
+  	294,297,306,317,323
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -285,16 +298,16 @@ LMlangGrammarParser::ProgramContext* LMlangGrammarParser::program() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(56);
+    setState(58);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 2722101118) != 0)) {
-      setState(54);
+      setState(56);
       _errHandler->sync(this);
       switch (_input->LA(1)) {
         case LMlangGrammarParser::FUNC: {
-          setState(52);
+          setState(54);
           functionDecl();
           break;
         }
@@ -320,7 +333,7 @@ LMlangGrammarParser::ProgramContext* LMlangGrammarParser::program() {
         case LMlangGrammarParser::NOT:
         case LMlangGrammarParser::LPAREN:
         case LMlangGrammarParser::LBRACE: {
-          setState(53);
+          setState(55);
           statement();
           break;
         }
@@ -328,11 +341,11 @@ LMlangGrammarParser::ProgramContext* LMlangGrammarParser::program() {
       default:
         throw NoViableAltException(this);
       }
-      setState(58);
+      setState(60);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(59);
+    setState(61);
     match(LMlangGrammarParser::EOF);
    
   }
@@ -418,26 +431,26 @@ LMlangGrammarParser::FunctionDeclContext* LMlangGrammarParser::functionDecl() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(61);
-    match(LMlangGrammarParser::FUNC);
-    setState(62);
-    returnType();
     setState(63);
-    match(LMlangGrammarParser::ID);
+    match(LMlangGrammarParser::FUNC);
     setState(64);
-    match(LMlangGrammarParser::LPAREN);
+    returnType();
+    setState(65);
+    match(LMlangGrammarParser::ID);
     setState(66);
+    match(LMlangGrammarParser::LPAREN);
+    setState(68);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 62) != 0)) {
-      setState(65);
+      setState(67);
       parameterList();
     }
-    setState(68);
+    setState(70);
     match(LMlangGrammarParser::RPAREN);
-    setState(69);
+    setState(71);
     block();
    
   }
@@ -501,7 +514,7 @@ LMlangGrammarParser::ReturnTypeContext* LMlangGrammarParser::returnType() {
     exitRule();
   });
   try {
-    setState(73);
+    setState(75);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case LMlangGrammarParser::T__0:
@@ -510,14 +523,14 @@ LMlangGrammarParser::ReturnTypeContext* LMlangGrammarParser::returnType() {
       case LMlangGrammarParser::T__3:
       case LMlangGrammarParser::T__4: {
         enterOuterAlt(_localctx, 1);
-        setState(71);
+        setState(73);
         type(0);
         break;
       }
 
       case LMlangGrammarParser::VOID: {
         enterOuterAlt(_localctx, 2);
-        setState(72);
+        setState(74);
         match(LMlangGrammarParser::VOID);
         break;
       }
@@ -597,17 +610,17 @@ LMlangGrammarParser::ParameterListContext* LMlangGrammarParser::parameterList() 
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(75);
+    setState(77);
     parameter();
-    setState(80);
+    setState(82);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LMlangGrammarParser::COMMA) {
-      setState(76);
+      setState(78);
       match(LMlangGrammarParser::COMMA);
-      setState(77);
+      setState(79);
       parameter();
-      setState(82);
+      setState(84);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
@@ -674,9 +687,9 @@ LMlangGrammarParser::ParameterContext* LMlangGrammarParser::parameter() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(83);
+    setState(85);
     type(0);
-    setState(84);
+    setState(86);
     match(LMlangGrammarParser::ID);
    
   }
@@ -766,10 +779,10 @@ LMlangGrammarParser::TypeContext* LMlangGrammarParser::type(int precedence) {
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(87);
+    setState(89);
     primitiveType();
     _ctx->stop = _input->LT(-1);
-    setState(95);
+    setState(97);
     _errHandler->sync(this);
     alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 5, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
@@ -779,17 +792,17 @@ LMlangGrammarParser::TypeContext* LMlangGrammarParser::type(int precedence) {
         previousContext = _localctx;
         _localctx = _tracker.createInstance<TypeContext>(parentContext, parentState);
         pushNewRecursionContext(_localctx, startState, RuleType);
-        setState(89);
+        setState(91);
 
         if (!(precpred(_ctx, 1))) throw FailedPredicateException(this, "precpred(_ctx, 1)");
-        setState(90);
-        match(LMlangGrammarParser::LBRACK);
-        setState(91);
-        match(LMlangGrammarParser::INT);
         setState(92);
+        match(LMlangGrammarParser::LBRACK);
+        setState(93);
+        match(LMlangGrammarParser::INT);
+        setState(94);
         match(LMlangGrammarParser::RBRACK); 
       }
-      setState(97);
+      setState(99);
       _errHandler->sync(this);
       alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 5, _ctx);
     }
@@ -847,7 +860,7 @@ LMlangGrammarParser::PrimitiveTypeContext* LMlangGrammarParser::primitiveType() 
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(98);
+    setState(100);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 62) != 0))) {
@@ -929,20 +942,20 @@ LMlangGrammarParser::BlockContext* LMlangGrammarParser::block() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(100);
+    setState(102);
     match(LMlangGrammarParser::LBRACE);
-    setState(104);
+    setState(106);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 2722101054) != 0)) {
-      setState(101);
+      setState(103);
       statement();
-      setState(106);
+      setState(108);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(107);
+    setState(109);
     match(LMlangGrammarParser::RBRACE);
    
   }
@@ -1042,89 +1055,89 @@ LMlangGrammarParser::StatementContext* LMlangGrammarParser::statement() {
     exitRule();
   });
   try {
-    setState(133);
+    setState(135);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 7, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(109);
+      setState(111);
       varDecl();
-      setState(110);
+      setState(112);
       match(LMlangGrammarParser::SEMI);
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(112);
+      setState(114);
       assignment();
-      setState(113);
+      setState(115);
       match(LMlangGrammarParser::SEMI);
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(115);
+      setState(117);
       returnStatement();
-      setState(116);
+      setState(118);
       match(LMlangGrammarParser::SEMI);
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(118);
+      setState(120);
       printStatement();
-      setState(119);
+      setState(121);
       match(LMlangGrammarParser::SEMI);
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
-      setState(121);
+      setState(123);
       expression(0);
-      setState(122);
+      setState(124);
       match(LMlangGrammarParser::SEMI);
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
-      setState(124);
+      setState(126);
       ifStatement();
       break;
     }
 
     case 7: {
       enterOuterAlt(_localctx, 7);
-      setState(125);
+      setState(127);
       breakStatement();
-      setState(126);
+      setState(128);
       match(LMlangGrammarParser::SEMI);
       break;
     }
 
     case 8: {
       enterOuterAlt(_localctx, 8);
-      setState(128);
+      setState(130);
       continueStatement();
-      setState(129);
+      setState(131);
       match(LMlangGrammarParser::SEMI);
       break;
     }
 
     case 9: {
       enterOuterAlt(_localctx, 9);
-      setState(131);
+      setState(133);
       block();
       break;
     }
 
     case 10: {
       enterOuterAlt(_localctx, 10);
-      setState(132);
+      setState(134);
       forStatement();
       break;
     }
@@ -1169,8 +1182,8 @@ tree::TerminalNode* LMlangGrammarParser::ForStatementContext::RPAREN() {
   return getToken(LMlangGrammarParser::RPAREN, 0);
 }
 
-LMlangGrammarParser::StatementContext* LMlangGrammarParser::ForStatementContext::statement() {
-  return getRuleContext<LMlangGrammarParser::StatementContext>(0);
+LMlangGrammarParser::BlockContext* LMlangGrammarParser::ForStatementContext::block() {
+  return getRuleContext<LMlangGrammarParser::BlockContext>(0);
 }
 
 LMlangGrammarParser::ForInitContext* LMlangGrammarParser::ForStatementContext::forInit() {
@@ -1181,8 +1194,16 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::ForStatementContext
   return getRuleContext<LMlangGrammarParser::ExpressionContext>(0);
 }
 
-LMlangGrammarParser::ForPostContext* LMlangGrammarParser::ForStatementContext::forPost() {
-  return getRuleContext<LMlangGrammarParser::ForPostContext>(0);
+LMlangGrammarParser::ForIncrementContext* LMlangGrammarParser::ForStatementContext::forIncrement() {
+  return getRuleContext<LMlangGrammarParser::ForIncrementContext>(0);
+}
+
+LMlangGrammarParser::StatementContext* LMlangGrammarParser::ForStatementContext::statement() {
+  return getRuleContext<LMlangGrammarParser::StatementContext>(0);
+}
+
+LMlangGrammarParser::RangeClauseContext* LMlangGrammarParser::ForStatementContext::rangeClause() {
+  return getRuleContext<LMlangGrammarParser::RangeClauseContext>(0);
 }
 
 
@@ -1223,70 +1244,155 @@ LMlangGrammarParser::ForStatementContext* LMlangGrammarParser::forStatement() {
     exitRule();
   });
   try {
-    setState(156);
+    setState(187);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 11, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 14, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(135);
+      setState(137);
       match(LMlangGrammarParser::FOR);
-
-      setState(136);
-      match(LMlangGrammarParser::LPAREN);
       setState(138);
+      match(LMlangGrammarParser::LPAREN);
+      setState(140);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
         ((1ULL << _la) & 2722070590) != 0)) {
-        setState(137);
+        setState(139);
         forInit();
       }
-      setState(140);
-      match(LMlangGrammarParser::SEMI);
       setState(142);
+      match(LMlangGrammarParser::SEMI);
+      setState(144);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
         ((1ULL << _la) & 2722070528) != 0)) {
-        setState(141);
+        setState(143);
         expression(0);
       }
-      setState(144);
-      match(LMlangGrammarParser::SEMI);
       setState(146);
+      match(LMlangGrammarParser::SEMI);
+      setState(148);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if ((((_la & ~ 0x3fULL) == 0) &&
         ((1ULL << _la) & 2722070528) != 0)) {
-        setState(145);
-        forPost();
+        setState(147);
+        forIncrement();
       }
-      setState(148);
+      setState(150);
       match(LMlangGrammarParser::RPAREN);
-      setState(149);
-      statement();
+      setState(151);
+      block();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(150);
-      match(LMlangGrammarParser::FOR);
-      setState(151);
-      expression(0);
       setState(152);
+      match(LMlangGrammarParser::FOR);
+      setState(153);
+      match(LMlangGrammarParser::LPAREN);
+      setState(155);
+      _errHandler->sync(this);
+
+      _la = _input->LA(1);
+      if ((((_la & ~ 0x3fULL) == 0) &&
+        ((1ULL << _la) & 2722070590) != 0)) {
+        setState(154);
+        forInit();
+      }
+      setState(157);
+      match(LMlangGrammarParser::SEMI);
+      setState(159);
+      _errHandler->sync(this);
+
+      _la = _input->LA(1);
+      if ((((_la & ~ 0x3fULL) == 0) &&
+        ((1ULL << _la) & 2722070528) != 0)) {
+        setState(158);
+        expression(0);
+      }
+      setState(161);
+      match(LMlangGrammarParser::SEMI);
+      setState(163);
+      _errHandler->sync(this);
+
+      _la = _input->LA(1);
+      if ((((_la & ~ 0x3fULL) == 0) &&
+        ((1ULL << _la) & 2722070528) != 0)) {
+        setState(162);
+        forIncrement();
+      }
+      setState(165);
+      match(LMlangGrammarParser::RPAREN);
+      setState(166);
       statement();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(154);
+      setState(167);
       match(LMlangGrammarParser::FOR);
-      setState(155);
+      setState(168);
+      rangeClause();
+      setState(169);
+      block();
+      break;
+    }
+
+    case 4: {
+      enterOuterAlt(_localctx, 4);
+      setState(171);
+      match(LMlangGrammarParser::FOR);
+      setState(172);
+      rangeClause();
+      setState(173);
+      statement();
+      break;
+    }
+
+    case 5: {
+      enterOuterAlt(_localctx, 5);
+      setState(175);
+      match(LMlangGrammarParser::FOR);
+      setState(176);
+      expression(0);
+      setState(177);
+      block();
+      break;
+    }
+
+    case 6: {
+      enterOuterAlt(_localctx, 6);
+      setState(179);
+      match(LMlangGrammarParser::FOR);
+      setState(180);
+      expression(0);
+      setState(181);
+      statement();
+      break;
+    }
+
+    case 7: {
+      enterOuterAlt(_localctx, 7);
+      setState(183);
+      match(LMlangGrammarParser::FOR);
+      setState(184);
+      block();
+      break;
+    }
+
+    case 8: {
+      enterOuterAlt(_localctx, 8);
+      setState(185);
+      match(LMlangGrammarParser::FOR);
+      setState(186);
       statement();
       break;
     }
@@ -1360,26 +1466,26 @@ LMlangGrammarParser::ForInitContext* LMlangGrammarParser::forInit() {
     exitRule();
   });
   try {
-    setState(161);
+    setState(192);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 12, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 15, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(158);
+      setState(189);
       varDecl();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(159);
+      setState(190);
       assignment();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(160);
+      setState(191);
       expression(0);
       break;
     }
@@ -1398,48 +1504,44 @@ LMlangGrammarParser::ForInitContext* LMlangGrammarParser::forInit() {
   return _localctx;
 }
 
-//----------------- ForPostContext ------------------------------------------------------------------
+//----------------- ForIncrementContext ------------------------------------------------------------------
 
-LMlangGrammarParser::ForPostContext::ForPostContext(ParserRuleContext *parent, size_t invokingState)
+LMlangGrammarParser::ForIncrementContext::ForIncrementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-LMlangGrammarParser::AssignmentContext* LMlangGrammarParser::ForPostContext::assignment() {
-  return getRuleContext<LMlangGrammarParser::AssignmentContext>(0);
-}
-
-LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::ForPostContext::expression() {
+LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::ForIncrementContext::expression() {
   return getRuleContext<LMlangGrammarParser::ExpressionContext>(0);
 }
 
 
-size_t LMlangGrammarParser::ForPostContext::getRuleIndex() const {
-  return LMlangGrammarParser::RuleForPost;
+size_t LMlangGrammarParser::ForIncrementContext::getRuleIndex() const {
+  return LMlangGrammarParser::RuleForIncrement;
 }
 
-void LMlangGrammarParser::ForPostContext::enterRule(tree::ParseTreeListener *listener) {
+void LMlangGrammarParser::ForIncrementContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<LMlangGrammarListener *>(listener);
   if (parserListener != nullptr)
-    parserListener->enterForPost(this);
+    parserListener->enterForIncrement(this);
 }
 
-void LMlangGrammarParser::ForPostContext::exitRule(tree::ParseTreeListener *listener) {
+void LMlangGrammarParser::ForIncrementContext::exitRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<LMlangGrammarListener *>(listener);
   if (parserListener != nullptr)
-    parserListener->exitForPost(this);
+    parserListener->exitForIncrement(this);
 }
 
 
-std::any LMlangGrammarParser::ForPostContext::accept(tree::ParseTreeVisitor *visitor) {
+std::any LMlangGrammarParser::ForIncrementContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<LMlangGrammarVisitor*>(visitor))
-    return parserVisitor->visitForPost(this);
+    return parserVisitor->visitForIncrement(this);
   else
     return visitor->visitChildren(this);
 }
 
-LMlangGrammarParser::ForPostContext* LMlangGrammarParser::forPost() {
-  ForPostContext *_localctx = _tracker.createInstance<ForPostContext>(_ctx, getState());
-  enterRule(_localctx, 22, LMlangGrammarParser::RuleForPost);
+LMlangGrammarParser::ForIncrementContext* LMlangGrammarParser::forIncrement() {
+  ForIncrementContext *_localctx = _tracker.createInstance<ForIncrementContext>(_ctx, getState());
+  enterRule(_localctx, 22, LMlangGrammarParser::RuleForIncrement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1449,26 +1551,101 @@ LMlangGrammarParser::ForPostContext* LMlangGrammarParser::forPost() {
     exitRule();
   });
   try {
-    setState(165);
+    enterOuterAlt(_localctx, 1);
+    setState(194);
+    expression(0);
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- RangeClauseContext ------------------------------------------------------------------
+
+LMlangGrammarParser::RangeClauseContext::RangeClauseContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+std::vector<tree::TerminalNode *> LMlangGrammarParser::RangeClauseContext::ID() {
+  return getTokens(LMlangGrammarParser::ID);
+}
+
+tree::TerminalNode* LMlangGrammarParser::RangeClauseContext::ID(size_t i) {
+  return getToken(LMlangGrammarParser::ID, i);
+}
+
+tree::TerminalNode* LMlangGrammarParser::RangeClauseContext::RANGE() {
+  return getToken(LMlangGrammarParser::RANGE, 0);
+}
+
+LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::RangeClauseContext::expression() {
+  return getRuleContext<LMlangGrammarParser::ExpressionContext>(0);
+}
+
+tree::TerminalNode* LMlangGrammarParser::RangeClauseContext::COMMA() {
+  return getToken(LMlangGrammarParser::COMMA, 0);
+}
+
+
+size_t LMlangGrammarParser::RangeClauseContext::getRuleIndex() const {
+  return LMlangGrammarParser::RuleRangeClause;
+}
+
+void LMlangGrammarParser::RangeClauseContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<LMlangGrammarListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterRangeClause(this);
+}
+
+void LMlangGrammarParser::RangeClauseContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<LMlangGrammarListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitRangeClause(this);
+}
+
+
+std::any LMlangGrammarParser::RangeClauseContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<LMlangGrammarVisitor*>(visitor))
+    return parserVisitor->visitRangeClause(this);
+  else
+    return visitor->visitChildren(this);
+}
+
+LMlangGrammarParser::RangeClauseContext* LMlangGrammarParser::rangeClause() {
+  RangeClauseContext *_localctx = _tracker.createInstance<RangeClauseContext>(_ctx, getState());
+  enterRule(_localctx, 24, LMlangGrammarParser::RuleRangeClause);
+  size_t _la = 0;
+
+#if __cplusplus > 201703L
+  auto onExit = finally([=, this] {
+#else
+  auto onExit = finally([=] {
+#endif
+    exitRule();
+  });
+  try {
+    enterOuterAlt(_localctx, 1);
+    setState(196);
+    match(LMlangGrammarParser::ID);
+    setState(199);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 13, _ctx)) {
-    case 1: {
-      enterOuterAlt(_localctx, 1);
-      setState(163);
-      assignment();
-      break;
-    }
 
-    case 2: {
-      enterOuterAlt(_localctx, 2);
-      setState(164);
-      expression(0);
-      break;
+    _la = _input->LA(1);
+    if (_la == LMlangGrammarParser::COMMA) {
+      setState(197);
+      match(LMlangGrammarParser::COMMA);
+      setState(198);
+      match(LMlangGrammarParser::ID);
     }
-
-    default:
-      break;
-    }
+    setState(201);
+    match(LMlangGrammarParser::RANGE);
+    setState(202);
+    expression(0);
    
   }
   catch (RecognitionException &e) {
@@ -1529,7 +1706,7 @@ std::any LMlangGrammarParser::VarDeclContext::accept(tree::ParseTreeVisitor *vis
 
 LMlangGrammarParser::VarDeclContext* LMlangGrammarParser::varDecl() {
   VarDeclContext *_localctx = _tracker.createInstance<VarDeclContext>(_ctx, getState());
-  enterRule(_localctx, 24, LMlangGrammarParser::RuleVarDecl);
+  enterRule(_localctx, 26, LMlangGrammarParser::RuleVarDecl);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1541,18 +1718,18 @@ LMlangGrammarParser::VarDeclContext* LMlangGrammarParser::varDecl() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(167);
+    setState(204);
     type(0);
-    setState(168);
+    setState(205);
     match(LMlangGrammarParser::ID);
-    setState(171);
+    setState(208);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == LMlangGrammarParser::ASSIGN) {
-      setState(169);
+      setState(206);
       match(LMlangGrammarParser::ASSIGN);
-      setState(170);
+      setState(207);
       expression(0);
     }
    
@@ -1611,7 +1788,7 @@ std::any LMlangGrammarParser::AssignmentContext::accept(tree::ParseTreeVisitor *
 
 LMlangGrammarParser::AssignmentContext* LMlangGrammarParser::assignment() {
   AssignmentContext *_localctx = _tracker.createInstance<AssignmentContext>(_ctx, getState());
-  enterRule(_localctx, 26, LMlangGrammarParser::RuleAssignment);
+  enterRule(_localctx, 28, LMlangGrammarParser::RuleAssignment);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1622,11 +1799,11 @@ LMlangGrammarParser::AssignmentContext* LMlangGrammarParser::assignment() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(173);
+    setState(210);
     assignable();
-    setState(174);
+    setState(211);
     match(LMlangGrammarParser::ASSIGN);
-    setState(175);
+    setState(212);
     expression(0);
    
   }
@@ -1700,7 +1877,7 @@ std::any LMlangGrammarParser::IfStatementContext::accept(tree::ParseTreeVisitor 
 
 LMlangGrammarParser::IfStatementContext* LMlangGrammarParser::ifStatement() {
   IfStatementContext *_localctx = _tracker.createInstance<IfStatementContext>(_ctx, getState());
-  enterRule(_localctx, 28, LMlangGrammarParser::RuleIfStatement);
+  enterRule(_localctx, 30, LMlangGrammarParser::RuleIfStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1711,24 +1888,24 @@ LMlangGrammarParser::IfStatementContext* LMlangGrammarParser::ifStatement() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(177);
+    setState(214);
     match(LMlangGrammarParser::IF);
-    setState(178);
+    setState(215);
     match(LMlangGrammarParser::LPAREN);
-    setState(179);
+    setState(216);
     expression(0);
-    setState(180);
+    setState(217);
     match(LMlangGrammarParser::RPAREN);
-    setState(181);
+    setState(218);
     statement();
-    setState(184);
+    setState(221);
     _errHandler->sync(this);
 
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 15, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 18, _ctx)) {
     case 1: {
-      setState(182);
+      setState(219);
       match(LMlangGrammarParser::ELSE);
-      setState(183);
+      setState(220);
       statement();
       break;
     }
@@ -1784,7 +1961,7 @@ std::any LMlangGrammarParser::BreakStatementContext::accept(tree::ParseTreeVisit
 
 LMlangGrammarParser::BreakStatementContext* LMlangGrammarParser::breakStatement() {
   BreakStatementContext *_localctx = _tracker.createInstance<BreakStatementContext>(_ctx, getState());
-  enterRule(_localctx, 30, LMlangGrammarParser::RuleBreakStatement);
+  enterRule(_localctx, 32, LMlangGrammarParser::RuleBreakStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1795,7 +1972,7 @@ LMlangGrammarParser::BreakStatementContext* LMlangGrammarParser::breakStatement(
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(186);
+    setState(223);
     match(LMlangGrammarParser::BREAK);
    
   }
@@ -1845,7 +2022,7 @@ std::any LMlangGrammarParser::ContinueStatementContext::accept(tree::ParseTreeVi
 
 LMlangGrammarParser::ContinueStatementContext* LMlangGrammarParser::continueStatement() {
   ContinueStatementContext *_localctx = _tracker.createInstance<ContinueStatementContext>(_ctx, getState());
-  enterRule(_localctx, 32, LMlangGrammarParser::RuleContinueStatement);
+  enterRule(_localctx, 34, LMlangGrammarParser::RuleContinueStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1856,7 +2033,7 @@ LMlangGrammarParser::ContinueStatementContext* LMlangGrammarParser::continueStat
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(188);
+    setState(225);
     match(LMlangGrammarParser::CONTINUE);
    
   }
@@ -1910,7 +2087,7 @@ std::any LMlangGrammarParser::ReturnStatementContext::accept(tree::ParseTreeVisi
 
 LMlangGrammarParser::ReturnStatementContext* LMlangGrammarParser::returnStatement() {
   ReturnStatementContext *_localctx = _tracker.createInstance<ReturnStatementContext>(_ctx, getState());
-  enterRule(_localctx, 34, LMlangGrammarParser::RuleReturnStatement);
+  enterRule(_localctx, 36, LMlangGrammarParser::RuleReturnStatement);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -1922,15 +2099,15 @@ LMlangGrammarParser::ReturnStatementContext* LMlangGrammarParser::returnStatemen
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(190);
+    setState(227);
     match(LMlangGrammarParser::RETURN);
-    setState(192);
+    setState(229);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 2722070528) != 0)) {
-      setState(191);
+      setState(228);
       expression(0);
     }
    
@@ -1993,7 +2170,7 @@ std::any LMlangGrammarParser::PrintStatementContext::accept(tree::ParseTreeVisit
 
 LMlangGrammarParser::PrintStatementContext* LMlangGrammarParser::printStatement() {
   PrintStatementContext *_localctx = _tracker.createInstance<PrintStatementContext>(_ctx, getState());
-  enterRule(_localctx, 36, LMlangGrammarParser::RulePrintStatement);
+  enterRule(_localctx, 38, LMlangGrammarParser::RulePrintStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2004,13 +2181,13 @@ LMlangGrammarParser::PrintStatementContext* LMlangGrammarParser::printStatement(
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(194);
+    setState(231);
     match(LMlangGrammarParser::PRINT);
-    setState(195);
+    setState(232);
     match(LMlangGrammarParser::LPAREN);
-    setState(196);
+    setState(233);
     expression(0);
-    setState(197);
+    setState(234);
     match(LMlangGrammarParser::RPAREN);
    
   }
@@ -2121,8 +2298,8 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
   LMlangGrammarParser::ExpressionContext *_localctx = _tracker.createInstance<ExpressionContext>(_ctx, parentState);
   LMlangGrammarParser::ExpressionContext *previousContext = _localctx;
   (void)previousContext; // Silence compiler, in case the context is not used by generated code.
-  size_t startState = 38;
-  enterRecursionRule(_localctx, 38, LMlangGrammarParser::RuleExpression, precedence);
+  size_t startState = 40;
+  enterRecursionRule(_localctx, 40, LMlangGrammarParser::RuleExpression, precedence);
 
     
 
@@ -2136,37 +2313,37 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
   try {
     size_t alt;
     enterOuterAlt(_localctx, 1);
-    setState(209);
+    setState(246);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 17, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 20, _ctx)) {
     case 1: {
-      setState(200);
+      setState(237);
       match(LMlangGrammarParser::LPAREN);
-      setState(201);
+      setState(238);
       expression(0);
-      setState(202);
+      setState(239);
       match(LMlangGrammarParser::RPAREN);
       break;
     }
 
     case 2: {
-      setState(204);
+      setState(241);
       match(LMlangGrammarParser::NEG);
-      setState(205);
+      setState(242);
       expression(9);
       break;
     }
 
     case 3: {
-      setState(206);
+      setState(243);
       match(LMlangGrammarParser::NOT);
-      setState(207);
+      setState(244);
       expression(8);
       break;
     }
 
     case 4: {
-      setState(208);
+      setState(245);
       primaryExpression();
       break;
     }
@@ -2175,26 +2352,26 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
       break;
     }
     _ctx->stop = _input->LT(-1);
-    setState(233);
+    setState(270);
     _errHandler->sync(this);
-    alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 19, _ctx);
+    alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 22, _ctx);
     while (alt != 2 && alt != atn::ATN::INVALID_ALT_NUMBER) {
       if (alt == 1) {
         if (!_parseListeners.empty())
           triggerExitRuleEvent();
         previousContext = _localctx;
-        setState(231);
+        setState(268);
         _errHandler->sync(this);
-        switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 18, _ctx)) {
+        switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 21, _ctx)) {
         case 1: {
           _localctx = _tracker.createInstance<ExpressionContext>(parentContext, parentState);
           pushNewRecursionContext(_localctx, startState, RuleExpression);
-          setState(211);
+          setState(248);
 
           if (!(precpred(_ctx, 7))) throw FailedPredicateException(this, "precpred(_ctx, 7)");
-          setState(212);
+          setState(249);
           match(LMlangGrammarParser::AND);
-          setState(213);
+          setState(250);
           expression(8);
           break;
         }
@@ -2202,12 +2379,12 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
         case 2: {
           _localctx = _tracker.createInstance<ExpressionContext>(parentContext, parentState);
           pushNewRecursionContext(_localctx, startState, RuleExpression);
-          setState(214);
+          setState(251);
 
           if (!(precpred(_ctx, 6))) throw FailedPredicateException(this, "precpred(_ctx, 6)");
-          setState(215);
+          setState(252);
           match(LMlangGrammarParser::OR);
-          setState(216);
+          setState(253);
           expression(7);
           break;
         }
@@ -2215,12 +2392,12 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
         case 3: {
           _localctx = _tracker.createInstance<ExpressionContext>(parentContext, parentState);
           pushNewRecursionContext(_localctx, startState, RuleExpression);
-          setState(217);
+          setState(254);
 
           if (!(precpred(_ctx, 5))) throw FailedPredicateException(this, "precpred(_ctx, 5)");
-          setState(218);
+          setState(255);
           match(LMlangGrammarParser::MULT);
-          setState(219);
+          setState(256);
           expression(6);
           break;
         }
@@ -2228,12 +2405,12 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
         case 4: {
           _localctx = _tracker.createInstance<ExpressionContext>(parentContext, parentState);
           pushNewRecursionContext(_localctx, startState, RuleExpression);
-          setState(220);
+          setState(257);
 
           if (!(precpred(_ctx, 4))) throw FailedPredicateException(this, "precpred(_ctx, 4)");
-          setState(221);
+          setState(258);
           match(LMlangGrammarParser::ADD);
-          setState(222);
+          setState(259);
           expression(5);
           break;
         }
@@ -2241,12 +2418,12 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
         case 5: {
           _localctx = _tracker.createInstance<ExpressionContext>(parentContext, parentState);
           pushNewRecursionContext(_localctx, startState, RuleExpression);
-          setState(223);
+          setState(260);
 
           if (!(precpred(_ctx, 3))) throw FailedPredicateException(this, "precpred(_ctx, 3)");
-          setState(224);
+          setState(261);
           match(LMlangGrammarParser::COMPOP);
-          setState(225);
+          setState(262);
           expression(4);
           break;
         }
@@ -2254,14 +2431,14 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
         case 6: {
           _localctx = _tracker.createInstance<ExpressionContext>(parentContext, parentState);
           pushNewRecursionContext(_localctx, startState, RuleExpression);
-          setState(226);
+          setState(263);
 
           if (!(precpred(_ctx, 1))) throw FailedPredicateException(this, "precpred(_ctx, 1)");
-          setState(227);
+          setState(264);
           match(LMlangGrammarParser::LBRACK);
-          setState(228);
+          setState(265);
           expression(0);
-          setState(229);
+          setState(266);
           match(LMlangGrammarParser::RBRACK);
           break;
         }
@@ -2270,9 +2447,9 @@ LMlangGrammarParser::ExpressionContext* LMlangGrammarParser::expression(int prec
           break;
         } 
       }
-      setState(235);
+      setState(272);
       _errHandler->sync(this);
-      alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 19, _ctx);
+      alt = getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 22, _ctx);
     }
   }
   catch (RecognitionException &e) {
@@ -2364,7 +2541,7 @@ std::any LMlangGrammarParser::PrimaryExpressionContext::accept(tree::ParseTreeVi
 
 LMlangGrammarParser::PrimaryExpressionContext* LMlangGrammarParser::primaryExpression() {
   PrimaryExpressionContext *_localctx = _tracker.createInstance<PrimaryExpressionContext>(_ctx, getState());
-  enterRule(_localctx, 40, LMlangGrammarParser::RulePrimaryExpression);
+  enterRule(_localctx, 42, LMlangGrammarParser::RulePrimaryExpression);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2374,79 +2551,79 @@ LMlangGrammarParser::PrimaryExpressionContext* LMlangGrammarParser::primaryExpre
     exitRule();
   });
   try {
-    setState(249);
+    setState(286);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 20, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 23, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(236);
+      setState(273);
       match(LMlangGrammarParser::ID);
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(237);
+      setState(274);
       arrayAccess();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
-      setState(238);
+      setState(275);
       functionCall();
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
-      setState(239);
+      setState(276);
       match(LMlangGrammarParser::INT);
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
-      setState(240);
+      setState(277);
       match(LMlangGrammarParser::DOUBLE);
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
-      setState(241);
+      setState(278);
       match(LMlangGrammarParser::CHAR);
       break;
     }
 
     case 7: {
       enterOuterAlt(_localctx, 7);
-      setState(242);
+      setState(279);
       match(LMlangGrammarParser::BOOL);
       break;
     }
 
     case 8: {
       enterOuterAlt(_localctx, 8);
-      setState(243);
+      setState(280);
       match(LMlangGrammarParser::STRING);
       break;
     }
 
     case 9: {
       enterOuterAlt(_localctx, 9);
-      setState(244);
+      setState(281);
       match(LMlangGrammarParser::LPAREN);
-      setState(245);
+      setState(282);
       expression(0);
-      setState(246);
+      setState(283);
       match(LMlangGrammarParser::RPAREN);
       break;
     }
 
     case 10: {
       enterOuterAlt(_localctx, 10);
-      setState(248);
+      setState(285);
       arrayInit();
       break;
     }
@@ -2522,7 +2699,7 @@ std::any LMlangGrammarParser::ArrayInitContext::accept(tree::ParseTreeVisitor *v
 
 LMlangGrammarParser::ArrayInitContext* LMlangGrammarParser::arrayInit() {
   ArrayInitContext *_localctx = _tracker.createInstance<ArrayInitContext>(_ctx, getState());
-  enterRule(_localctx, 42, LMlangGrammarParser::RuleArrayInit);
+  enterRule(_localctx, 44, LMlangGrammarParser::RuleArrayInit);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2534,30 +2711,30 @@ LMlangGrammarParser::ArrayInitContext* LMlangGrammarParser::arrayInit() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(251);
+    setState(288);
     match(LMlangGrammarParser::LBRACE);
-    setState(260);
+    setState(297);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 2722070528) != 0)) {
-      setState(252);
+      setState(289);
       expression(0);
-      setState(257);
+      setState(294);
       _errHandler->sync(this);
       _la = _input->LA(1);
       while (_la == LMlangGrammarParser::COMMA) {
-        setState(253);
+        setState(290);
         match(LMlangGrammarParser::COMMA);
-        setState(254);
+        setState(291);
         expression(0);
-        setState(259);
+        setState(296);
         _errHandler->sync(this);
         _la = _input->LA(1);
       }
     }
-    setState(262);
+    setState(299);
     match(LMlangGrammarParser::RBRACE);
    
   }
@@ -2619,7 +2796,7 @@ std::any LMlangGrammarParser::ArgumentListContext::accept(tree::ParseTreeVisitor
 
 LMlangGrammarParser::ArgumentListContext* LMlangGrammarParser::argumentList() {
   ArgumentListContext *_localctx = _tracker.createInstance<ArgumentListContext>(_ctx, getState());
-  enterRule(_localctx, 44, LMlangGrammarParser::RuleArgumentList);
+  enterRule(_localctx, 46, LMlangGrammarParser::RuleArgumentList);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2631,17 +2808,17 @@ LMlangGrammarParser::ArgumentListContext* LMlangGrammarParser::argumentList() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(264);
+    setState(301);
     expression(0);
-    setState(269);
+    setState(306);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while (_la == LMlangGrammarParser::COMMA) {
-      setState(265);
+      setState(302);
       match(LMlangGrammarParser::COMMA);
-      setState(266);
+      setState(303);
       expression(0);
-      setState(271);
+      setState(308);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
@@ -2705,7 +2882,7 @@ std::any LMlangGrammarParser::ArrayAccessContext::accept(tree::ParseTreeVisitor 
 
 LMlangGrammarParser::ArrayAccessContext* LMlangGrammarParser::arrayAccess() {
   ArrayAccessContext *_localctx = _tracker.createInstance<ArrayAccessContext>(_ctx, getState());
-  enterRule(_localctx, 46, LMlangGrammarParser::RuleArrayAccess);
+  enterRule(_localctx, 48, LMlangGrammarParser::RuleArrayAccess);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2716,13 +2893,13 @@ LMlangGrammarParser::ArrayAccessContext* LMlangGrammarParser::arrayAccess() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(272);
+    setState(309);
     match(LMlangGrammarParser::ID);
-    setState(273);
+    setState(310);
     match(LMlangGrammarParser::LBRACK);
-    setState(274);
+    setState(311);
     expression(0);
-    setState(275);
+    setState(312);
     match(LMlangGrammarParser::RBRACK);
    
   }
@@ -2784,7 +2961,7 @@ std::any LMlangGrammarParser::FunctionCallContext::accept(tree::ParseTreeVisitor
 
 LMlangGrammarParser::FunctionCallContext* LMlangGrammarParser::functionCall() {
   FunctionCallContext *_localctx = _tracker.createInstance<FunctionCallContext>(_ctx, getState());
-  enterRule(_localctx, 48, LMlangGrammarParser::RuleFunctionCall);
+  enterRule(_localctx, 50, LMlangGrammarParser::RuleFunctionCall);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -2796,20 +2973,20 @@ LMlangGrammarParser::FunctionCallContext* LMlangGrammarParser::functionCall() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(277);
+    setState(314);
     match(LMlangGrammarParser::ID);
-    setState(278);
+    setState(315);
     match(LMlangGrammarParser::LPAREN);
-    setState(280);
+    setState(317);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & 2722070528) != 0)) {
-      setState(279);
+      setState(316);
       argumentList();
     }
-    setState(282);
+    setState(319);
     match(LMlangGrammarParser::RPAREN);
    
   }
@@ -2863,7 +3040,7 @@ std::any LMlangGrammarParser::AssignableContext::accept(tree::ParseTreeVisitor *
 
 LMlangGrammarParser::AssignableContext* LMlangGrammarParser::assignable() {
   AssignableContext *_localctx = _tracker.createInstance<AssignableContext>(_ctx, getState());
-  enterRule(_localctx, 50, LMlangGrammarParser::RuleAssignable);
+  enterRule(_localctx, 52, LMlangGrammarParser::RuleAssignable);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -2873,19 +3050,19 @@ LMlangGrammarParser::AssignableContext* LMlangGrammarParser::assignable() {
     exitRule();
   });
   try {
-    setState(286);
+    setState(323);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 25, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 28, _ctx)) {
     case 1: {
       enterOuterAlt(_localctx, 1);
-      setState(284);
+      setState(321);
       match(LMlangGrammarParser::ID);
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
-      setState(285);
+      setState(322);
       arrayAccess();
       break;
     }
@@ -2907,7 +3084,7 @@ LMlangGrammarParser::AssignableContext* LMlangGrammarParser::assignable() {
 bool LMlangGrammarParser::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
     case 5: return typeSempred(antlrcpp::downCast<TypeContext *>(context), predicateIndex);
-    case 19: return expressionSempred(antlrcpp::downCast<ExpressionContext *>(context), predicateIndex);
+    case 20: return expressionSempred(antlrcpp::downCast<ExpressionContext *>(context), predicateIndex);
 
   default:
     break;
