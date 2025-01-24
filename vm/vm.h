@@ -131,7 +131,7 @@ public:
         while (pc < bytecode.size()) {
             Bytecode instruction = static_cast<Bytecode>(bytecode[pc++]);
 
-            if (instruction == Bytecode::Jump || instruction == Bytecode::JumpIfFalse) { // TODO: Вычленить кусок байткода с циклом и отправить в функцию
+            if (instruction == Bytecode::Jump || instruction == Bytecode::JumpIfFalse) {
                 LoopCounters[pc]++;
                 if (LoopCounters[pc] > HotLoopThreshold) {
                     std::cout << "Hot loop detected at PC: " << pc << std::endl;
@@ -316,7 +316,7 @@ public:
         execEngine->runFunction(jitFunc, arrRef);
     }
 
-private:  // TODO: Написать Array table и подержку массивов
+private:
 
     std::unordered_map<int, int> LoopCounters; // Map to track loop instruction usage
     const int HotLoopThreshold = 10;          // Threshold for marking a loop as hot

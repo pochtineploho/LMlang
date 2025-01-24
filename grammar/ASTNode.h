@@ -87,6 +87,14 @@ public:
         return "VarDeclNode";
     }
 
+    std::string getVarType() {
+        return type;
+    }
+
+    ASTNodePtr getValue() {
+        return value;
+    }
+
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Type: " << type << "\n";
@@ -117,9 +125,17 @@ public:
         return "LiteralNode";
     }
 
+    char getValue(){
+        return value;
+    }
+
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Value: " << value << "\n";
+    }
+
+    void Codegen() override {
+        //
     }
 };
 
@@ -135,9 +151,16 @@ public:
         return "NumberNode";
     }
 
+    int getValue(){
+        return value;
+    }
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Value: " << value << "\n";
+    }
+
+    void Codegen() override {
+        //
     }
 };
 
@@ -151,9 +174,17 @@ public:
         return "BooleanNode";
     }
 
+    bool getValue(){
+        return value;
+    }
+
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Value: " << value << "\n";
+    }
+
+    void Codegen() override {
+        //
     }
 };
 
@@ -167,9 +198,17 @@ public:
         return "DoubleNode";
     }
 
+    double getValue(){
+        return value;
+    }
+
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Value: " << value << "\n";
+    }
+
+    void Codegen() override {
+        //
     }
 };
 
@@ -183,9 +222,17 @@ public:
         return "StringNode";
     }
 
+    std::string getValue(){
+        return value;
+    }
+
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Value: " << value << "\n";
+    }
+
+    void Codegen() override {
+        //
     }
 };
 
@@ -314,10 +361,55 @@ public:
     }
 
     void Codegen() override {
-        for (const auto &value : values) {
-            value->Codegen();
+        // Check the type of the first element to determine the array type
+        if (values.empty()) {
+            throw std::runtime_error("ArrayInitializerNode: Empty array is not supported");
         }
-        bCG.EmitArray(true);
+
+        // Handle arrays of integers, doubles, or strings
+        if (std::dynamic_pointer_cast<NumberNode>(values[0])) {
+            std::vector<int> intValues;
+            for (const auto &value : values) {
+                auto numberNode = std::dynamic_pointer_cast<NumberNode>(value);
+                if (!numberNode) {
+                    throw std::runtime_error("ArrayInitializerNode: Mixed types in array are not supported");
+                }
+                intValues.push_back(static_cast<int>(numberNode->getValue())); // Assuming NumberNode provides getValue()
+            }
+            bCG.EmitArray(intValues); // Emit the array of integers
+        } else if (std::dynamic_pointer_cast<DoubleNode>(values[0])) {
+            std::vector<double> doubleValues;
+            for (const auto &value : values) {
+                auto doubleNode = std::dynamic_pointer_cast<DoubleNode>(value);
+                if (!doubleNode) {
+                    throw std::runtime_error("ArrayInitializerNode: Mixed types in array are not supported");
+                }
+                doubleValues.push_back(doubleNode->getValue()); // Assuming DoubleNode provides getValue()
+            }
+            bCG.EmitArray(doubleValues); // Emit the array of doubles
+        } else if (std::dynamic_pointer_cast<CharNode>(values[0])) {
+            std::vector<char> charValues;
+            for (const auto &value : values) {
+                auto charNode = std::dynamic_pointer_cast<CharNode>(value);
+                if (!charNode) {
+                    throw std::runtime_error("ArrayInitializerNode: Mixed types in array are not supported");
+                }
+                charValues.push_back(charNode->getValue()); // Assuming DoubleNode provides getValue()
+            }
+            bCG.EmitArray(charValues); // Emit the array of doubles
+        } else if (std::dynamic_pointer_cast<StringNode>(values[0])) {
+            std::vector<std::string> stringValues;
+            for (const auto &value : values) {
+                auto stringNode = std::dynamic_pointer_cast<StringNode>(value);
+                if (!stringNode) {
+                    throw std::runtime_error("ArrayInitializerNode: Mixed types in array are not supported");
+                }
+                stringValues.push_back(stringNode->getValue()); // Assuming StringNode provides getValue()
+            }
+            bCG.EmitArray(stringValues); // Emit the array of strings
+        } else {
+            throw std::runtime_error("ArrayInitializerNode: Unsupported element type");
+        }
     }
 };
 
@@ -373,6 +465,10 @@ public:
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Name: " << name << "\n";
+    }
+
+    void Codegen() override {
+      //
     }
 };
 

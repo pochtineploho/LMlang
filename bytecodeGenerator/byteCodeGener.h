@@ -85,6 +85,18 @@ public:
         return arrayID;
     }
 
+    // Emit array creation (for chars)
+    int EmitArray(const std::vector<char> &arrayElements) {
+        int arrayID = NextArrayID++;
+        std::vector<int> converted(arrayElements.size());
+        std::transform(arrayElements.begin(), arrayElements.end(), converted.begin(),
+                       [](char val) { return static_cast<int>(val); }); // Convert chars to ints for simplicity
+        ArrayTable[arrayID] = converted;
+        EmitBytecode(static_cast<uint8_t>(Bytecode::CreateArray));
+        EmitInt(arrayID);
+        return arrayID;
+    }
+
     // Emit array creation (for strings)
     int EmitArray(const std::vector<std::string> &arrayElements) {
         int arrayID = NextArrayID++;
