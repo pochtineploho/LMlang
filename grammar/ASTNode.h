@@ -10,6 +10,7 @@
 #include <optional>
 #include <utility>
 #include <vector>
+#include "../bytecodeGenerator/byteCodeGener.h"
 
 class ASTNode; ///TODO: Bytecode generation
 using ASTNodePtr = std::shared_ptr<ASTNode>;
@@ -19,6 +20,8 @@ using ASTNodePtr = std::shared_ptr<ASTNode>;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class ASTNode {
+protected:
+    byteCodeGener bCG;
 public:
     virtual ~ASTNode() = default;
 
@@ -28,6 +31,7 @@ public:
     virtual void print(int indent) const {
         std::cout << std::string(indent, ' ') << getTypeName() << std::endl;
     }
+    virtual void Codegen() = 0; // Abstract Codegen function
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,6 +55,11 @@ public:
         ASTNode::print(indent);
         for (const auto &child: children) {
             child->print(indent + 2);
+        }
+    }
+    void Codegen() override {
+        for (const auto &child : children) {
+            child->Codegen();
         }
     }
 };
@@ -86,6 +95,13 @@ public:
             std::cout << std::string(indent + 2, ' ') << "Value:\n";
             value->print(indent + 4);
         }
+    }
+    void Codegen() override {
+        if (value) {
+            value->Codegen();
+        }
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::StoreVar));
+        bCG.EmitString(name);
     }
 };
 
@@ -193,6 +209,17 @@ public:
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Operator: " << op << "\n";
     }
+
+    void Codegen() override {
+        lhs->Codegen();
+        rhs->Codegen();
+
+        if (op == "+") bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Add));
+        else if (op == "-") bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Subtract));
+        else if (op == "*") bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Multiply));
+        else if (op == "/") bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Divide));
+        else throw std::runtime_error("Unknown binary operator");
+    }
 };
 
 class AssignmentNode : public ASTNode {
@@ -223,6 +250,16 @@ public:
         std::cout << std::string(indent + 2, ' ') << "LHS: " << lhs << "\n";
         std::cout << std::string(indent + 2, ' ') << "RHS: " << rhs << "\n";
     }
+
+    void Codegen() override {
+        rhs->Codegen();
+        auto varNode = std::dynamic_pointer_cast<VariableNode>(lhs);
+        if (!varNode) {
+            throw std::runtime_error("LHS of assignment must be a variable");
+        }
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::StoreVar));
+        bCG.EmitString(varNode->getTypeName());
+    }
 };
 
 class UnaryOperatorNode : public ASTNode {
@@ -242,6 +279,13 @@ public:
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Operator: " << op << "\n";
         ASTNode::print(indent);
+    }
+
+    void Codegen() override {
+        operand->Codegen();
+        if (op == "-") bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Subtract));
+        else if (op == "!") bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Not));
+        else throw std::runtime_error("Unknown unary operator");
     }
 };
 
@@ -267,6 +311,13 @@ public:
         for (const auto &value: values) {
             value->print(indent + 2);
         }
+    }
+
+    void Codegen() override {
+        for (const auto &value : values) {
+            value->Codegen();
+        }
+        bCG.EmitArray(true);
     }
 };
 
@@ -301,6 +352,12 @@ public:
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Index: " << index << "\n";
     }
+
+    void Codegen() override {
+        array->Codegen();
+        index->Codegen();
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
+    }
 };
 
 class TypeNode : public ASTNode {
@@ -332,6 +389,11 @@ public:
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "Name: " << name << "\n";
+    }
+
+    void Codegen() override {
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::LoadVar));
+        bCG.EmitString(name);
     }
 };
 
@@ -384,6 +446,17 @@ public:
             body->print(indent + 2);
         }
     }
+
+    void Codegen() override {
+        bCG.EmitFunctionStart(name);
+        for (const auto &param : parameters) {
+            param->Codegen();
+        }
+        if (body) {
+            body->Codegen();
+        }
+        bCG.EmitFunctionEnd();
+    }
 };
 
 class CallFunctionNode : public ASTNode {
@@ -408,6 +481,14 @@ public:
         std::cout << std::string(indent + 2, ' ') << "Name: " << name << "\n";
     }
 
+    void Codegen() override {
+        for (const auto &param : parameters) {
+            param->Codegen();
+        }
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Call));
+        bCG.EmitString(name);
+        bCG.EmitInt(parameters.size());
+    }
 };
 
 class ParameterNode : public ASTNode {
@@ -436,6 +517,10 @@ public:
         std::cout << std::string(indent + 2, ' ') << "Type: " << type << "\n";
         std::cout << std::string(indent + 2, ' ') << "Name: " << name << "\n";
     }
+
+    void Codegen() override {
+        bCG.EmitVariableDeclaration(name, type);
+    }
 };
 
 
@@ -461,6 +546,13 @@ public:
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "ReturnExpression: " << returnExpression << "\n";
+    }
+
+    void Codegen() override {
+        if (returnExpression) {
+            returnExpression->Codegen();
+        }
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Return));
     }
 };
 
@@ -503,6 +595,23 @@ public:
         if (else_) {
             std::cout << std::string(indent + 2, ' ') << "Else: " << else_ << "\n";
         }
+    }
+
+    void Codegen() override {
+        condition->Codegen();
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::JumpIfFalse));
+        int elseJumpPos = bCG.ReserveJump();
+
+        then->Codegen();
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
+        int endJumpPos = bCG.ReserveJump();
+
+        bCG.FixJump(elseJumpPos);
+        if (else_) {
+            else_->Codegen();
+        }
+
+        bCG.FixJump(endJumpPos);
     }
 };
 
@@ -569,6 +678,34 @@ public:
 
         std::cout << std::string(indent + 2, ' ') << "Body: " << body << "\n";
     }
+
+    void Codegen() override {
+        if (rangeExpr) {
+            // Range-based for loop
+            rangeExpr->Codegen();
+            if (rangeVar1) bCG.EmitString(*rangeVar1);
+            if (rangeVar2) bCG.EmitString(*rangeVar2);
+        } else {
+            // Traditional for loop
+            if (init) init->Codegen();
+
+            int loopStart = bCG.CurrentBytecodePosition();
+
+            if (condition) {
+                condition->Codegen();
+                bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::JumpIfFalse));
+                int exitJump = bCG.ReserveJump();
+
+                body->Codegen();
+                if (increment) increment->Codegen();
+
+                bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
+                bCG.EmitJump(loopStart);
+
+                bCG.FixJump(exitJump);
+            }
+        }
+    }
 };
 
 
@@ -585,6 +722,11 @@ public:
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "BreakNode\n";
     }
+
+    void Codegen() override {
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
+        bCG.ReserveJump();
+    }
 };
 
 class ContinueNode : public ASTNode {
@@ -599,6 +741,11 @@ public:
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "ContinueNode\n";
+    }
+
+    void Codegen() override {
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Jump));
+        // FixJump to loop start should be managed externally.
     }
 };
 
@@ -623,6 +770,11 @@ public:
     void print(int indent) const override {
         ASTNode::print(indent);
         std::cout << std::string(indent + 2, ' ') << "PrintNode\n";
+    }
+
+    void Codegen() override {
+        expression->Codegen();
+        bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Print));
     }
 };
 

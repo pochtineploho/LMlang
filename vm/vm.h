@@ -116,6 +116,15 @@ public:
         llvm::InitializeNativeTargetAsmParser();
     }
 
+    void LoadArrayTable(const std::unordered_map<int, std::vector<int>> &arrayTable) {
+        for (const auto &[id, intArray] : arrayTable) {
+            std::vector<Value> valueArray(intArray.size());
+            std::transform(intArray.begin(), intArray.end(), valueArray.begin(),
+                           [](int val) { return Value(val); });
+            ArrayTable[id] = valueArray;
+        }
+    }
+
     /// Выполнение байткода
     void Execute(const std::vector<uint8_t> &bytecode) {
         size_t pc = 0; // Программный счётчик
@@ -147,18 +156,28 @@ public:
                     stack.push(Value(lhs.Data.IntVal + rhs.Data.IntVal));
                     break;
                 }
-                case Bytecode::StoreVar: {
-                    std::string name = GetStringFromPool(bytecode[pc++]);
-                    variables[name] = stack.top();
+                case Bytecode::LoadVar: {
+                    int stringID = bytecode[pc++];
+                    std::string varName = GetStringByID(stringID);
+                    stack.push(variables[varName]);
                     break;
                 }
-                case Bytecode::LoadVar: {
-                    std::string name = GetStringFromPool(bytecode[pc++]);
-                    stack.push(variables[name]);
+
+                case Bytecode::StoreVar: {
+                    int stringID = bytecode[pc++];
+                    std::string varName = GetStringByID(stringID);
+                    variables[varName] = stack.top();
+                    stack.pop();
+                    break;
+                }
+
+                case Bytecode::Print: {
+                    int stringID = bytecode[pc++];
+                    std::cout << GetStringByID(stringID) << std::endl;
                     break;
                 }
                 case Bytecode::Call: {
-                    std::string funcName = GetStringFromPool(bytecode[pc++]); // Fetch function name
+                    std::string funcName = GetStringByID(bytecode[pc++]); // Fetch function name
                     int argCount = bytecode[pc++];                           // Fetch argument count
 
                     // Look up function address (not shown in your example but assumed)
@@ -179,6 +198,25 @@ public:
                     stack.pop();      // Pop the return address
                     break;
                 }
+                case Bytecode::CreateArray:
+                    // Already handled in byteCodeGener
+                    break;
+
+                case Bytecode::LoadArray: {
+                    int index = stack.top().Data.IntVal; stack.pop();
+                    int arrayID = stack.top().Data.IntVal; stack.pop();
+                    stack.push(ArrayTable[arrayID].at(index));
+                    break;
+                }
+
+                case Bytecode::StoreArray: {
+                    Value value = stack.top(); stack.pop();
+                    int index = stack.top().Data.IntVal; stack.pop();
+                    int arrayID = stack.top().Data.IntVal; stack.pop();
+                    ArrayTable[arrayID][index] = value;
+                    break;
+                }
+
                 default:
                     throw std::runtime_error("Unknown instruction");
             }
@@ -254,18 +292,29 @@ private:  // TODO: Написать Array table и подержку массив
     std::stack<Value> stack; // Стек выполнения
     std::unordered_map<std::string, Value> variables; // Таблица переменных
 
+    /// Таблица строк и таблица массивов для оптимизации хранения строк и массивов
+    std::unordered_map<int, std::vector<Value>> ArrayTable; // Array table for runtime
+    std::unordered_map<int, std::string> StringTable; // String table for runtime
+
+
     llvm::LLVMContext context;
     llvm::Module module;
     llvm::IRBuilder<> builder;
 
-    /// Таблица строк для оптимизации хранения строк
-    std::unordered_map<int, std::string> stringPool;
+
 
 
     std::unordered_map<std::string, Function> FunctionTable;
 
     /// Получение строки из пула
-    std::string GetStringFromPool(int id) {
-        return stringPool.at(id);
+
+
+    // Access a string by ID during execution
+    std::string GetStringByID(int id) {
+        auto it = StringTable.find(id);
+        if (it == StringTable.end()) {
+            throw std::runtime_error("String ID not found in table: " + std::to_string(id));
+        }
+        return it->second;
     }
 };

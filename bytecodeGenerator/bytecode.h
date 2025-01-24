@@ -45,12 +45,17 @@ enum class Bytecode {
 
     // Functionality
     Print = 20,     // 20: Print the top of the stack to the console
-    Call = 21,     // 21: Call function
-    Return = 22,  // 22: Return from function
+    Call = 21,      // 21: Call function
+    Return = 22,    // 22: Return from function
 
-    // Special markers
-    NoOp = 23,      // 23: No operation
-    Halt = 24       // 24: Halt the program
+    // Array operations
+    CreateArray = 23, // 23: Create an array and store its ID in the table
+    LoadArray = 24,   // 24: Load an element from an array by ID and index
+    StoreArray = 25,  // 25: Store a value in an array by ID and index
+    DeleteArray = 26, // 26: Delete an array by its ID (optional for GC scenarios)
+
+    NoOp = 27,        // 27: No operation
+    Halt = 28         // 28: Halt the program
 };
 
 // Primitive type IDs for variable handling (optional, for LLVM translation)
