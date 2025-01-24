@@ -6,13 +6,16 @@
 #include "grammar/CustomErrorListener.h"
 #include "grammar/LMlangGrammarParser.h"
 #include "grammar/LMlangGrammarLexer.h"
+#include "grammar/ASTBuilder.cpp"
+#include "grammar/ASTNode.h"
+#include "vm/vm.h"
 
 #ifndef MYANTLRPROJECT_CODERUNNER_H
 #define MYANTLRPROJECT_CODERUNNER_H
 
 #endif //MYANTLRPROJECT_CODERUNNER_H
 
-std::vector<bytecode::Operation> GenerateByteCode(std::istream& input) {
+byteCodeGener GetBytecodeGenerator(std::istream& input) {
     static std::unordered_set<std::string> builtinFunctions = {
             "print",
             "append",
@@ -39,14 +42,20 @@ std::vector<bytecode::Operation> GenerateByteCode(std::istream& input) {
 
     tree = parser.program();
 
+    ProgramNode programNode = std::any_cast<ProgramNode>(ASTBuilder().visitProgram(tree)));
+    byteCodeGener bytecodeGenerator;
+    programNode.Codegen(bytecodeGenerator);
+
+    return bytecodeGenerator;
 }
 
 void RunCode(std::ifstream& input){
-    std::stringstream ss(input);
-    auto code = GenerateByteCode(ss);
-    if (const_folding) {
-        code = bytecode::foldConstants(code);
-    }
-    VirtualMachine vm;
-    vm.Run(code, jit, verbose);
+    std::stringstream stringStream;
+    stringStream << input.rdbuf();
+    auto bytecodeGenerator = GetBytecodeGenerator(stringStream);
+
+    VM virtualMachine;
+    virtualMachine.LoadArrayTable(bytecodeGenerator.GetArrayTable());
+    virtualMachine.LoadStringTable(bytecodeGenerator.GetStringTable());
+    virtualMachine.Execute(bytecodeGenerator.GetBytecodeStream());
 }

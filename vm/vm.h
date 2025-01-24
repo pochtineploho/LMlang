@@ -125,6 +125,13 @@ public:
         }
     }
 
+    // Load string table from byteCodeGener
+    void LoadStringTable(const std::unordered_map<std::string, int> &stringTable) {
+        for (const auto &[str, id] : stringTable) {
+            StringTable[id] = str; // Reverse mapping: ID -> string
+        }
+    }
+
     /// Выполнение байткода
     void Execute(const std::vector<uint8_t> &bytecode) {
         size_t pc = 0; // Программный счётчик
