@@ -80,6 +80,9 @@ public:
   virtual void enterArrayInit(LMlangGrammarParser::ArrayInitContext *ctx) = 0;
   virtual void exitArrayInit(LMlangGrammarParser::ArrayInitContext *ctx) = 0;
 
+  virtual void enterArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *ctx) = 0;
+  virtual void exitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *ctx) = 0;
+
   virtual void enterArgumentList(LMlangGrammarParser::ArgumentListContext *ctx) = 0;
   virtual void exitArgumentList(LMlangGrammarParser::ArgumentListContext *ctx) = 0;
 

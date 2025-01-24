@@ -82,6 +82,9 @@ public:
   virtual void enterArrayInit(LMlangGrammarParser::ArrayInitContext * /*ctx*/) override { }
   virtual void exitArrayInit(LMlangGrammarParser::ArrayInitContext * /*ctx*/) override { }
 
+  virtual void enterArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext * /*ctx*/) override { }
+  virtual void exitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext * /*ctx*/) override { }
+
   virtual void enterArgumentList(LMlangGrammarParser::ArgumentListContext * /*ctx*/) override { }
   virtual void exitArgumentList(LMlangGrammarParser::ArgumentListContext * /*ctx*/) override { }
 
