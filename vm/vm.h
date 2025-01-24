@@ -151,7 +151,7 @@ public:
                 }
             }
 
-            switch (instruction) { // TODO: Дописать обработку оставшихся инструкций(смотри bytecode.h)
+            switch (instruction) {
                 case Bytecode::Push: {
                     int value = bytecode[pc++];
                     stack.push(Value(value));
@@ -357,6 +357,10 @@ public:
                 case Bytecode::NoOp: {
                     pc++;
                     break;
+                }
+
+                case Bytecode::Halt: {
+                    return;
                 }
 
                 default:
