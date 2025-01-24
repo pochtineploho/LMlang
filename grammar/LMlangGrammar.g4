@@ -1,3 +1,5 @@
+// Updated Grammar for LMlang without range and Go-style for
+
 grammar LMlangGrammar;
 
 // Parser
@@ -27,13 +29,13 @@ statement:
     ;
 
 forStatement:
-    FOR (LPAREN forInit? SEMI expression? SEMI expression? RPAREN statement)
+    FOR (LPAREN forInit? SEMI expression? SEMI forPost? RPAREN statement)
     | FOR expression statement
     | FOR statement
-    | FOR ID (COMMA ID)? RANGE expression statement
     ;
 
 forInit: varDecl | assignment | expression;
+forPost: assignment | expression;
 
 varDecl: type ID (ASSIGN expression)?;
 assignment: assignable ASSIGN expression;
@@ -88,13 +90,12 @@ ELSE: 'else';
 BREAK: 'break';
 CONTINUE: 'continue';
 FOR: 'for';
-RANGE: 'range';
 
 BOOL: 'true' | 'false';
 INT: [0-9]+;
 DOUBLE: [0-9]+ DOT [0-9]*;
 CHAR: '\'' . '\'';
-STRING: '"' ( ~['"'] | '""' )* '"';
+STRING: '"' ( ~['"] | '""' )* '"';
 ID: [a-zA-Z_][a-zA-Z_0-9]*;
 
 NEG: '--';

@@ -4,7 +4,7 @@
 #pragma once
 
 
-#include "antlr4-runtime.h"
+#include "antlr4-runtime/antlr4-runtime.h"
 
 
 
@@ -14,11 +14,11 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, FUNC = 6, VOID = 7, 
     RETURN = 8, PRINT = 9, IF = 10, ELSE = 11, BREAK = 12, CONTINUE = 13, 
-    FOR = 14, RANGE = 15, BOOL = 16, INT = 17, DOUBLE = 18, CHAR = 19, STRING = 20, 
-    ID = 21, NEG = 22, MULT = 23, ADD = 24, COMPOP = 25, NOT = 26, AND = 27, 
-    OR = 28, ASSIGN = 29, LPAREN = 30, RPAREN = 31, LBRACE = 32, RBRACE = 33, 
-    LBRACK = 34, RBRACK = 35, SEMI = 36, COMMA = 37, DOT = 38, WS = 39, 
-    COMMENT = 40
+    FOR = 14, BOOL = 15, INT = 16, DOUBLE = 17, CHAR = 18, STRING = 19, 
+    ID = 20, NEG = 21, MULT = 22, ADD = 23, COMPOP = 24, NOT = 25, AND = 26, 
+    OR = 27, ASSIGN = 28, LPAREN = 29, RPAREN = 30, LBRACE = 31, RBRACE = 32, 
+    LBRACK = 33, RBRACK = 34, SEMI = 35, COMMA = 36, DOT = 37, WS = 38, 
+    COMMENT = 39
   };
 
   explicit LMlangGrammarLexer(antlr4::CharStream *input);
