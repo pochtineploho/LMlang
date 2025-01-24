@@ -110,7 +110,7 @@ public:
 //    };
 
     /// Конструктор
-    VM() : gc(), context(), module("jit_module", context), builder(context) { // TODO: Настроить подключение к LLVM и дать инструкции, откуда его качать
+    VM() : gc(), context(), module("jit_module", context), builder(context) {
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
         llvm::InitializeNativeTargetAsmParser();

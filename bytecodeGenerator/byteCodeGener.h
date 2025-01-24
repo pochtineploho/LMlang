@@ -55,6 +55,14 @@ public:
         BytecodeStream.push_back(value ? 1 : 0);
     }
 
+    void EmitChar(char value) {
+    /// TODO;
+    }
+
+    void EmitArray(bool value) {
+    /// TODO;
+    }
+
 // Резервировать место для перехода
     int ReserveJump() {
         int position = CurrentBytecodePosition();

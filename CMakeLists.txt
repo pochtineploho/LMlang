@@ -46,6 +46,8 @@ set(SOURCES
         grammar/ASTNode.h
         grammar/ASTBuilder.h
         grammar/ASTBuilder.cpp
+        codeRunner/CodeRunner.h
+        grammar/CustomErrorListener.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
