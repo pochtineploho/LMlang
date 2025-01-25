@@ -17,6 +17,7 @@
 
 byteCodeGener GetBytecodeGenerator(std::istream& input) {
 
+
     LMlangGrammarParser::ProgramContext* tree;
     auto* error_listener = new CustomErrorListener();
 
@@ -43,7 +44,7 @@ void RunCode(std::ifstream& input){
     auto bytecodeGenerator = GetBytecodeGenerator(input);
 
     VM virtualMachine;
-    virtualMachine.LoadArrayTable(bytecodeGenerator.GetArrayTable());
+    virtualMachine.LoadExecutionStack(bytecodeGenerator.GetExecutionStack());
     virtualMachine.LoadStringTable(bytecodeGenerator.GetStringTable());
     virtualMachine.Execute(bytecodeGenerator.GetBytecodeStream());
 }

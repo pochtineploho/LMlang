@@ -283,8 +283,5 @@ std::any ASTBuilder::visitForPost(LMlangGrammarParser::ForPostContext *context) 
 std::any ASTBuilder::visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *context) {
     std::string elementType = context->type()->getText();
     auto capacity = visit(context->expression());
-    std::shared_ptr<ArrayInitializerWithCapacityNode> arrayInitNode =
-        std::make_shared<ArrayInitializerWithCapacityNode>(elementType, capacity);
-
-    return arrayInitNode;
+    return std::make_shared<ArrayInitializerWithCapacityNode>(elementType, std::any_cast<int>(capacity));
 }
