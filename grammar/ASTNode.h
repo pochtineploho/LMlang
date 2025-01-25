@@ -455,8 +455,8 @@ class ArrayInitializerWithCapacityNode : public ASTNode {
     int capacity;
 public:
     explicit ArrayInitializerWithCapacityNode(std::string type, int capacity)
-            : type(std::move(type)),
-              capacity(capacity) {}
+    : type(std::move(type)),
+    capacity(capacity) {}
 
     [[nodiscard]]
     std::string getTypeName() const override {

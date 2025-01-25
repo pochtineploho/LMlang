@@ -284,7 +284,7 @@ std::any ASTBuilder::visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWi
     std::string elementType = context->type()->getText();
     auto capacity = visit(context->expression());
     std::shared_ptr<ArrayInitializerWithCapacityNode> arrayInitNode =
-            std::make_shared<ArrayInitializerWithCapacityNode>(elementType, capacity);
+        std::make_shared<ArrayInitializerWithCapacityNode>(elementType, capacity);
 
     return arrayInitNode;
 }
