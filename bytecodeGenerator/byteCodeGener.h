@@ -15,8 +15,75 @@
 #include <cstdint>
 #include <iostream>
 #include <algorithm>
+#include <stack>
 
+
+#include "gc/gc.h"
 #include "bytecode.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/GenericValue.h"
+#include "llvm/ExecutionEngine/MCJIT.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/InitLLVM.h"
+#include "llvm/Support/raw_ostream.h"
+
+class Value {
+public:
+    enum ValueType { Int, Double, String, Bool, Pointer, Undefined };
+
+    ValueType Type;
+    union {
+        int IntVal;
+        double DoubleVal;
+        std::string *StringVal;
+        bool BoolVal;
+        void *PointerVal;
+    } Data;
+
+    Value() : Type(Undefined) {}
+    explicit Value(int val) : Type(Int) { Data.IntVal = val; }
+    explicit Value(double val) : Type(Double) { Data.DoubleVal = val; }
+    explicit Value(const std::string &val) : Type(String) {
+        Data.StringVal = new std::string(val);
+    }
+    explicit Value(bool val) : Type(Bool) { Data.BoolVal = val; }
+    explicit Value(void *val) : Type(Pointer) { Data.PointerVal = val; }
+
+    ~Value() {
+        if (Type == String) {
+            delete Data.StringVal;
+        }
+    }
+
+    llvm::Value* toLLVMValue(llvm::LLVMContext &context) const {
+        switch (Type) {
+            case Int:
+                return llvm::ConstantInt::get(context, llvm::APInt(32, Data.IntVal));
+            case Double:
+                return llvm::ConstantFP::get(context, llvm::APFloat(Data.DoubleVal));
+            case Bool:
+                return llvm::ConstantInt::get(context, llvm::APInt(1, Data.BoolVal));
+            default:
+                throw std::runtime_error("Unsupported type for conversion to LLVM value");
+        }
+    }
+
+    llvm::Type* getLLVMType(llvm::LLVMContext &context) const {
+        switch (Type) {
+            case Int:
+                return llvm::Type::getInt32Ty(context);
+            case Double:
+                return llvm::Type::getDoubleTy(context);
+            case Bool:
+                return llvm::Type::getInt1Ty(context);
+            default:
+                throw std::runtime_error("Unsupported type for conversion to LLVM type");
+        }
+    }
+};
 
 class byteCodeGener { ///TODO: возможно не хватает функции для генерации массивов
     // Простой поток байткода
@@ -25,8 +92,7 @@ class byteCodeGener { ///TODO: возможно не хватает функци
 // Таблица строк для строковых значений
     std::unordered_map<std::string, int> StringTable;
 
-    std::unordered_map<int, std::vector<int>> ArrayTable; // Array table for managing arrays
-    int NextArrayID = 0; // Incremental array ID
+    std::stack<Value> ExecutionStack; // Execution stack for values
 
 public:
 // Добавить байт в поток байткода
@@ -34,10 +100,31 @@ public:
         BytecodeStream.push_back(opcode);
     }
 
-// Добавить целое значение в поток байткода
+    // Emit an integer
     void EmitInt(int value) {
-        uint8_t *bytes = reinterpret_cast<uint8_t*>(&value);
+        uint8_t *bytes = reinterpret_cast<uint8_t *>(&value);
         BytecodeStream.insert(BytecodeStream.end(), bytes, bytes + sizeof(int));
+    }
+
+    // Push a pointer onto the stack
+    void PushPointer(void *ptr) {
+        ExecutionStack.push(Value(ptr));
+    }
+
+    // Pop the top value off the stack
+    void PopStack() {
+        if (ExecutionStack.empty()) {
+            throw std::runtime_error("Stack underflow: Cannot pop from an empty stack");
+        }
+        ExecutionStack.pop();
+    }
+
+    // Retrieve the top value of the stack without popping it
+    Value GetStackTop() const {
+        if (ExecutionStack.empty()) {
+            throw std::runtime_error("Stack underflow: Cannot get the top value from an empty stack");
+        }
+        return ExecutionStack.top();
     }
 
 // Добавить число с плавающей точкой в поток байткода
@@ -65,57 +152,10 @@ public:
     }
 
 // Emit array creation (for integers)
-    int EmitArray(const std::vector<int> &arrayElements) {
-        int arrayID = NextArrayID++;
-        ArrayTable[arrayID] = arrayElements; // Store array in the table
+    // Emit array creation
+    void EmitArray(size_t size) {
         EmitBytecode(static_cast<uint8_t>(Bytecode::CreateArray));
-        EmitInt(arrayID); // Push array ID to bytecode
-        return arrayID; // Return ID for reference
-    }
-
-    // Emit array creation (for doubles)
-    int EmitArray(const std::vector<double> &arrayElements) {
-        int arrayID = NextArrayID++;
-        std::vector<int> converted(arrayElements.size());
-        std::transform(arrayElements.begin(), arrayElements.end(), converted.begin(),
-                       [](double val) { return static_cast<int>(val); }); // Convert doubles to ints for simplicity
-        ArrayTable[arrayID] = converted;
-        EmitBytecode(static_cast<uint8_t>(Bytecode::CreateArray));
-        EmitInt(arrayID);
-        return arrayID;
-    }
-
-    // Emit array creation (for chars)
-    int EmitArray(const std::vector<char> &arrayElements) {
-        int arrayID = NextArrayID++;
-        std::vector<int> converted(arrayElements.size());
-        std::transform(arrayElements.begin(), arrayElements.end(), converted.begin(),
-                       [](char val) { return static_cast<int>(val); }); // Convert chars to ints for simplicity
-        ArrayTable[arrayID] = converted;
-        EmitBytecode(static_cast<uint8_t>(Bytecode::CreateArray));
-        EmitInt(arrayID);
-        return arrayID;
-    }
-
-    // Emit array creation (for strings)
-    int EmitArray(const std::vector<std::string> &arrayElements) {
-        int arrayID = NextArrayID++;
-        std::vector<int> stringIDs;
-        for (const auto &str : arrayElements) {
-            if (StringTable.find(str) == StringTable.end()) {
-                StringTable[str] = StringTable.size();
-            }
-            stringIDs.push_back(StringTable[str]);
-        }
-        ArrayTable[arrayID] = stringIDs;
-        EmitBytecode(static_cast<uint8_t>(Bytecode::CreateArray));
-        EmitInt(arrayID);
-        return arrayID;
-    }
-
-    // Retrieve the array table for VM
-    const std::unordered_map<int, std::vector<int>> &GetArrayTable() const {
-        return ArrayTable;
+        EmitInt(size);
     }
 
     const std::unordered_map<std::string, int> &GetStringTable() const {
@@ -162,9 +202,15 @@ public:
         return BytecodeStream.size();
     }
 
+    [[nodiscard]]
     // Retrieve the generated bytecode stream
     const std::vector<uint8_t> &GetBytecodeStream() const { // TODO: Написать оператора, который будет передавать в runtime BytecodeStream в VM
         return BytecodeStream;
+    }
+
+    [[nodiscard]]
+    const std::stack<Value> &GetExecutionStack() const{
+        return ExecutionStack;
     }
 
     // Debugging: Print bytecode for verification

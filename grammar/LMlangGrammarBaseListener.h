@@ -1,3 +1,4 @@
+
 // Generated from LMlangGrammar.g4 by ANTLR 4.13.2
 
 #pragma once
@@ -103,3 +104,4 @@ public:
   virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override { }
 
 };
+
