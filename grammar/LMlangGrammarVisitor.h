@@ -63,6 +63,8 @@ public:
 
     virtual std::any visitArrayInit(LMlangGrammarParser::ArrayInitContext *context) = 0;
 
+    virtual std::any visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *context) = 0;
+
     virtual std::any visitArgumentList(LMlangGrammarParser::ArgumentListContext *context) = 0;
 
     virtual std::any visitArrayAccess(LMlangGrammarParser::ArrayAccessContext *context) = 0;

@@ -450,6 +450,30 @@ public:
     }
 };
 
+class ArrayInitializerWithCapacityNode : public ASTNode {
+    std::string type;
+    int capacity;
+public:
+    explicit ArrayInitializerWithCapacityNode(std::string type, int capacity)
+            : type(std::move(type)),
+              capacity(capacity) {}
+
+    [[nodiscard]]
+    std::string getTypeName() const override {
+        return "ArrayInitializerWithCapacityNode";
+    }
+
+    [[nodiscard]]
+    int getCapacity() const {
+        return capacity;
+    }
+
+    void print(int indent) const override {
+        ASTNode::print(indent);
+        std::cout << std::string(indent + 2, ' ') << "Type: " << type << "\n";
+    }
+};
+
 class TypeNode : public ASTNode {
     std::string name;
 public:

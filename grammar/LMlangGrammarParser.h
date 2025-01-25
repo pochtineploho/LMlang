@@ -28,8 +28,8 @@ public:
     RuleVarDecl = 12, RuleAssignment = 13, RuleIfStatement = 14, RuleBreakStatement = 15, 
     RuleContinueStatement = 16, RuleReturnStatement = 17, RulePrintStatement = 18, 
     RuleExpression = 19, RulePrimaryExpression = 20, RuleArrayInit = 21, 
-    RuleArgumentList = 22, RuleArrayAccess = 23, RuleFunctionCall = 24, 
-    RuleAssignable = 25
+    RuleArrayInitWithCapacity = 22, RuleArgumentList = 23, RuleArrayAccess = 24, 
+    RuleFunctionCall = 25, RuleAssignable = 26
   };
 
   explicit LMlangGrammarParser(antlr4::TokenStream *input);
@@ -71,6 +71,7 @@ public:
   class ExpressionContext;
   class PrimaryExpressionContext;
   class ArrayInitContext;
+  class ArrayInitWithCapacityContext;
   class ArgumentListContext;
   class ArrayAccessContext;
   class FunctionCallContext;
@@ -462,6 +463,7 @@ public:
     ExpressionContext *expression();
     antlr4::tree::TerminalNode *RPAREN();
     ArrayInitContext *arrayInit();
+    ArrayInitWithCapacityContext *arrayInitWithCapacity();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -491,6 +493,24 @@ public:
   };
 
   ArrayInitContext* arrayInit();
+
+  class  ArrayInitWithCapacityContext : public antlr4::ParserRuleContext {
+  public:
+    ArrayInitWithCapacityContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    TypeContext *type();
+    antlr4::tree::TerminalNode *LBRACK();
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *RBRACK();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ArrayInitWithCapacityContext* arrayInitWithCapacity();
 
   class  ArgumentListContext : public antlr4::ParserRuleContext {
   public:

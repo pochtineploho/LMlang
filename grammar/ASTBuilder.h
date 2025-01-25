@@ -65,6 +65,8 @@ public:
     std::any visitFunctionCall(LMlangGrammarParser::FunctionCallContext *context) override;
 
     std::any visitAssignable(LMlangGrammarParser::AssignableContext *context) override;
+
+    std::any visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *context) override;
 };
 
 #endif //ASTBUILDER_H
