@@ -1,4 +1,3 @@
-
 // Generated from LMlangGrammar.g4 by ANTLR 4.13.2
 
 #pragma once
@@ -80,6 +79,9 @@ public:
   virtual void enterArrayInit(LMlangGrammarParser::ArrayInitContext *ctx) = 0;
   virtual void exitArrayInit(LMlangGrammarParser::ArrayInitContext *ctx) = 0;
 
+  virtual void enterArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *ctx) = 0;
+  virtual void exitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *ctx) = 0;
+
   virtual void enterArgumentList(LMlangGrammarParser::ArgumentListContext *ctx) = 0;
   virtual void exitArgumentList(LMlangGrammarParser::ArgumentListContext *ctx) = 0;
 
@@ -94,4 +96,3 @@ public:
 
 
 };
-

@@ -12,7 +12,7 @@ class ASTBuilder : public LMlangGrammarVisitor {
 public:
     ASTBuilder();
 
-    ~ASTBuilder() override;
+    ~ASTBuilder();
 
     std::any visitProgram(LMlangGrammarParser::ProgramContext *context) override;
 
@@ -69,6 +69,8 @@ public:
     std::any visitFunctionCall(LMlangGrammarParser::FunctionCallContext *context) override;
 
     std::any visitAssignable(LMlangGrammarParser::AssignableContext *context) override;
+
+    std::any visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *context) override;
 };
 
 #endif //ASTBUILDER_H

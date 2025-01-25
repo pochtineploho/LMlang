@@ -1,8 +1,8 @@
-// Updated Grammar for LMlang without range and Go-style for
+// Grammar for LMlang with support for array initialization by size (capacity)
 
 grammar LMlangGrammar;
 
-// Parser
+// Parser rules
 program: (functionDecl | statement)* EOF;
 
 functionDecl: FUNC returnType ID LPAREN parameterList? RPAREN block;
@@ -71,16 +71,20 @@ primaryExpression:
     | BOOL
     | STRING
     | LPAREN expression RPAREN
-    | arrayInit;
+    | arrayInit
+    | arrayInitWithCapacity
+    ;
 
 arrayInit: LBRACE (expression (COMMA expression)*)? RBRACE;
+arrayInitWithCapacity: type LBRACK expression RBRACK;
+
 argumentList: expression (COMMA expression)*;
 
 arrayAccess: ID LBRACK expression RBRACK;
 functionCall: ID LPAREN argumentList? RPAREN;
 assignable: ID | arrayAccess;
 
-// Lexer
+// Lexer rules
 FUNC: 'func';
 VOID: 'void';
 RETURN: 'return';

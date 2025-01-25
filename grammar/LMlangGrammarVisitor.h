@@ -1,5 +1,4 @@
-
-// Generated from LMlangGrammar.g4 by ANTLR 4.13.2
+TLR 4.13.2
 
 #pragma once
 
@@ -63,6 +62,8 @@ public:
 
     virtual std::any visitArrayInit(LMlangGrammarParser::ArrayInitContext *context) = 0;
 
+    virtual std::any visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *context) = 0;
+
     virtual std::any visitArgumentList(LMlangGrammarParser::ArgumentListContext *context) = 0;
 
     virtual std::any visitArrayAccess(LMlangGrammarParser::ArrayAccessContext *context) = 0;
@@ -73,4 +74,3 @@ public:
 
 
 };
-

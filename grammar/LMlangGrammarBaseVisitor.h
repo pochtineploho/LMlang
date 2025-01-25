@@ -1,4 +1,3 @@
-
 // Generated from LMlangGrammar.g4 by ANTLR 4.13.2
 
 #pragma once
@@ -103,6 +102,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitArgumentList(LMlangGrammarParser::ArgumentListContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -121,4 +124,3 @@ public:
 
 
 };
-
