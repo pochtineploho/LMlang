@@ -146,7 +146,7 @@ public:
 
             switch (instruction) {
                 case Bytecode::Push: {
-                    int value = bytecode[pc++];
+                    int value = bytecode[pc++]; // Переделать, int занимает 4 ячейки. Остальное соответственно
                     stack.push(Value(value));
                     break;
                 }
@@ -604,7 +604,6 @@ public:
 
                 case Bytecode::LoadVar: {
                     int varNameID = bytecode[pc++];
-
                     std::string varName = StringTable[varNameID];
                     llvm::Value *var = builder.CreateLoad(variables[varName].getLLVMType(context),variables[varName].toLLVMValue(context), "loadtmp");
                     stackIR.push(var);

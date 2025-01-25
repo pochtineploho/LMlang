@@ -89,10 +89,11 @@ class byteCodeGener { ///TODO: возможно не хватает функци
     // Простой поток байткода
     std::vector<uint8_t> BytecodeStream;
 
-// Таблица строк для строковых значений
+    // Таблица строк для строковых значений
     std::unordered_map<std::string, int> StringTable;
 
-    std::stack<Value> ExecutionStack; // Execution stack for values
+    // Execution stack for values
+    std::stack<Value> ExecutionStack;
 
 public:
 // Добавить байт в поток байткода
