@@ -5,14 +5,18 @@ import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class BlockNode implements ASTNode {
     private List<ASTNode> statements;
+
+    BlockNode(){
+        statements = new ArrayList<ASTNode>();
+    }
 
     @Override
     public String GetTypeName() {

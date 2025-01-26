@@ -10,9 +10,13 @@ import java.util.ArrayList;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class ProgramNode implements ASTNode {
     private ArrayList<ASTNode> children;
+
+    ProgramNode(){
+        children = new ArrayList<ASTNode>();
+    }
+
 
     @Override
     public String GetTypeName() {

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ArrayInitializerWithCapacityNode implements ASTNode {
     private String type;
-    private Integer capacity;
+    private ASTNode capacity;
 
     @Override
     public String GetTypeName() {
