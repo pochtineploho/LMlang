@@ -10,8 +10,8 @@
 #include "vm.h"
 
 std::string VM::GetStringByID(int id) {
-    auto it = variablesNames.find(id);
-    if (it == variablesNames.end()) {
+    auto it = namesMap.find(id);
+    if (it == namesMap.end()) {
         throw std::runtime_error("String ID not found in table: " + std::to_string(id));
     }
     return it->second;
@@ -30,12 +30,22 @@ void VM::CheckStack(const Command &command, int size) {
 }
 
 std::string VM::GetVariableName(const Command &command) {
-    auto var_iter = variablesNames.find(command.str_index);
-    if (var_iter != variablesNames.end()) {
+    auto var_iter = namesMap.find(command.str_index);
+    if (var_iter != namesMap.end()) {
         return var_iter->second;
     }
     throw std::runtime_error(
             "Variable error on" + BytecodeToString(command.bytecode) + " " + std::to_string(command.str_index));
+}
+
+std::optional<llvm::APInt> VM::FindInVariablesStack(const std::string &name) {
+    for (long long i = variablesStack.size() - 1; i >= 0; --i) {
+        const auto &localVars = variablesStack[i];
+        if (localVars.find(name) != localVars.end()) {
+            return localVars.at(name);
+        }
+    }
+    return std::nullopt;
 }
 
 void VM::LoadExecutionStack(const std::stack<llvm::APInt> &executionStack) {
@@ -44,7 +54,7 @@ void VM::LoadExecutionStack(const std::stack<llvm::APInt> &executionStack) {
 
 void VM::LoadStringTable(const std::unordered_map<std::string, int> &stringTable) {
     for (const auto &[str, id]: stringTable) {
-        variablesNames[id] = str; // Reverse mapping: ID -> string
+        namesMap[id] = str; // Reverse mapping: ID -> string
     }
 }
 
@@ -231,13 +241,12 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::LoadVar: {
             CheckType(command, Command::OnlyStr);
             auto var_name = GetVariableName(command);
-            if (!localVariablesStack.empty() && localVariablesStack.top().find(var_name) != localVariablesStack.top().end()) {
-                valueStack.push(localVariablesStack.top()[var_name]);
-            } else if (globalVariables.find(var_name) != globalVariables.end()) {
-                valueStack.push(globalVariables[var_name]);
+            std::optional<llvm::APInt> foundValue = FindInVariablesStack(var_name);
+            if (foundValue) {
+                valueStack.push(*foundValue);
             } else {
                 throw std::runtime_error(
-                        "Variable error on" + BytecodeToString(command.bytecode) + " " +
+                        "Variable error on " + BytecodeToString(command.bytecode) + " " +
                         std::to_string(command.str_index));
             }
             break;
@@ -249,11 +258,11 @@ int VM::HandleCommand(const Command &command) {
             auto value = valueStack.top();
             valueStack.pop();
             auto var_name = GetVariableName(command);
-            if (localVariablesStack.empty()) {
-                globalVariables[var_name] = value;
-            } else {
-                localVariablesStack.top()[var_name] = value;
+            if (variablesStack.empty()) {
+                variablesStack.emplace_back();
             }
+            variablesStack.back()[var_name] = value;
+
             break;
         }
 
@@ -269,6 +278,9 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Call: {
+            CheckType(command, Command::OnlyStr);
+            CheckStack(command, 1);
+
             std::string funcName = GetStringByID(bytecode[pc++]);
             int argCount = bytecode[pc++];
 
@@ -556,7 +568,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
 
             case Bytecode::LoadVar: {
                 int varNameID = bytecode[pc++];
-                std::string varName = variablesNames[varNameID];
+                std::string varName = namesMap[varNameID];
                 llvm::Value *var = builder.CreateLoad(globalVariables[varName].getLLVMType(context),
                                                       globalVariables[varName].toLLVMValue(context), "loadtmp");
                 stackIR.push(var);
@@ -671,7 +683,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 stackIR.pop();
                 int varNameID = bytecode[pc++];
 
-                std::string varName = variablesNames[varNameID];
+                std::string varName = namesMap[varNameID];
                 builder.CreateStore(value, globalVariables[varName].toLLVMValue(context));
                 break;
             }
@@ -694,7 +706,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
 
             case Bytecode::Call: { /// TODO: й fix
                 int funcNameID = bytecode[pc++];
-                std::string funcName = variablesNames[funcNameID];
+                std::string funcName = namesMap[funcNameID];
                 llvm::Function *calledFunction = (FunctionTable.find(funcName)->second).GenerateLLVMFunction(
                         context, module);
                 builder.CreateCall(calledFunction);
