@@ -146,7 +146,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             auto lhs = valueStack.top();
             valueStack.pop();
-            if (rhs == 0) throw std::runtime_error("Division by zero");
+            if (rhs.isZero()) throw std::runtime_error("Division by zero");
             valueStack.emplace(lhs.sdiv(rhs));
             break;
         }
@@ -303,6 +303,7 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Return: {
+            CheckType(command, Command::Empty);
             CheckCallStack(command, 1);
             if (!variablesStack.empty()) {
                 variablesStack.pop_back();
@@ -316,6 +317,7 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::CreateArray: {
+            CheckType(command, Command::Empty);
             CheckValueStack(command, 1);
             auto memory = valueStack.top();
             valueStack.pop();
@@ -332,6 +334,8 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::LoadArray: {
+            CheckType(command, Command::Empty);
+            CheckValueStack(command, 2);
             llvm::APInt index = valueStack.top();
             valueStack.pop();
             llvm::APInt array = valueStack.top();
@@ -343,6 +347,8 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::StoreArray: {
+            CheckType(command, Command::Empty);
+            CheckValueStack(command, 3);
             llvm::APInt value = valueStack.top();
             valueStack.pop();
             llvm::APInt index = valueStack.top();
@@ -357,23 +363,33 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Jump: {
-            pointer =
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
+            pointer = jumpPointerTable[command.number.getLimitedValue()];
             break;
         }
 
         case Bytecode::JumpIfFalse: {
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
-            if (!valueStack.top().Data.BoolVal) {
-                pc = valueStack.top().Data.IntVal;
+            if (value.isZero()) {
+                if (jumpPointerTable.find(command.number.getLimitedValue()) != jumpPointerTable.end()) {
+                    pointer = jumpPointerTable[command.number.getLimitedValue()];
+                }
             }
         }
 
         case Bytecode::JumpIfTrue: {
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
-            if (valueStack.top().Data.BoolVal) {
-                pc = valueStack.top().Data.IntVal;
+            if (!value.isZero()) {
+                if (jumpPointerTable.find(command.number.getLimitedValue()) != jumpPointerTable.end()) {
+                    pointer = jumpPointerTable[command.number.getLimitedValue()];
+                }
             }
         }
 
