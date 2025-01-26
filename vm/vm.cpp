@@ -388,7 +388,7 @@ int VM::HandleCommand(const Command &command) {
 }
 
 size_t VM::FindLoopStart(const std::vector<Command> &bytecode, size_t pc) {
-    size_t jumpTarget = bytecode[pc - 1];
+    size_t jumpTarget = static_cast<size_t>(bytecode[pc - 1].number.bitsToDouble());
     return jumpTarget;
 }
 
@@ -396,7 +396,7 @@ size_t VM::FindLoopEnd(const std::vector<Command> &bytecode, size_t pc) {
     size_t loopEnd = pc;
 
     while (loopEnd < bytecode.size()) {
-        Bytecode instruction = static_cast<Bytecode>(bytecode[loopEnd]);
+        Bytecode instruction = bytecode[loopEnd].bytecode;
 
         if (instruction == Bytecode::Jump || instruction == Bytecode::JumpIfFalse) {
             return loopEnd + 1;

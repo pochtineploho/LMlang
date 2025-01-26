@@ -11,10 +11,14 @@
 #include <vector>
 #include <unordered_map>
 #include <stack>
-#include "../bytecodeGenerator/byteCodeGener.h"
 
+#include "gc/gc.h"
+#include "../bytecodeGenerator/bytecode.h"
 #include <memory>
 #include <llvm/ADT/SmallString.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Module.h>
+#include <llvm/Support/TargetSelect.h>
 
 
 /// Класс сборщика мусора на основе Boehm GC.
@@ -47,7 +51,7 @@ private:
     std::unordered_map<int, std::string> namesMap;
     std::stack<llvm::APInt> valueStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
-    
+
     std::stack<size_t> callStack;
     size_t pointer;
     std::unordered_map<std::string, size_t> functionTable;

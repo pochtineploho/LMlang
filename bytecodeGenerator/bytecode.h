@@ -5,6 +5,8 @@
 
 #include <cstdint>
 #include <utility>
+#include <map>
+#include <string>
 #include <llvm/ADT/APInt.h>
 
 
