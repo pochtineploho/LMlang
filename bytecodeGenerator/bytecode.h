@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <utility>
 #include <llvm/ADT/APInt.h>
+#include <iostream>
+#include <map>
 
 
 enum class Bytecode {
