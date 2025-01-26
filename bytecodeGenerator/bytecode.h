@@ -9,7 +9,6 @@
 #include <string>
 #include <llvm/ADT/APInt.h>
 #include <iostream>
-#include <map>
 
 enum class Bytecode {
     // Arithmetic operations
@@ -60,17 +59,6 @@ enum class Bytecode {
     FuncEnd = 30
 };
 
-// Primitive type IDs for variable handling (optional, for LLVM translation)
-enum class PrimitiveType {
-    Int = 0,
-    Double = 1,
-    Char = 2,
-    Bool = 3,
-    String = 4
-};
-
-
-
 class Command {
 
 public:
@@ -86,8 +74,6 @@ public:
     llvm::APInt number;
     CommandType type;
 
-    Command(Bytecode bytecode, int str_index, const llvm::APInt& number, CommandType type)
-        : bytecode(bytecode), str_index(str_index), number(number), type(type) {}
     Command(const Bytecode bytecode, const int str_index, llvm::APInt number)
             : bytecode(bytecode), str_index(str_index), number(std::move(number)), type(StrAndNum) {}
     explicit Command(const Bytecode bytecode)
@@ -140,7 +126,7 @@ std::string BytecodeToString(Bytecode code) {
     return "Unknown";
 }
 
-Bytecode stringToBytecode(const std::string& name) {
+Bytecode StringToBytecode(const std::string& name) {
     static const std::map<std::string, Bytecode> stringToBytecodeMap = {
         { "Add", Bytecode::Add },
         { "Subtract", Bytecode::Subtract },
