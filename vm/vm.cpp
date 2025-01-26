@@ -418,12 +418,6 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 break;
             }
 
-            case Bytecode::Pop: {
-                if (stackIR.empty()) throw std::runtime_error("IR valueStack underflow on Pop");
-                stackIR.pop();
-                break;
-            }
-
             case Bytecode::Add: {
                 // Simplified example of IR translation for Add
                 llvm::Value *lhs = stackIR.top();
@@ -563,20 +557,20 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 break;
             }
 
-                // case Bytecode::StoreArray: {
-                //     Value indexValue = valueStack.top(); valueStack.pop();
-                //     Value valueToStore = valueStack.top(); valueStack.pop();
-                //     int stringID = bytecode[pc++];
-                //     std::string arrayName = GetStringByID(stringID);
-                //     auto *arrayPtr = llvm::ConstantArray::get(ArrayTable[indexValue.Data.IntVal]);
-                //     llvm::Value *index = indexValue.toLLVMValue(context);
-                //     llvm::Value *number = valueToStore.toLLVMValue(context);
-                //     llvm::Value *elementPtr = builder.CreateGEP(arrayPtr, index, "elementPtr");
-                //     builder.CreateStore(number, elementPtr);
-                //
-                //
-                //     break;
-                // }
+                 case Bytecode::StoreArray: {
+                     Value indexValue = valueStack.top(); valueStack.pop();
+                     Value valueToStore = valueStack.top(); valueStack.pop();
+                     int stringID = bytecode[pc++];
+                     std::string arrayName = GetStringByID(stringID);
+                     auto *arrayPtr = llvm::ConstantArray::get(ArrayTable[indexValue.Data.IntVal]);
+                     llvm::Value *index = indexValue.toLLVMValue(context);
+                     llvm::Value *number = valueToStore.toLLVMValue(context);
+                     llvm::Value *elementPtr = builder.CreateGEP(arrayPtr, index, "elementPtr");
+                     builder.CreateStore(number, elementPtr);
+
+
+                     break;
+                 }
 
             case Bytecode::Jump: {
                 llvm::BasicBlock *target = builder.GetInsertBlock(); // Placeholder for actual jump target logic
