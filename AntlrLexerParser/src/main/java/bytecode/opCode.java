@@ -42,7 +42,9 @@ public enum opCode {
     StoreArray(25),        // 25: Store a value in an array by ID and index
 
     NoOp(27),              // 27: No operation
-    Halt(28);              // 28: Halt the program
+    Halt(28),              // 28: Halt the program
+    FuncDecl(29),              // 28: Halt the program
+    FuncEnd(30);              // 28: Halt the program
 
     private final int value;
 

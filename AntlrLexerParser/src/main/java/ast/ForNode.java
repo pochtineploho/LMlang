@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,11 @@ public class ForNode implements ASTNode {
             System.out.println(" ".repeat(indent + 4) + "Increment: " + increment);
         }
         System.out.println(" ".repeat(indent + 2) + "Body: " + body);
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }
 

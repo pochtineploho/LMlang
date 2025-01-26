@@ -1,6 +1,7 @@
 package ast;
 
 
+import bytecode.bytecodeHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,10 @@ public class DoubleNode implements ASTNode {
     @Override
     public void Print(int indent) {
         System.out.println();
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }

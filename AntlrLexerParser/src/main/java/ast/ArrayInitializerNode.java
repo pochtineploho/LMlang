@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,5 +27,10 @@ public class ArrayInitializerNode implements ASTNode {
         for (ASTNode value : values) {
             value.Print(indent + 2);
         }
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }

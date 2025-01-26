@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.*;
 
 @Getter
@@ -21,5 +22,10 @@ public class BinaryOperationNode implements ASTNode {
         left.Print(indent + 1);
         right.Print(indent + 1);
         System.out.println(operation);
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }
