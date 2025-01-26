@@ -1,5 +1,7 @@
 package ast;
 
+import bytecode.bytecode;
+import bytecode.opCode;
 import bytecode.bytecodeHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +33,10 @@ public class VariableNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
+        value.BytecodeGeneration(bch);
+        Integer varNameID = bch.getStringTable().size();
+        bch.getStringTable().put(name, varNameID);
 
+        bch.getBytecodes().add(new bytecode(opCode.StoreVar, 0L, varNameID, false, true));
     }
 }

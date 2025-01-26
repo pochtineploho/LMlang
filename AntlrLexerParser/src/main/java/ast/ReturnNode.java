@@ -1,6 +1,6 @@
 package ast;
 
-import bytecode.bytecodeHolder;
+import bytecode.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,8 @@ public class ReturnNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        returnExpression.BytecodeGeneration(bch);
+        bch.getBytecodes().add(new bytecode(opCode.Return, 0L, 0, false, false));
     }
 }
 

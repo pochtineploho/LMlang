@@ -1,6 +1,9 @@
 package ast;
 
+
 import bytecode.bytecodeHolder;
+import bytecode.bytecode;
+import bytecode.opCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +36,8 @@ public class ProgramNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        for(ASTNode child : children) {
+            child.BytecodeGeneration(bch);
+        }
     }
 }
