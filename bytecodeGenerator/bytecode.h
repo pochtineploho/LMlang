@@ -85,7 +85,7 @@ public:
             : bytecode(bytecode), number(std::move(number)), type(OnlyNum) {}
 };
 
-std::string BytecodeToString(Bytecode code) {
+inline std::string BytecodeToString(Bytecode code) {
     static const std::map<Bytecode, std::string> bytecodeNames = {
             { Bytecode::Add, "Add" },
             { Bytecode::Subtract, "Subtract" },
@@ -126,7 +126,7 @@ std::string BytecodeToString(Bytecode code) {
     return "Unknown";
 }
 
-Bytecode StringToBytecode(const std::string& name) {
+inline Bytecode StringToBytecode(const std::string& name) {
     static const std::map<std::string, Bytecode> stringToBytecodeMap = {
         { "Add", Bytecode::Add },
         { "Subtract", Bytecode::Subtract },
