@@ -56,7 +56,9 @@ enum class Bytecode {
     StoreArray = 25,  // 25: Store a value in an array by ID and index
 
     NoOp = 27,        // 27: No operation
-    Halt = 28         // 28: Halt the program
+    Halt = 28,         // 28: Halt the program
+    FuncDecl = 29,
+    FuncEnd = 30
 };
 
 // Primitive type IDs for variable handling (optional, for LLVM translation)
@@ -122,6 +124,8 @@ std::string BytecodeToString(Bytecode code) {
             { Bytecode::CreateArray, "CreateArray" },
             { Bytecode::LoadArray, "LoadArray" },
             { Bytecode::StoreArray, "StoreArray" },
+            { Bytecode::FuncDecl, "LoadArray" },
+            { Bytecode::FuncEnd, "StoreArray" },
             { Bytecode::NoOp, "NoOp" },
             { Bytecode::Halt, "Halt" }
     };
