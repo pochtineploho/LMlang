@@ -40,7 +40,7 @@ public class FunctionNode implements ASTNode {
         body.BytecodeGeneration(bch);
         Integer varNameID = bch.getStringTable().size();
         bch.getStringTable().put(name, varNameID);
-        bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, varNameID, false, false));
+        bch.getBytecodes().add(new bytecode(opCode.FuncDecl, 0L, varNameID, false, false));
     }
 }
 

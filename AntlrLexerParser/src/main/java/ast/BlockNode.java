@@ -34,7 +34,9 @@ public class BlockNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        for (ASTNode statement : statements) {
+            statement.BytecodeGeneration(bch);
+        }
     }
 }
 

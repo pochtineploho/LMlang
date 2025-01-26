@@ -1,12 +1,10 @@
 package ast;
 
-import bytecode.bytecodeHolder;
+import bytecode.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -28,7 +26,10 @@ public class CallFunctionNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        parameters.BytecodeGeneration(bch);
+        Integer varNameID = bch.getStringTable().size();
+        bch.getStringTable().put(name, varNameID);
+        bch.getBytecodes().add(new bytecode(opCode.Call, 0L, varNameID, false, true));
     }
 }
 

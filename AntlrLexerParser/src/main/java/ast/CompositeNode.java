@@ -32,6 +32,8 @@ public class CompositeNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        for(ASTNode child : children) {
+            child.BytecodeGeneration(bch);
+        }
     }
 }
