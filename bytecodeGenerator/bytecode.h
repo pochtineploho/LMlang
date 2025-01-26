@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 #include <llvm/ADT/APInt.h>
-
+#include <map>
 
 enum class Bytecode {
     // Arithmetic operations
@@ -66,6 +66,8 @@ enum class PrimitiveType {
     String = 4
 };
 
+
+
 class Command {
 
 public:
@@ -81,6 +83,8 @@ public:
     llvm::APInt number;
     CommandType type;
 
+    Command(Bytecode bytecode, int str_index, const llvm::APInt& number, CommandType type)
+        : bytecode(bytecode), str_index(str_index), number(number), type(type) {}
     Command(const Bytecode bytecode, const int str_index, llvm::APInt number)
             : bytecode(bytecode), str_index(str_index), number(std::move(number)), type(StrAndNum) {}
     explicit Command(const Bytecode bytecode)
@@ -129,4 +133,43 @@ std::string BytecodeToString(Bytecode code) {
         return it->second;
     }
     return "Unknown";
+}
+
+Bytecode stringToBytecode(const std::string& name) {
+    static const std::map<std::string, Bytecode> stringToBytecodeMap = {
+        { "Add", Bytecode::Add },
+        { "Subtract", Bytecode::Subtract },
+        { "Multiply", Bytecode::Multiply },
+        { "Divide", Bytecode::Divide },
+        { "Equal", Bytecode::Equal },
+        { "NotEqual", Bytecode::NotEqual },
+        { "LessThan", Bytecode::LessThan },
+        { "GreaterThan", Bytecode::GreaterThan },
+        { "LessOrEqual", Bytecode::LessOrEqual },
+        { "GreaterOrEqual", Bytecode::GreaterOrEqual },
+        { "And", Bytecode::And },
+        { "Or", Bytecode::Or },
+        { "Not", Bytecode::Not },
+        { "Push", Bytecode::Push },
+        { "Pop", Bytecode::Pop },
+        { "LoadVar", Bytecode::LoadVar },
+        { "StoreVar", Bytecode::StoreVar },
+        { "Jump", Bytecode::Jump },
+        { "JumpIfTrue", Bytecode::JumpIfTrue },
+        { "JumpIfFalse", Bytecode::JumpIfFalse },
+        { "Print", Bytecode::Print },
+        { "Call", Bytecode::Call },
+        { "Return", Bytecode::Return },
+        { "CreateArray", Bytecode::CreateArray },
+        { "LoadArray", Bytecode::LoadArray },
+        { "StoreArray", Bytecode::StoreArray },
+        { "NoOp", Bytecode::NoOp },
+        { "Halt", Bytecode::Halt }
+    };
+
+    auto it = stringToBytecodeMap.find(name);
+    if (it != stringToBytecodeMap.end()) {
+        return it->second;
+    }
+    throw std::invalid_argument("Unknown bytecode string: " + name);
 }
