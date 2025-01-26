@@ -2,10 +2,6 @@
 // Created by admin on 18.01.2025.
 //
 #pragma once
-#ifndef MYANTLRPROJECT_VM_H
-#define MYANTLRPROJECT_VM_H
-
-#endif //MYANTLRPROJECT_VM_H
 
 #include <iostream>
 #include <vector>
@@ -383,25 +379,6 @@ public:
                     auto *array = static_cast<Value *>(arrayPtr.Data.PointerVal);
                     array[index] = value;
                     break;
-                }
-
-                case Bytecode::DeleteArray: {
-//                    int index = stack.top().Data.IntVal; stack.pop();
-//                    int arrayID = stack.top().Data.IntVal; stack.pop();
-//                    if (ArrayTable.find(arrayID) != ArrayTable.end()) {
-//                        auto& array = ArrayTable[arrayID];
-//                        if (index >= 0 && index < array.size()) {
-//                            array.erase(array.begin() + index);
-//                        } else {
-//                            throw std::out_of_range("Invalid index for DeleteArray operation");
-//                        }
-//
-//                        if (array.empty()) {
-//                            ArrayTable.erase(arrayID);
-//                        }
-//                    } else {
-//                        throw std::runtime_error("Array with the given ID does not exist");
-//                    }
                 }
 
                 case Bytecode::Jump: {
@@ -810,7 +787,7 @@ private:
     std::stack<llvm::Value *> stackIR; // IR representation of the stack
 
     /// Таблица строк и таблица массивов для оптимизации хранения строк и массивов
-    std::unordered_map<int, std::vector<Value>> ArrayTable; // Array table for runtime
+    //std::unordered_map<int, std::vector<Value>> ArrayTable; // Array table for runtime
     std::unordered_map<int, std::string> StringTable; // String table for runtime
 
 

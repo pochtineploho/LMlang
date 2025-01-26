@@ -9,24 +9,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_package(BDWgc 8.2.0 REQUIRED PATHS "D:/1_5sem/PISVJAP/boehmGC/bdwgcInstall")
 
 find_package(antlr4-runtime REQUIRED CONFIG PATHS "D:/1_5sem/PISVJAP/antlr4/install/")
-
 find_package(LLVM REQUIRED CONFIG PATHS "D:/1_5sem/PISVJAP/LLVM/clang+llvm-19.1.0-x86_64-pc-windows-msvc/")
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
-#include_directories(${antlr4-runtime_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/lib)
 include_directories("D:/1_5sem/PISVJAP/antlr4/install/include/antlr4-runtime")
 include_directories("D:/1_5sem/PISVJAP/antlr4/install/include/")
 include_directories("D:/1_5sem/PISVJAP/antlr4/install/lib")
-#include_directories("D:/1_5sem/PISVJAP/antlr4/install/bin")
-#
+
 link_directories("D:/1_5sem/PISVJAP/antlr4/install/include/antlr4-runtime")
 link_directories("D:/1_5sem/PISVJAP/antlr4/install/lib")
-#link_directories("D:/1_5sem/PISVJAP/antlr4/install/bin")
+
 link_directories(${CMAKE_SOURCE_DIR}/lib)
-#link_directories("C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\DIA SDK\\lib\\amd64")
 
 
 llvm_map_components_to_libnames(
@@ -50,10 +46,8 @@ set(SOURCES
         gcMemoryManager/gcMemoryManager.cpp
         vm/vm.cpp
         main.cpp
-        grammar/ASTNode.h
-        grammar/ASTBuilder.h
+        grammar/ASTNode.cpp
         grammar/ASTBuilder.cpp
-        codeRunner/CodeRunner.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
