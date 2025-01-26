@@ -32,7 +32,7 @@ public class ArrayAccessNode implements ASTNode {
         index.BytecodeGeneration(bch);
         Integer arrNameID = bch.getStringTable().size();
         bch.getStringTable().put(array, arrNameID);
-        bch.getBytecodes().add(new bytecode(opCode.LoadArray, null, arrNameID, false, false));
+        bch.getBytecodes().add(new bytecode(opCode.LoadArray, 0L, arrNameID, false, true));
     }
 }
 

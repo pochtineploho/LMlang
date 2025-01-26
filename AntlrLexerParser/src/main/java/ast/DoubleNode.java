@@ -2,6 +2,8 @@ package ast;
 
 
 import bytecode.bytecodeHolder;
+import bytecode.bytecode;
+import bytecode.opCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
