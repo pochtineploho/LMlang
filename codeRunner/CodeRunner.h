@@ -1,19 +1,16 @@
 //
 // Created by admin on 24.01.2025.
 //
+#pragma once
+
 #include <iostream>
 #include <sstream>
-#include "grammar/LMlangGrammarParser.h"
-#include "grammar/LMlangGrammarLexer.h"
-#include "grammar/ASTBuilder.h"
-#include "grammar/ASTNode.h"
-#include "vm/vm.h"
-#include "grammar/CustomErrorListener.h"
-
-#ifndef MYANTLRPROJECT_CODERUNNER_H
-#define MYANTLRPROJECT_CODERUNNER_H
-
-#endif //MYANTLRPROJECT_CODERUNNER_H
+#include "../grammar/LMlangGrammarParser.h"
+#include "../grammar/LMlangGrammarLexer.h"
+#include "../grammar/ASTBuilder.h"
+#include "../grammar/ASTNode.h"
+#include "../vm/vm.h"
+#include "../grammar/CustomErrorListener.h"
 
 byteCodeGener GetBytecodeGenerator(std::istream &input) {
     LMlangGrammarParser::ProgramContext *tree;

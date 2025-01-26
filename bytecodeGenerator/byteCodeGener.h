@@ -4,11 +4,6 @@
 
 #pragma once
 
-#ifndef MYANTLRPROJECT_BYTECODEGENER_H
-#define MYANTLRPROJECT_BYTECODEGENER_H
-
-#endif //MYANTLRPROJECT_BYTECODEGENER_H
-
 #include <vector>
 #include <string>
 #include <unordered_map>

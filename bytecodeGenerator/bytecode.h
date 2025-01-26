@@ -1,15 +1,11 @@
 //
 // Created by admin on 17.01.2025.
 //
+#pragma once
 
 #include <cstdint>
 #include <utility>
 #include <llvm/ADT/APInt.h>
-
-#ifndef MYANTLRPROJECT_BYTECODE_H
-#define MYANTLRPROJECT_BYTECODE_H
-
-#endif //MYANTLRPROJECT_BYTECODE_H
 
 
 enum class Bytecode {
@@ -54,7 +50,6 @@ enum class Bytecode {
     CreateArray = 23, // 23: Create an array and store its ID in the table
     LoadArray = 24,   // 24: Load an element from an array by ID and index
     StoreArray = 25,  // 25: Store a value in an array by ID and index
-    DeleteArray = 26, // 26: Delete an array by its ID (optional for GC scenarios)
 
     NoOp = 27,        // 27: No operation
     Halt = 28         // 28: Halt the program

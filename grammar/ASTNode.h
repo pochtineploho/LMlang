@@ -1,10 +1,7 @@
 //
 // Created by alex on 17.01.25.
 //
-
-#ifndef ASTNODE_H
-#define ASTNODE_H
-
+#pragma once
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -878,5 +875,3 @@ public:
         bCG.EmitBytecode(static_cast<uint8_t>(Bytecode::Print));
     }
 };
-
-#endif

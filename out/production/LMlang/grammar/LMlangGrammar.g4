@@ -10,7 +10,7 @@ returnType: type | VOID;
 parameterList: parameter (COMMA parameter)*;
 parameter: type ID;
 
-type: primitiveType | type LBRACK INT RBRACK | type LBRACK RBRACK;
+type: primitiveType | type LBRACK INT RBRACK;
 primitiveType: 'int' | 'double' | 'char' | 'bool' | 'string';
 
 block: LBRACE statement* RBRACE;

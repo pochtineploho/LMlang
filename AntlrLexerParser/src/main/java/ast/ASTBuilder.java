@@ -103,6 +103,10 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
             return visit(context.returnStatement());
         } else if (context.printStatement() != null) {
             return visit(context.printStatement());
+        } else if (context.block() != null) {
+            return visit(context.block());
+        } else if (context.forStatement() != null) {
+            return visit(context.forStatement());
         } else {
             return visit(context.expression());
         }
@@ -218,6 +222,12 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
 
     @Override
     public ASTNode visitExpression(LMlangGrammarParser.ExpressionContext context) {
+        if (context.LPAREN()!= null && context.expression() != null && context.RPAREN()!= null) {
+            return visit(context.expression(0));
+        }
+        if (context.expression(0) != null && context.LBRACK()!= null && context.expression(1) != null && context.RBRACK()!= null) {
+            return visit(context.primaryExpression());
+        }
         if (context.ADD() != null || context.MULT() != null || context.COMPOP() != null ||
                 context.SUB() != null || context.DIV() != null || context.AND() != null || context.OR() != null) {
 
@@ -244,7 +254,18 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
                     binaryOp
             );
         }
-
+        if (context.NEG() != null && context.expression() != null) {
+            return new UnaryOperationNode(
+                    context.NEG().getText(),
+                    visit(context.expression(0))
+            );
+        }
+        if (context.NOT() != null && context.expression() != null) {
+            return new UnaryOperationNode(
+                    context.NOT().getText(),
+                    visit(context.expression(0))
+            );
+        }
         if (context.primaryExpression() != null) {
             return visit(context.primaryExpression());
         }
@@ -269,6 +290,19 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
         if (context.LPAREN() != null && context.expression() != null && context.RPAREN() != null) {
             return visit(context.expression());
         }
+        if (context.functionCall() != null ){
+            return visit(context.functionCall());
+        }
+        if (context.arrayInit() != null ){
+            return visit(context.arrayInit());
+        }
+        if (context.arrayAccess() != null ){
+            return visit(context.arrayAccess());
+        }
+        if (context.arrayInitWithCapacity() != null ){
+            return visit(context.arrayInitWithCapacity());
+        }
+
         throw new RuntimeException("Unsupported primary expression type");
     }
 
@@ -288,12 +322,7 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
         String elementType = context.type().getText();
         ASTNode capacityNode = visit(context.expression());
 
-        if (capacityNode instanceof IntNode) {
-            int capacity = ((IntNode) capacityNode).getValue();
-            return new ArrayInitializerWithCapacityNode(elementType, capacity);
-        } else {
-            throw new RuntimeException("Capacity must be an integer");
-        }
+        return new ArrayInitializerWithCapacityNode(elementType, capacityNode);
     }
 
     @Override
@@ -330,6 +359,8 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
     public ASTNode visit(ParseTree parseTree) {
         if (parseTree instanceof LMlangGrammarParser.ArgumentListContext) {
             return visitArgumentList((LMlangGrammarParser.ArgumentListContext) parseTree);
+        } else if (parseTree instanceof LMlangGrammarParser.AssignableContext) {
+            return visitAssignable((LMlangGrammarParser.AssignableContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.ArrayAccessContext) {
             return visitArrayAccess((LMlangGrammarParser.ArrayAccessContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.ArrayInitContext) {
@@ -338,6 +369,10 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
             return visitArrayInitWithCapacity((LMlangGrammarParser.ArrayInitWithCapacityContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.AssignmentContext) {
             return visitAssignment((LMlangGrammarParser.AssignmentContext) parseTree);
+        } else if (parseTree instanceof LMlangGrammarParser.StatementContext) {
+            return visitStatement((LMlangGrammarParser.StatementContext) parseTree);
+        } else if (parseTree instanceof LMlangGrammarParser.PrimaryExpressionContext) {
+            return visitPrimaryExpression((LMlangGrammarParser.PrimaryExpressionContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.BlockContext) {
             return visitBlock((LMlangGrammarParser.BlockContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.BreakStatementContext) {
@@ -346,6 +381,10 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
             return visitFunctionCall((LMlangGrammarParser.FunctionCallContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.ContinueStatementContext) {
             return visitContinueStatement((LMlangGrammarParser.ContinueStatementContext) parseTree);
+        } else if (parseTree instanceof LMlangGrammarParser.ForInitContext) {
+            return visitForInit((LMlangGrammarParser.ForInitContext) parseTree);
+        } else if (parseTree instanceof LMlangGrammarParser.ForPostContext) {
+            return visitForPost((LMlangGrammarParser.ForPostContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.ForStatementContext) {
             return visitForStatement((LMlangGrammarParser.ForStatementContext) parseTree);
         } else if (parseTree instanceof LMlangGrammarParser.FunctionDeclContext) {
