@@ -1,6 +1,6 @@
 package ast;
 
-import bytecode.bytecodeHolder;
+import bytecode.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +31,8 @@ public class UnaryOperationNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        operand.BytecodeGeneration(bch);
+        bch.getBytecodes().add(new bytecode(opCode.LoadVar, 0L, 0, false, false));
     }
 }
 
