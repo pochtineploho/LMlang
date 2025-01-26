@@ -5,4 +5,5 @@ lib/llvm
 CMakeLists.txt
 grammar
 antlr4-runtime
-bytecodeGenerator
+bytecodeGenerator/byteCodeGener.cpp
+bytecodeGenerator/byteCodeGener.h

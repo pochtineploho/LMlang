@@ -1,6 +1,7 @@
-#include "codeRunner/CodeRunner.h"
+#pragma once
 #include <iostream>
 #include <fstream>
+#include "codeRunner/CodeRunner.h"
 
 int main(int argc, const char** argv) {
     if (argc < 2) {

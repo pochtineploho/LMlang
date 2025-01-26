@@ -394,7 +394,7 @@ int VM::HandleCommand(const Command &command) {
 }
 
 size_t VM::FindLoopStart(const std::vector<Command> &bytecode, size_t pc) {
-    size_t jumpTarget = bytecode[pc - 1];
+    size_t jumpTarget = static_cast<size_t>(bytecode[pc - 1].number.bitsToDouble());
     return jumpTarget;
 }
 
@@ -402,7 +402,7 @@ size_t VM::FindLoopEnd(const std::vector<Command> &bytecode, size_t pc) {
     size_t loopEnd = pc;
 
     while (loopEnd < bytecode.size()) {
-        Bytecode instruction = static_cast<Bytecode>(bytecode[loopEnd]);
+        Bytecode instruction = bytecode[loopEnd].bytecode;
 
         if (instruction == Bytecode::Jump || instruction == Bytecode::JumpIfFalse) {
             return loopEnd + 1;
@@ -441,12 +441,6 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 int value = bytecode[pc++];
                 llvm::Value *llvmValue = llvm::ConstantInt::get(context, llvm::APInt(32, value));
                 stackIR.push(llvmValue);
-                break;
-            }
-
-            case Bytecode::Pop: {
-                if (stackIR.empty()) throw std::runtime_error("IR valueStack underflow on Pop");
-                stackIR.pop();
                 break;
             }
 
@@ -589,20 +583,20 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 break;
             }
 
-                // case Bytecode::StoreArray: {
-                //     Value indexValue = valueStack.top(); valueStack.pop();
-                //     Value valueToStore = valueStack.top(); valueStack.pop();
-                //     int stringID = bytecode[pc++];
-                //     std::string arrayName = GetStringByID(stringID);
-                //     auto *arrayPtr = llvm::ConstantArray::get(ArrayTable[indexValue.Data.IntVal]);
-                //     llvm::Value *index = indexValue.toLLVMValue(context);
-                //     llvm::Value *number = valueToStore.toLLVMValue(context);
-                //     llvm::Value *elementPtr = builder.CreateGEP(arrayPtr, index, "elementPtr");
-                //     builder.CreateStore(number, elementPtr);
-                //
-                //
-                //     break;
-                // }
+                 case Bytecode::StoreArray: {
+                     Value indexValue = valueStack.top(); valueStack.pop();
+                     Value valueToStore = valueStack.top(); valueStack.pop();
+                     int stringID = bytecode[pc++];
+                     std::string arrayName = GetStringByID(stringID);
+                     auto *arrayPtr = llvm::ConstantArray::get(ArrayTable[indexValue.Data.IntVal]);
+                     llvm::Value *index = indexValue.toLLVMValue(context);
+                     llvm::Value *number = valueToStore.toLLVMValue(context);
+                     llvm::Value *elementPtr = builder.CreateGEP(arrayPtr, index, "elementPtr");
+                     builder.CreateStore(number, elementPtr);
+
+
+                     break;
+                 }
 
             case Bytecode::Jump: {
                 llvm::BasicBlock *target = builder.GetInsertBlock(); // Placeholder for actual jump target logic
