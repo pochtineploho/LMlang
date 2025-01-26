@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.*;
 
 @Getter
@@ -17,5 +18,10 @@ public class IntNode implements ASTNode {
     @Override
     public void Print(int indent) {
         System.out.println();
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }

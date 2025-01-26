@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,11 @@ public class IfNode implements ASTNode {
         if (else_ != null) {
             System.out.println(" ".repeat(indent + 2) + "Else: " + else_);
         }
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }
 
