@@ -28,6 +28,6 @@ public class DoubleNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        bch.getBytecodes().add(new bytecode(opCode.StoreVar, value.longValue(), 0, true, false));
     }
 }

@@ -39,5 +39,6 @@ public class ProgramNode implements ASTNode {
         for(ASTNode child : children) {
             child.BytecodeGeneration(bch);
         }
+        bch.getBytecodes().add(new bytecode(opCode.Halt, 0L, 0, false, false));
     }
 }

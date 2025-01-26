@@ -75,7 +75,8 @@ public:
     CommandType type;
 
     Command(const Bytecode bytecode, const int str_index, llvm::APInt number)
-            : bytecode(bytecode), str_index(str_index), number(std::move(number)), type(StrAndNum) {}
+            : bytecode(bytecode), str_index(str_index), number(std::move(number)), type(StrAndNum) {
+    }
     explicit Command(const Bytecode bytecode)
             : bytecode(bytecode), type(Empty) {}
     Command(const Bytecode bytecode, const int str_index)
