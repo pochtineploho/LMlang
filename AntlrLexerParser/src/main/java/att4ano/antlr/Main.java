@@ -14,7 +14,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Started work");
         System.out.println(args);
-        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\prime_numbers.lm";
+        String filepath = "/home/alex/Документы/LMlang/LMLang_benchmarks/sort.lm";
         try {
             // Create a CharStream from the file
             CharStream charStream = CharStreams.fromFileName(filepath);
