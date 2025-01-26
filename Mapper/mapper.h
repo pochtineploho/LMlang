@@ -13,20 +13,16 @@
 
 class mapper {
 private:
-    Command::CommandType ct_map(bool w_str, bool w_wal) {
-        if (w_str && w_wal){
-            return Command::StrAndNum;
-        } else if (w_str && !w_wal) {
-            return Command::OnlyStr;
-        } else if (!w_str && w_wal) {
-            return Command::OnlyNum;
+    Command BytecodeMapper(const bytecode& bytecode) {
+        if (bytecode.withStringID && bytecode.withValue){
+            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID, llvm::APInt(64, bytecode.value)};
+        } else if (bytecode.withStringID) {
+            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID};
+        } else if (bytecode.withValue) {
+            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), llvm::APInt(64, bytecode.value)};
         } else {
-            return Command::Empty;
+            return Command(StringToBytecode(opCodeToString[bytecode.opCode]));
         }
-    }
-
-    Command bytecode_mapper(const bytecode& bytecode){
-        return Command(stringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID, llvm::APInt(64, bytecode.value), ct_map(bytecode.withStringID, bytecode.withValue));
     }
 
 public:
@@ -48,7 +44,7 @@ public:
 
 
         for (const auto& bytecode : holder.bytecodes) {
-            commands.emplace_back(bytecode_mapper(bytecode));
+            commands.emplace_back(BytecodeMapper(bytecode));
         }
         stringTable = std::unordered_map<std::string, int>(std::move(holder.stringTable));
     }
