@@ -1,9 +1,7 @@
 package ast;
 
 
-import bytecode.bytecodeHolder;
-import bytecode.bytecode;
-import bytecode.opCode;
+import bytecode.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +26,6 @@ public class DoubleNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, 0, false, false));
     }
 }
