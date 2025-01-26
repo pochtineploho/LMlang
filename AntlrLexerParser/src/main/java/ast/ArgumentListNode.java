@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,14 @@ public class ArgumentListNode implements ASTNode {
         System.out.println(" ".repeat(indent + 2) + "Arguments:");
         for (ASTNode argument : arguments) {
             argument.Print(indent + 4);
+        }
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+        for (ASTNode argument : arguments) {
+            argument.BytecodeGeneration(bch);
+
         }
     }
 }

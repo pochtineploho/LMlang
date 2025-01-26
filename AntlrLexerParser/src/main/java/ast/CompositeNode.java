@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -27,5 +28,10 @@ public class CompositeNode implements ASTNode {
         for(ASTNode child : children) {
             child.Print(indent + 1);
         }
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }

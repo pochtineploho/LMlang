@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,11 @@ public class CallFunctionNode implements ASTNode {
     @Override
     public void Print(int indent) {
         System.out.println(" ".repeat(indent + 2) + "Name: " + name);
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }
 

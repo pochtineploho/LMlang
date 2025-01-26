@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.*;
 
 @Getter
@@ -26,6 +27,11 @@ public class AssignmentNode implements ASTNode {
         if (rhs != null) {
             rhs.Print(indent + 4);
         }
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }
 
