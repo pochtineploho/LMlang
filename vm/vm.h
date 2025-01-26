@@ -45,9 +45,9 @@ private:
     llvm::Module module;
 
     std::unordered_map<int, std::string> variablesNames;
-    std::stack<llvm::APInt> stack;
-    std::stack<std::unordered_map<std::string, llvm::APInt>> localStack;
-    std::unordered_map<std::string, llvm::APInt> variables;
+    std::stack<llvm::APInt> valueStack;
+    std::stack<std::unordered_map<std::string, llvm::APInt>> localVariablesStack;
+    std::unordered_map<std::string, llvm::APInt> globalVariables;
 
     std::string GetStringByID(int id);
     std::string GetVariableName(const Command &command);

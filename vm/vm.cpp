@@ -24,7 +24,7 @@ void VM::CheckType(const Command &command, Command::CommandType type) {
 }
 
 void VM::CheckStack(const Command &command, int size) {
-    if (stack.size() < size) {
+    if (valueStack.size() < size) {
         throw std::runtime_error("Stack error on " + BytecodeToString(command.bytecode));
     }
 }
@@ -39,7 +39,7 @@ std::string VM::GetVariableName(const Command &command) {
 }
 
 void VM::LoadExecutionStack(const std::stack<llvm::APInt> &executionStack) {
-    stack = executionStack;
+    valueStack = executionStack;
 }
 
 void VM::LoadStringTable(const std::unordered_map<std::string, int> &stringTable) {
@@ -76,165 +76,165 @@ int VM::HandleCommand(const Command &command) {
     switch (command.bytecode) {
         case Bytecode::Push: {
             CheckType(command, Command::Empty);
-            stack.push(command.number);
+            valueStack.push(command.number);
             break;
         }
 
         case Bytecode::Pop: { // useless
             CheckType(command, Command::Empty);
-            stack.pop();
+            valueStack.pop();
             break;
         }
 
         case Bytecode::Add: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(lhs + rhs);
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(lhs + rhs);
             break;
         }
 
         case Bytecode::Subtract: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(lhs - rhs);
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(lhs - rhs);
             break;
         }
 
         case Bytecode::Multiply: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(lhs * rhs);
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(lhs * rhs);
             break;
         }
 
         case Bytecode::Divide: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
             if (rhs == 0) throw std::runtime_error("Division by zero");
-            stack.emplace(lhs.sdiv(rhs));
+            valueStack.emplace(lhs.sdiv(rhs));
             break;
         }
 
         case Bytecode::And: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(rhs != 0 && lhs != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(rhs != 0 && lhs != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
             break;
         }
 
         case Bytecode::Or: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(rhs != 0 || lhs != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(rhs != 0 || lhs != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
             break;
         }
 
         case Bytecode::Not: {
             CheckType(command, Command::Empty);
             CheckStack(command, 1);
-            auto value = stack.top();
-            stack.pop();
-            stack.emplace(value != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
+            auto value = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(value != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
             break;
         }
 
         case Bytecode::Equal: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(1, lhs.eq(rhs));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(1, lhs.eq(rhs));
             break;
         }
 
         case Bytecode::NotEqual: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(1, lhs.ne(rhs));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(1, lhs.ne(rhs));
             break;
         }
 
         case Bytecode::GreaterThan: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(1, lhs.sgt(rhs));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(1, lhs.sgt(rhs));
             break;
         }
 
         case Bytecode::GreaterOrEqual: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(1, lhs.sge(rhs));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(1, lhs.sge(rhs));
             break;
         }
 
         case Bytecode::LessThan: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(1, lhs.slt(rhs));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(1, lhs.slt(rhs));
             break;
         }
 
         case Bytecode::LessOrEqual: {
             CheckType(command, Command::Empty);
             CheckStack(command, 2);
-            auto rhs = stack.top();
-            stack.pop();
-            auto lhs = stack.top();
-            stack.pop();
-            stack.emplace(1, lhs.sle(rhs));
+            auto rhs = valueStack.top();
+            valueStack.pop();
+            auto lhs = valueStack.top();
+            valueStack.pop();
+            valueStack.emplace(1, lhs.sle(rhs));
             break;
         }
 
         case Bytecode::LoadVar: {
             CheckType(command, Command::OnlyStr);
             auto var_name = GetVariableName(command);
-            if (!localStack.empty() && localStack.top().find(var_name) != localStack.top().end()) {
-                stack.push(localStack.top()[var_name]);
-            } else if (variables.find(var_name) != variables.end()) {
-                stack.push(variables[var_name]);
+            if (!localVariablesStack.empty() && localVariablesStack.top().find(var_name) != localVariablesStack.top().end()) {
+                valueStack.push(localVariablesStack.top()[var_name]);
+            } else if (globalVariables.find(var_name) != globalVariables.end()) {
+                valueStack.push(globalVariables[var_name]);
             } else {
                 throw std::runtime_error(
                         "Variable error on" + BytecodeToString(command.bytecode) + " " +
@@ -246,13 +246,13 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::StoreVar: {
             CheckType(command, Command::OnlyStr);
             CheckStack(command, 1);
-            auto value = stack.top();
-            stack.pop();
+            auto value = valueStack.top();
+            valueStack.pop();
             auto var_name = GetVariableName(command);
-            if (localStack.empty()) {
-                variables[var_name] = value;
+            if (localVariablesStack.empty()) {
+                globalVariables[var_name] = value;
             } else {
-                localStack.top()[var_name] = value;
+                localVariablesStack.top()[var_name] = value;
             }
             break;
         }
@@ -260,8 +260,8 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::Print: {
             CheckType(command, Command::Empty);
             CheckStack(command, 1);
-            auto value = stack.top();
-            stack.pop();
+            auto value = valueStack.top();
+            valueStack.pop();
             llvm::SmallString<64> buffer;
             value.toString(buffer, 10, true);
             std::cout << buffer.c_str();
@@ -277,50 +277,50 @@ int VM::HandleCommand(const Command &command) {
                 throw std::runtime_error("Undefined function: " + funcName);
             }
 
-            stack.emplace(static_cast<int>(pc));
+            valueStack.emplace(static_cast<int>(pc));
             pc = funcAddress;
             break;
         }
         case Bytecode::Return: {
-            if (stack.empty()) {
-                throw std::runtime_error("Call stack underflow: Return without Call");
+            if (valueStack.empty()) {
+                throw std::runtime_error("Call valueStack underflow: Return without Call");
             }
-            pc = stack.top().Int;
-            stack.pop();
+            pc = valueStack.top().Int;
+            valueStack.pop();
             break;
         }
         case Bytecode::CreateArray: {
-            size_t size = stack.top().Data.IntVal;
-            stack.pop();
+            size_t size = valueStack.top().Data.IntVal;
+            valueStack.pop();
             auto *array = static_cast<Value *>(GC_MALLOC(size * sizeof(Value)));
             if (!array) throw std::runtime_error("Failed to allocate memory for array");
 
             for (size_t i = 0; i < size; ++i) {
                 array[i] = Value(); // Initialize with Undefined values
             }
-            stack.push(Value(array));
+            valueStack.push(Value(array));
             break;
         }
 
         case Bytecode::LoadArray: {
-            int index = stack.top().Data.IntVal;
-            stack.pop();
-            Value arrayPtr = stack.top();
-            stack.pop();
+            int index = valueStack.top().Data.IntVal;
+            valueStack.pop();
+            Value arrayPtr = valueStack.top();
+            valueStack.pop();
             if (arrayPtr.Type != Value::Pointer) throw std::runtime_error("Invalid array pointer");
 
             auto *array = static_cast<Value *>(arrayPtr.Data.PointerVal);
-            stack.push(array[index]);
+            valueStack.push(array[index]);
             break;
         }
 
         case Bytecode::StoreArray: {
-            Value value = stack.top();
-            stack.pop();
-            int index = stack.top().Data.IntVal;
-            stack.pop();
-            Value arrayPtr = stack.top();
-            stack.pop();
+            Value value = valueStack.top();
+            valueStack.pop();
+            int index = valueStack.top().Data.IntVal;
+            valueStack.pop();
+            Value arrayPtr = valueStack.top();
+            valueStack.pop();
             if (arrayPtr.Type != Value::Pointer) throw std::runtime_error("Invalid array pointer");
 
             auto *array = static_cast<Value *>(arrayPtr.Data.PointerVal);
@@ -329,25 +329,25 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Jump: {
-            auto value = stack.top();
-            stack.pop();
-            pc = stack.top().Data.IntVal;
+            auto value = valueStack.top();
+            valueStack.pop();
+            pc = valueStack.top().Data.IntVal;
             break;
         }
 
         case Bytecode::JumpIfFalse: {
-            auto value = stack.top();
-            stack.pop();
-            if (!stack.top().Data.BoolVal) {
-                pc = stack.top().Data.IntVal;
+            auto value = valueStack.top();
+            valueStack.pop();
+            if (!valueStack.top().Data.BoolVal) {
+                pc = valueStack.top().Data.IntVal;
             }
         }
 
         case Bytecode::JumpIfTrue: {
-            auto value = stack.top();
-            stack.pop();
-            if (stack.top().Data.BoolVal) {
-                pc = stack.top().Data.IntVal;
+            auto value = valueStack.top();
+            valueStack.pop();
+            if (valueStack.top().Data.BoolVal) {
+                pc = valueStack.top().Data.IntVal;
             }
         }
 
@@ -419,7 +419,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
             }
 
             case Bytecode::Pop: {
-                if (stackIR.empty()) throw std::runtime_error("IR stack underflow on Pop");
+                if (stackIR.empty()) throw std::runtime_error("IR valueStack underflow on Pop");
                 stackIR.pop();
                 break;
             }
@@ -557,15 +557,15 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
             case Bytecode::LoadVar: {
                 int varNameID = bytecode[pc++];
                 std::string varName = variablesNames[varNameID];
-                llvm::Value *var = builder.CreateLoad(variables[varName].getLLVMType(context),
-                                                      variables[varName].toLLVMValue(context), "loadtmp");
+                llvm::Value *var = builder.CreateLoad(globalVariables[varName].getLLVMType(context),
+                                                      globalVariables[varName].toLLVMValue(context), "loadtmp");
                 stackIR.push(var);
                 break;
             }
 
                 // case Bytecode::StoreArray: {
-                //     Value indexValue = stack.top(); stack.pop();
-                //     Value valueToStore = stack.top(); stack.pop();
+                //     Value indexValue = valueStack.top(); valueStack.pop();
+                //     Value valueToStore = valueStack.top(); valueStack.pop();
                 //     int stringID = bytecode[pc++];
                 //     std::string arrayName = GetStringByID(stringID);
                 //     auto *arrayPtr = llvm::ConstantArray::get(ArrayTable[indexValue.Data.IntVal]);
@@ -606,8 +606,8 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
 
                 // case Bytecode::Print: {
                 //     // Извлечение значения из стека
-                //     Value number = stack.top();
-                //     stack.pop();
+                //     Value number = valueStack.top();
+                //     valueStack.pop();
                 //
                 //     // Преобразование значения в llvm::Value*
                 //     llvm::Value *llvmValue = number.toLLVMValue(context, builder, module);
@@ -672,7 +672,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 int varNameID = bytecode[pc++];
 
                 std::string varName = variablesNames[varNameID];
-                builder.CreateStore(value, variables[varName].toLLVMValue(context));
+                builder.CreateStore(value, globalVariables[varName].toLLVMValue(context));
                 break;
             }
 
@@ -715,7 +715,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 break;
             }
 
-            case Bytecode::LoadArray: { /// TODO: й fix variables[varName].getLLVMType(context),variables[varName].toLLVMValue(context)?
+            case Bytecode::LoadArray: { /// TODO: й fix globalVariables[varName].getLLVMType(context),globalVariables[varName].toLLVMValue(context)?
                 llvm::Value *index = stackIR.top();
                 stackIR.pop();
                 llvm::Value *arrayPtr = stackIR.top();
