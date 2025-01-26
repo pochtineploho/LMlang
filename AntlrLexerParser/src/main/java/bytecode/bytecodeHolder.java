@@ -12,7 +12,7 @@ import java.util.Map;
 @Setter
 @AllArgsConstructor
 public class bytecodeHolder {
-    private ArrayList<bytecode> bytecodes;
+    private ArrayList<bytecode> bytecodes; // vector<Command>>?
     private Map<String,Integer> stringTable;
     public bytecodeHolder() {
         bytecodes = new ArrayList<bytecode>();

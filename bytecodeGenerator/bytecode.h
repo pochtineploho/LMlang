@@ -9,8 +9,6 @@
 #include <string>
 #include <llvm/ADT/APInt.h>
 #include <iostream>
-#include <map>
-
 
 enum class Bytecode {
     // Arithmetic operations
@@ -56,16 +54,9 @@ enum class Bytecode {
     StoreArray = 25,  // 25: Store a value in an array by ID and index
 
     NoOp = 27,        // 27: No operation
-    Halt = 28         // 28: Halt the program
-};
-
-// Primitive type IDs for variable handling (optional, for LLVM translation)
-enum class PrimitiveType {
-    Int = 0,
-    Double = 1,
-    Char = 2,
-    Bool = 3,
-    String = 4
+    Halt = 28,         // 28: Halt the program
+    FuncDecl = 29,
+    FuncEnd = 30
 };
 
 class Command {
@@ -122,6 +113,8 @@ std::string BytecodeToString(Bytecode code) {
             { Bytecode::CreateArray, "CreateArray" },
             { Bytecode::LoadArray, "LoadArray" },
             { Bytecode::StoreArray, "StoreArray" },
+            { Bytecode::FuncDecl, "LoadArray" },
+            { Bytecode::FuncEnd, "StoreArray" },
             { Bytecode::NoOp, "NoOp" },
             { Bytecode::Halt, "Halt" }
     };
@@ -131,4 +124,43 @@ std::string BytecodeToString(Bytecode code) {
         return it->second;
     }
     return "Unknown";
+}
+
+Bytecode StringToBytecode(const std::string& name) {
+    static const std::map<std::string, Bytecode> stringToBytecodeMap = {
+        { "Add", Bytecode::Add },
+        { "Subtract", Bytecode::Subtract },
+        { "Multiply", Bytecode::Multiply },
+        { "Divide", Bytecode::Divide },
+        { "Equal", Bytecode::Equal },
+        { "NotEqual", Bytecode::NotEqual },
+        { "LessThan", Bytecode::LessThan },
+        { "GreaterThan", Bytecode::GreaterThan },
+        { "LessOrEqual", Bytecode::LessOrEqual },
+        { "GreaterOrEqual", Bytecode::GreaterOrEqual },
+        { "And", Bytecode::And },
+        { "Or", Bytecode::Or },
+        { "Not", Bytecode::Not },
+        { "Push", Bytecode::Push },
+        { "Pop", Bytecode::Pop },
+        { "LoadVar", Bytecode::LoadVar },
+        { "StoreVar", Bytecode::StoreVar },
+        { "Jump", Bytecode::Jump },
+        { "JumpIfTrue", Bytecode::JumpIfTrue },
+        { "JumpIfFalse", Bytecode::JumpIfFalse },
+        { "Print", Bytecode::Print },
+        { "Call", Bytecode::Call },
+        { "Return", Bytecode::Return },
+        { "CreateArray", Bytecode::CreateArray },
+        { "LoadArray", Bytecode::LoadArray },
+        { "StoreArray", Bytecode::StoreArray },
+        { "NoOp", Bytecode::NoOp },
+        { "Halt", Bytecode::Halt }
+    };
+
+    auto it = stringToBytecodeMap.find(name);
+    if (it != stringToBytecodeMap.end()) {
+        return it->second;
+    }
+    throw std::invalid_argument("Unknown bytecode string: " + name);
 }

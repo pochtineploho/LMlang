@@ -3,12 +3,15 @@ package att4ano.antlr;
 import ast.ASTBuilder;
 import ast.ASTNode;
 import bytecode.bytecodeHolder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import grammar.LMlangGrammarLexer;
 import grammar.LMlangGrammarParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class Main {
@@ -41,6 +44,23 @@ public class Main {
             ast.BytecodeGeneration(bch);
             //Работает Саша bch
             System.out.println(ast.GetTypeName());
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            // Create bytecodeHolder with sample data
+            bytecodeHolder holder = new bytecodeHolder();/*
+            holder.getBytecodes().add(new bytecode(opCode.Add, 123L, 1, true, false));
+            holder.getStringTable().put("exampleKey", 42);
+*/
+            // Serialize bytecodeHolder to JSON
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(holder);
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath+".btc"))) {
+                writer.write(json);
+                System.out.println("File saved successfully: " + filepath+".btc");
+            } catch (IOException e) {
+                System.err.println("An error occurred while saving the file: " + e.getMessage());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
