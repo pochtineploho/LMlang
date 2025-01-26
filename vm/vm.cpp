@@ -70,9 +70,11 @@ void VM::LoadStringTable(const std::unordered_map<std::string, int> &stringTable
 
 /// Выполнение байткода
 void VM::Execute(const std::vector<Command> &commands) {
+    if (commands.empty()) {
+        return;
+    }
     for (int pc = 0; pc < commands.size(); pc++) {
         Command command = commands[pc];
-
 //        if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfFalse) {
 //            loopCounters[pc]++;
 //            if (loopCounters[pc] > hotLoopThreshold) {
@@ -85,8 +87,19 @@ void VM::Execute(const std::vector<Command> &commands) {
 //                break;
 //            }
 //        }
-
+        if (command.bytecode != Bytecode::FuncDecl) {
+            continue;
+        }
+        pointer = pc;
         if (HandleCommand(command) != 0) {
+            break;
+        }
+    }
+    callStack.push(commands.size());
+    CheckFunctions(commands[0], "main");
+    pointer = functionTable["main"];
+    while (pointer < commands.size()) {
+        if (HandleCommand(commands[pointer]) != 0) {
             break;
         }
     }
@@ -298,7 +311,6 @@ int VM::HandleCommand(const Command &command) {
             variablesStack.emplace_back();
             callStack.emplace(pointer + 1);
             pointer = functionTable[func_name];
-            isFunctionExec = true;
             break;
         }
 
@@ -423,7 +435,6 @@ int VM::HandleCommand(const Command &command) {
             pointer = callStack.top();
             callStack.pop();
             variablesStack.pop_back();
-            isFunctionExec = false;
             break;
         }
 

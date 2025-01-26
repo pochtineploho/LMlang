@@ -56,7 +56,6 @@ private:
     size_t pointer;
     std::unordered_map<std::string, size_t> functionTable;
     std::unordered_map<uint64_t, size_t> jumpPointerTable;
-    bool isFunctionExec; // TODO needed?
 
     std::string GetNameByIndex(const Command &command);
     std::optional<llvm::APInt> FindInVariablesStack(const std::string& name);

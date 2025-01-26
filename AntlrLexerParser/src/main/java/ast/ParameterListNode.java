@@ -31,7 +31,9 @@ public class ParameterListNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        for (ASTNode argument : parameters) {
+            argument.BytecodeGeneration(bch);
+        }
     }
 }
 
