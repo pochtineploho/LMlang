@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Started work");
         System.out.println(args);
-        String filepath = "/home/alex/Документы/LMlang/LMLang_benchmarks/sort.lm";
+        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\prime_numbers.lm";
         try {
             // Create a CharStream from the file
             CharStream charStream = CharStreams.fromFileName(filepath);
@@ -38,6 +38,11 @@ public class Main {
             LMlangGrammarParser.ProgramContext parseTree = parser.program();
             ASTBuilder builder = new ASTBuilder();
             ASTNode ast = builder.visitProgram(parseTree);
+
+            bytecodeHolder bch = new bytecodeHolder();
+
+            ast.BytecodeGeneration(bch);
+            //Работает Саша bch
             System.out.println(ast.GetTypeName());
 
             ObjectMapper mapper = new ObjectMapper();

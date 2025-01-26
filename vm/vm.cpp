@@ -33,9 +33,15 @@ void VM::CheckCallStack(const Command &command, int size) {
     }
 }
 
+void VM::CheckPointer(const Command &command, llvm::APInt *ptr) {
+    if (!ptr) {
+        throw std::runtime_error(BytecodeToString(command.bytecode) + ": null pointer error");
+    }
+}
+
 std::string VM::GetNameByIndex(const Command &command) {
-    auto var_iter = namesMap.find(command.str_index);
-    if (var_iter != namesMap.end()) {
+    auto var_iter = namesTable.find(command.str_index);
+    if (var_iter != namesTable.end()) {
         return var_iter->second;
     }
     throw std::runtime_error(
@@ -58,7 +64,7 @@ void VM::LoadExecutionStack(const std::stack<llvm::APInt> &executionStack) {
 
 void VM::LoadStringTable(const std::unordered_map<std::string, int> &stringTable) {
     for (const auto &[str, id]: stringTable) {
-        namesMap[id] = str; // Reverse mapping: ID -> string
+        namesTable[id] = str; // Reverse mapping: ID -> string
     }
 }
 
@@ -140,7 +146,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             auto lhs = valueStack.top();
             valueStack.pop();
-            if (rhs == 0) throw std::runtime_error("Division by zero");
+            if (rhs.isZero()) throw std::runtime_error("Division by zero");
             valueStack.emplace(lhs.sdiv(rhs));
             break;
         }
@@ -297,6 +303,7 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Return: {
+            CheckType(command, Command::Empty);
             CheckCallStack(command, 1);
             if (!variablesStack.empty()) {
                 variablesStack.pop_back();
@@ -310,64 +317,79 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::CreateArray: {
-            size_t size = valueStack.top().Data.IntVal;
+            CheckType(command, Command::Empty);
+            CheckValueStack(command, 1);
+            auto memory = valueStack.top();
             valueStack.pop();
-            auto *array = static_cast<Value *>(GC_MALLOC(size * sizeof(Value)));
-            if (!array) throw std::runtime_error("Failed to allocate memory for array");
-
-            for (size_t i = 0; i < size; ++i) {
-                array[i] = Value(); // Initialize with Undefined values
+            if (!memory.isIntN(sizeof(size_t))) {
+                throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
-            valueStack.push(Value(array));
+            void *allocated = gc.Allocate(memory.getLimitedValue() * sizeof(size_t));
+            if (!allocated) {
+                throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
+            }
+            llvm::APInt array_ptr(sizeof(uintptr_t) * 8, reinterpret_cast<uintptr_t>(allocated));
+            valueStack.push(array_ptr);
             break;
         }
 
         case Bytecode::LoadArray: {
-            int index = valueStack.top().Data.IntVal;
+            CheckType(command, Command::Empty);
+            CheckValueStack(command, 2);
+            llvm::APInt index = valueStack.top();
             valueStack.pop();
-            Value arrayPtr = valueStack.top();
+            llvm::APInt array = valueStack.top();
             valueStack.pop();
-            if (arrayPtr.Type != Value::Pointer) throw std::runtime_error("Invalid array pointer");
-
-            auto *array = static_cast<Value *>(arrayPtr.Data.PointerVal);
-            valueStack.push(array[index]);
+            auto* array_ptr = reinterpret_cast<llvm::APInt*>(array.getLimitedValue());
+            CheckPointer(command, array_ptr);
+            valueStack.push(array_ptr[index.getLimitedValue()]);
             break;
         }
 
         case Bytecode::StoreArray: {
-            Value value = valueStack.top();
+            CheckType(command, Command::Empty);
+            CheckValueStack(command, 3);
+            llvm::APInt value = valueStack.top();
             valueStack.pop();
-            int index = valueStack.top().Data.IntVal;
+            llvm::APInt index = valueStack.top();
             valueStack.pop();
-            Value arrayPtr = valueStack.top();
+            llvm::APInt array = valueStack.top();
             valueStack.pop();
-            if (arrayPtr.Type != Value::Pointer) throw std::runtime_error("Invalid array pointer");
-
-            auto *array = static_cast<Value *>(arrayPtr.Data.PointerVal);
-            array[index] = value;
+            auto* array_ptr = reinterpret_cast<llvm::APInt*>(array.getLimitedValue());
+            CheckPointer(command, array_ptr);
+            auto *index_ptr = reinterpret_cast<llvm::APInt*>(&array_ptr[index.getLimitedValue()]);
+            *index_ptr = value;
             break;
         }
 
         case Bytecode::Jump: {
-            auto value = valueStack.top();
-            valueStack.pop();
-            pc = valueStack.top().Data.IntVal;
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
+            pointer = jumpPointerTable[command.number.getLimitedValue()];
             break;
         }
 
         case Bytecode::JumpIfFalse: {
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
-            if (!valueStack.top().Data.BoolVal) {
-                pc = valueStack.top().Data.IntVal;
+            if (value.isZero()) {
+                if (jumpPointerTable.find(command.number.getLimitedValue()) != jumpPointerTable.end()) {
+                    pointer = jumpPointerTable[command.number.getLimitedValue()];
+                }
             }
         }
 
         case Bytecode::JumpIfTrue: {
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
-            if (valueStack.top().Data.BoolVal) {
-                pc = valueStack.top().Data.IntVal;
+            if (!value.isZero()) {
+                if (jumpPointerTable.find(command.number.getLimitedValue()) != jumpPointerTable.end()) {
+                    pointer = jumpPointerTable[command.number.getLimitedValue()];
+                }
             }
         }
 
@@ -570,7 +592,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
 
             case Bytecode::LoadVar: {
                 int varNameID = bytecode[pc++];
-                std::string varName = namesMap[varNameID];
+                std::string varName = namesTable[varNameID];
                 llvm::Value *var = builder.CreateLoad(globalVariables[varName].getLLVMType(context),
                                                       globalVariables[varName].toLLVMValue(context), "loadtmp");
                 stackIR.push(var);
@@ -685,7 +707,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
                 stackIR.pop();
                 int varNameID = bytecode[pc++];
 
-                std::string varName = namesMap[varNameID];
+                std::string varName = namesTable[varNameID];
                 builder.CreateStore(value, globalVariables[varName].toLLVMValue(context));
                 break;
             }
@@ -708,7 +730,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
 
             case Bytecode::Call: { /// TODO: й fix
                 int funcNameID = bytecode[pc++];
-                std::string funcName = namesMap[funcNameID];
+                std::string funcName = namesTable[funcNameID];
                 llvm::Function *calledFunction = (functionTable.find(funcName)->second).GenerateLLVMFunction(
                         context, module);
                 builder.CreateCall(calledFunction);

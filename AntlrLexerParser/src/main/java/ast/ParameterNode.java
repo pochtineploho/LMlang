@@ -1,5 +1,6 @@
 package ast;
 
+import bytecode.bytecodeHolder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,10 @@ public class ParameterNode implements ASTNode {
     public void Print(int indent) {
         System.out.println(" ".repeat(indent + 2) + "Type: " + type);
         System.out.println(" ".repeat(indent + 2) + "Name: " + name);
+    }
+
+    @Override
+    public void BytecodeGeneration(bytecodeHolder bch){
+
     }
 }

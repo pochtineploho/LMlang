@@ -48,14 +48,15 @@ private:
     llvm::LLVMContext context;
     llvm::Module module;
 
-    std::unordered_map<int, std::string> namesMap;
+    std::unordered_map<int, std::string> namesTable;
     std::stack<llvm::APInt> valueStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
 
     std::stack<size_t> callStack;
     size_t pointer;
     std::unordered_map<std::string, size_t> functionTable;
-    bool isFunctionExec; // TODO delete
+    std::unordered_map<uint64_t, size_t> jumpPointerTable;
+    bool isFunctionExec; // TODO needed?
 
     std::string GetNameByIndex(const Command &command);
     std::optional<llvm::APInt> FindInVariablesStack(const std::string& name);
@@ -64,6 +65,7 @@ private:
     void CheckValueStack(const Command &command, int size);
     void CheckFunctions(const Command &command,  const std::string& function);
     void CheckCallStack(const Command &command, int size);
+    void CheckPointer(const Command &command, llvm::APInt* ptr);
 
 public:
     VM() : gc(), context(), module("jit_module", context), builder(context) {
