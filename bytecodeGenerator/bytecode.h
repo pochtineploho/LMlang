@@ -3,6 +3,7 @@
 //
 
 #include <cstdint>
+#include <utility>
 #include <llvm/ADT/APInt.h>
 
 #ifndef MYANTLRPROJECT_BYTECODE_H
@@ -79,19 +80,19 @@ public:
     };
 
     Bytecode bytecode;
-    size_t str_index;
+    int str_index{};
     llvm::APInt number;
     CommandType type;
 
-    Command(const Bytecode bytecode, const size_t str_index, const llvm::APInt &number)
-            : bytecode(bytecode), str_index(str_index), number(number), type(StrAndNum) {}
-    Command(const Bytecode bytecode)
+    Command(const Bytecode bytecode, const int str_index, llvm::APInt number)
+            : bytecode(bytecode), str_index(str_index), number(std::move(number)), type(StrAndNum) {}
+    explicit Command(const Bytecode bytecode)
             : bytecode(bytecode), type(Empty) {}
-    Command(const Bytecode bytecode, const size_t str_index)
+    Command(const Bytecode bytecode, const int str_index)
             : bytecode(bytecode), str_index(str_index), type(OnlyStr) {}
 
-    Command(const Bytecode bytecode, const llvm::APInt &number)
-            : bytecode(bytecode), number(number), type(OnlyNum) {}
+    Command(const Bytecode bytecode, llvm::APInt  number)
+            : bytecode(bytecode), number(std::move(number)), type(OnlyNum) {}
 };
 
 std::string BytecodeToString(Bytecode code) {
@@ -131,5 +132,5 @@ std::string BytecodeToString(Bytecode code) {
     if (it != bytecodeNames.end()) {
         return it->second;
     }
-    return "Unknown"; // Возвращаем "Unknown", если код не найден
+    return "Unknown";
 }
