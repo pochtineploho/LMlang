@@ -173,7 +173,7 @@ std::any ASTBuilder::visitExpression(LMlangGrammarParser::ExpressionContext *con
 
 
 std::any ASTBuilder::visitPrimaryExpression(LMlangGrammarParser::PrimaryExpressionContext *context) {
-    if (context->INT() || context->DOUBLE() || context->CHAR() || context->DOUBLE() || context-> BOOL()) {
+    if (context->INT()) {
         return std::make_shared<NumberNode>(std::stoi(context->INT()->getText()));
     }
     if (context->DOUBLE()) {

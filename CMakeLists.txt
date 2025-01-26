@@ -36,18 +36,14 @@ llvm_map_components_to_libnames(
         x86asmparser)
 
 set(SOURCES
-        grammar/LMlangGrammarListener.cpp
-        grammar/LMlangGrammarParser.cpp
-        grammar/LMlangGrammarBaseListener.cpp
-        grammar/LMlangGrammarLexer.cpp
-        grammar/LMlangGrammarBaseVisitor.cpp
-        grammar/CustomErrorListener.cpp
-        bytecodeGenerator/byteCodeGener.cpp
         gcMemoryManager/gcMemoryManager.cpp
         vm/vm.cpp
         main.cpp
         grammar/ASTNode.cpp
         grammar/ASTBuilder.cpp
+        codeRunner/CodeRunner.h
+        vm/vm2.h
+        vm/vm2.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
