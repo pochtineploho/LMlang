@@ -394,12 +394,37 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::NoOp: {
+            CheckType(command, Command::Empty);
             break;
         }
 
         case Bytecode::Halt: {
+            CheckType(command, Command::Empty);
             gc.Collect();
             return 1;
+        }
+
+        case Bytecode::FuncDecl: {
+            CheckType(command, Command::Empty);
+            CheckType(command, Command::OnlyStr);
+            std::string func_name = GetNameByIndex(command);
+            CheckFunctions(command, func_name);
+            functionTable[func_name] = pointer + 1;
+            break;
+        }
+
+        case Bytecode::FuncEnd: {
+            CheckType(command, Command::Empty);
+            CheckCallStack(command, 1);
+            if (functionTable.empty()) {
+                throw std::runtime_error(BytecodeToString(command.bytecode) + ": call stack is empty");
+            }
+            // ??
+            pointer = callStack.top();
+            callStack.pop();
+            variablesStack.pop_back();
+            isFunctionExec = false;
+            break;
         }
 
         default:
