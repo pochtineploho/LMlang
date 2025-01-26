@@ -73,18 +73,18 @@ void VM::Execute(const std::vector<Command> &commands) {
     for (int pc = 0; pc < commands.size(); pc++) {
         Command command = commands[pc];
 
-        if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfFalse) {
-            loopCounters[pc]++;
-            if (loopCounters[pc] > hotLoopThreshold) {
-                std::cout << "Hot loop detected at PC: " << pc << std::endl;
-
-                llvm::APInt loopStart = FindLoopStart(commands, pc); // loop start
-                size_t loopEnd = FindLoopEnd(commands, pc); // loop end
-                std::vector<Command> loop = LoopBytecode(commands, loopStart, loopEnd);
-                JITCompile(loop);
-                break;
-            }
-        }
+//        if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfFalse) {
+//            loopCounters[pc]++;
+//            if (loopCounters[pc] > hotLoopThreshold) {
+//                std::cout << "Hot loop detected at PC: " << pc << std::endl;
+//
+//                llvm::APInt loopStart = FindLoopStart(commands, pc); // loop start
+//                size_t loopEnd = FindLoopEnd(commands, pc); // loop end
+//                std::vector<Command> loop = LoopBytecode(commands, loopStart, loopEnd);
+//                JITCompile(loop);
+//                break;
+//            }
+//        }
 
         if (HandleCommand(command) != 0) {
             break;
@@ -146,7 +146,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             auto lhs = valueStack.top();
             valueStack.pop();
-            if (rhs == 0) throw std::runtime_error("Division by zero");
+            if (rhs.isZero()) throw std::runtime_error("Division by zero");
             valueStack.emplace(lhs.sdiv(rhs));
             break;
         }
@@ -303,6 +303,7 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Return: {
+            CheckType(command, Command::Empty);
             CheckCallStack(command, 1);
             if (!variablesStack.empty()) {
                 variablesStack.pop_back();
@@ -316,6 +317,7 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::CreateArray: {
+            CheckType(command, Command::Empty);
             CheckValueStack(command, 1);
             auto memory = valueStack.top();
             valueStack.pop();
@@ -332,6 +334,8 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::LoadArray: {
+            CheckType(command, Command::Empty);
+            CheckValueStack(command, 2);
             llvm::APInt index = valueStack.top();
             valueStack.pop();
             llvm::APInt array = valueStack.top();
@@ -343,6 +347,8 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::StoreArray: {
+            CheckType(command, Command::Empty);
+            CheckValueStack(command, 3);
             llvm::APInt value = valueStack.top();
             valueStack.pop();
             llvm::APInt index = valueStack.top();
@@ -357,33 +363,68 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Jump: {
-            pointer =
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
+            pointer = jumpPointerTable[command.number.getLimitedValue()];
             break;
         }
 
         case Bytecode::JumpIfFalse: {
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
-            if (!valueStack.top().Data.BoolVal) {
-                pc = valueStack.top().Data.IntVal;
+            if (value.isZero()) {
+                if (jumpPointerTable.find(command.number.getLimitedValue()) != jumpPointerTable.end()) {
+                    pointer = jumpPointerTable[command.number.getLimitedValue()];
+                }
             }
         }
 
         case Bytecode::JumpIfTrue: {
+            CheckType(command, Command::OnlyNum);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
-            if (valueStack.top().Data.BoolVal) {
-                pc = valueStack.top().Data.IntVal;
+            if (!value.isZero()) {
+                if (jumpPointerTable.find(command.number.getLimitedValue()) != jumpPointerTable.end()) {
+                    pointer = jumpPointerTable[command.number.getLimitedValue()];
+                }
             }
         }
 
         case Bytecode::NoOp: {
+            CheckType(command, Command::Empty);
             break;
         }
 
         case Bytecode::Halt: {
+            CheckType(command, Command::Empty);
             gc.Collect();
             return 1;
+        }
+
+        case Bytecode::FuncDecl: {
+            CheckType(command, Command::Empty);
+            CheckType(command, Command::OnlyStr);
+            std::string func_name = GetNameByIndex(command);
+            CheckFunctions(command, func_name);
+            functionTable[func_name] = pointer + 1;
+            break;
+        }
+
+        case Bytecode::FuncEnd: {
+            CheckType(command, Command::Empty);
+            CheckCallStack(command, 1);
+            if (functionTable.empty()) {
+                throw std::runtime_error(BytecodeToString(command.bytecode) + ": call stack is empty");
+            }
+            // ??
+            pointer = callStack.top();
+            callStack.pop();
+            variablesStack.pop_back();
+            isFunctionExec = false;
+            break;
         }
 
         default:
@@ -424,363 +465,363 @@ std::vector<uint8_t> VM::LoopBytecode(const std::vector<uint8_t> &bytecode, size
 
 /// Трансляция в LLVM IR
 void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
-    llvm::Function *jitFunc = llvm::Function::Create(
-            llvm::FunctionType::get(builder.getVoidTy(), false),
-            llvm::Function::ExternalLinkage,
-            "jit_compiled_function",
-            &module);
-
-    llvm::BasicBlock *entry = llvm::BasicBlock::Create(context, "entry", jitFunc);
-    builder.SetInsertPoint(entry);
-
-    size_t pc = 0;
-    while (pc < bytecode.size()) {
-        Bytecode instruction = static_cast<Bytecode>(bytecode[pc++]);
-        switch (instruction) { /// TODO: дописать трансляцию для всех инструкций bytecode.h
-            case Bytecode::Push: {
-                int value = bytecode[pc++];
-                llvm::Value *llvmValue = llvm::ConstantInt::get(context, llvm::APInt(32, value));
-                stackIR.push(llvmValue);
-                break;
-            }
-
-            case Bytecode::Add: {
-                // Simplified example of IR translation for Add
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *sum = builder.CreateAdd(lhs, rhs, "addtmp");
-                stackIR.push(sum);
-                break;
-            }
-
-            case Bytecode::Subtract: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *diff = builder.CreateSub(lhs, rhs, "subtmp");
-                stackIR.push(diff);
-                break;
-            }
-
-            case Bytecode::Multiply: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *product = builder.CreateMul(lhs, rhs, "multmp");
-                stackIR.push(product);
-                break;
-            }
-
-            case Bytecode::Divide: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *quotient = builder.CreateSDiv(lhs, rhs, "divtmp");
-                stackIR.push(quotient);
-                break;
-            }
-
-            case Bytecode::Equal: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *cmp = builder.CreateICmpEQ(lhs, rhs, "eqtmp");
-                stackIR.push(cmp);
-                break;
-            }
-
-            case Bytecode::NotEqual: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *cmp = builder.CreateICmpNE(lhs, rhs, "netmp");
-                stackIR.push(cmp);
-                break;
-            }
-
-            case Bytecode::LessThan: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *cmp = builder.CreateICmpSLT(lhs, rhs, "lttmp");
-                stackIR.push(cmp);
-                break;
-            }
-
-            case Bytecode::GreaterThan: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *cmp = builder.CreateICmpSGT(lhs, rhs, "gttmp");
-                stackIR.push(cmp);
-                break;
-            }
-
-            case Bytecode::LessOrEqual: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *cmp = builder.CreateICmpSLE(lhs, rhs, "letmp");
-                stackIR.push(cmp);
-                break;
-            }
-
-            case Bytecode::GreaterOrEqual: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *cmp = builder.CreateICmpSGE(lhs, rhs, "getmp");
-                stackIR.push(cmp);
-                break;
-            }
-
-
-            case Bytecode::And: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *andOp = builder.CreateAnd(lhs, rhs, "andtmp");
-                stackIR.push(andOp);
-                break;
-            }
-
-            case Bytecode::Or: {
-                llvm::Value *rhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *lhs = stackIR.top();
-                stackIR.pop();
-                llvm::Value *orOp = builder.CreateOr(lhs, rhs, "ortmp");
-                stackIR.push(orOp);
-                break;
-            }
-
-            case Bytecode::Not: {
-                llvm::Value *operand = stackIR.top();
-                stackIR.pop();
-                llvm::Value *notOp = builder.CreateNot(operand, "nottmp");
-                stackIR.push(notOp);
-                break;
-            }
-
-            case Bytecode::LoadVar: {
-                int varNameID = bytecode[pc++];
-                std::string varName = namesTable[varNameID];
-                llvm::Value *var = builder.CreateLoad(globalVariables[varName].getLLVMType(context),
-                                                      globalVariables[varName].toLLVMValue(context), "loadtmp");
-                stackIR.push(var);
-                break;
-            }
-
-                 case Bytecode::StoreArray: {
-                     Value indexValue = valueStack.top(); valueStack.pop();
-                     Value valueToStore = valueStack.top(); valueStack.pop();
-                     int stringID = bytecode[pc++];
-                     std::string arrayName = GetStringByID(stringID);
-                     auto *arrayPtr = llvm::ConstantArray::get(ArrayTable[indexValue.Data.IntVal]);
-                     llvm::Value *index = indexValue.toLLVMValue(context);
-                     llvm::Value *number = valueToStore.toLLVMValue(context);
-                     llvm::Value *elementPtr = builder.CreateGEP(arrayPtr, index, "elementPtr");
-                     builder.CreateStore(number, elementPtr);
-
-
-                     break;
-                 }
-
-            case Bytecode::Jump: {
-                llvm::BasicBlock *target = builder.GetInsertBlock(); // Placeholder for actual jump target logic
-                builder.CreateBr(target);
-                break;
-            }
-
-            case Bytecode::JumpIfTrue: {
-                llvm::Value *condition = stackIR.top();
-                stackIR.pop();
-                llvm::BasicBlock *trueBlock = llvm::BasicBlock::Create(context, "trueBlock", jitFunc);
-                llvm::BasicBlock *falseBlock = llvm::BasicBlock::Create(context, "falseBlock", jitFunc);
-                builder.CreateCondBr(condition, trueBlock, falseBlock);
-                builder.SetInsertPoint(falseBlock);
-                break;
-            }
-
-            case Bytecode::JumpIfFalse: {
-                llvm::Value *condition = stackIR.top();
-                stackIR.pop();
-                llvm::BasicBlock *trueBlock = llvm::BasicBlock::Create(context, "trueBlock", jitFunc);
-                llvm::BasicBlock *falseBlock = llvm::BasicBlock::Create(context, "falseBlock", jitFunc);
-                builder.CreateCondBr(condition, falseBlock, trueBlock);
-                builder.SetInsertPoint(falseBlock);
-                break;
-            }
-
-                // case Bytecode::Print: {
-                //     // Извлечение значения из стека
-                //     Value number = valueStack.top();
-                //     valueStack.pop();
-                //
-                //     // Преобразование значения в llvm::Value*
-                //     llvm::Value *llvmValue = number.toLLVMValue(context, builder, module);
-                //
-                //     // Получение типа значения
-                //     llvm::Type *valueType = number.getLLVMType(context);
-                //
-                //     // Создание форматной строки для printf
-                //     std::string formatStr;
-                //     if (valueType == llvm::Type::getInt32Ty(context)) {
-                //         formatStr = "%d\n";
-                //     } else if (valueType == llvm::Type::getDoubleTy(context)) {
-                //         formatStr = "%f\n";
-                //     } else if (valueType == llvm::Type::getInt1Ty(context)) {
-                //         formatStr = "%d\n";
-                //     } else if (valueType == llvm::Type::getInt8PtrTy(context)) {
-                //         formatStr = "%s\n";
-                //     } else {
-                //         throw std::runtime_error("Unsupported type for print");
-                //     }
-                //
-                //     // Создание глобальной переменной для форматной строки
-                //     llvm::Constant *formatStrConstant = llvm::ConstantDataArray::getString(context, formatStr, true);
-                //     llvm::GlobalVariable *formatStrVar = new llvm::GlobalVariable(
-                //         module,
-                //         formatStrConstant->getType(),
-                //         true,
-                //         llvm::GlobalValue::PrivateLinkage,
-                //         formatStrConstant,
-                //         ".number"
-                //     );
-                //     formatStrVar->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
-                //     llvm::Value *formatStrPtr = builder.CreateGlobalStringPtr(formatStrVar);
-                //
-                //     // Получение функции printf
-                //     llvm::FunctionType *printfType = llvm::FunctionType::get(
-                //         llvm::Type::getInt32Ty(context),
-                //         {llvm::Type::getInt8PtrTy(context)},
-                //         true
-                //     );
-                //     llvm::Function *printfFunc = llvm::Function::Create(
-                //         printfType,
-                //         llvm::Function::ExternalLinkage,
-                //         "printf",
-                //         module
-                //     );
-                //
-                //     // Создание вызова функции printf
-                //     std::vector<llvm::Value*> printfArgs = {formatStrPtr, llvmValue};
-                //     builder.CreateCall(printfFunc, printfArgs);
-                //
-                //     break;
-                // }
-
-            case Bytecode::NoOp: {
-                break;
-            }
-
-            case Bytecode::StoreVar: { /// TODO: й fix
-                llvm::Value *value = stackIR.top();
-                stackIR.pop();
-                int varNameID = bytecode[pc++];
-
-                std::string varName = namesTable[varNameID];
-                builder.CreateStore(value, globalVariables[varName].toLLVMValue(context));
-                break;
-            }
-
-            case Bytecode::Print: { /// TODO: й fix
-                llvm::Value *value = stackIR.top();
-                stackIR.pop();
-                llvm::Function *printfFunc = module.getFunction("printf");
-                if (!printfFunc) {
-                    llvm::FunctionType *printfType = llvm::FunctionType::get(builder.getInt32Ty(),
-                                                                             llvm::PointerType::getUnqual(context),
-                                                                             true);
-                    printfFunc = llvm::Function::Create(printfType, llvm::Function::ExternalLinkage, "printf",
-                                                        &module);
-                }
-                llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
-                builder.CreateCall(printfFunc, {formatStr, value});
-                break;
-            }
-
-            case Bytecode::Call: { /// TODO: й fix
-                int funcNameID = bytecode[pc++];
-                std::string funcName = namesTable[funcNameID];
-                llvm::Function *calledFunction = (functionTable.find(funcName)->second).GenerateLLVMFunction(
-                        context, module);
-                builder.CreateCall(calledFunction);
-                break;
-            }
-
-            case Bytecode::Return: {
-                builder.CreateRetVoid();
-                break;
-            }
-
-            case Bytecode::CreateArray: {
-                llvm::Value *size = stackIR.top();
-                stackIR.pop();
-                llvm::Type *arrayType = llvm::ArrayType::get(builder.getInt32Ty(), 0); // Array of int
-                llvm::Value *arrayPtr = builder.CreateAlloca(arrayType, size, "arraytmp");
-                stackIR.push(arrayPtr);
-                break;
-            }
-
-            case Bytecode::LoadArray: { /// TODO: й fix globalVariables[varName].getLLVMType(context),globalVariables[varName].toLLVMValue(context)?
-                llvm::Value *index = stackIR.top();
-                stackIR.pop();
-                llvm::Value *arrayPtr = stackIR.top();
-                stackIR.pop();
-                llvm::Value *elementPtr = builder.CreateGEP(arrayPtr->getType(), arrayPtr, index, "elementptrtmp");
-                llvm::Value *loadedValue = builder.CreateLoad(elementPtr->getType(), elementPtr, "loadarraytmp");
-                stackIR.push(loadedValue);
-                break;
-            }
-
-            case Bytecode::StoreArray: { /// TODO: й fix
-                llvm::Value *value = stackIR.top();
-                stackIR.pop();
-                llvm::Value *index = stackIR.top();
-                stackIR.pop();
-                llvm::Value *arrayPtr = stackIR.top();
-                stackIR.pop();
-                llvm::Value *elementPtr = builder.CreateGEP(arrayPtr->getType(), value, index, "elementptrtmp");
-                builder.CreateStore(value, elementPtr);
-                break;
-            }
-
-            case Bytecode::Halt: { /// TODO: й ?
-                builder.CreateRetVoid();
-                return;
-            }
-
-            default:
-                throw std::runtime_error("Unknown instruction in JITCompile");
-        }
-    }
-
-    builder.CreateRetVoid();
-
-    std::string errStr;
-    llvm::ExecutionEngine *execEngine = llvm::EngineBuilder(std::make_unique<llvm::Module>("jit_module", context))
-            .setErrorStr(&errStr)
-            .setEngineKind(llvm::EngineKind::JIT)
-            .create();
-
-    if (!execEngine) {
-        throw std::runtime_error("Failed to create ExecutionEngine: " + errStr);
-    }
-
-    execEngine->finalizeObject();
-    auto arrRef = llvm::ArrayRef<llvm::GenericValue>();
-    execEngine->runFunction(jitFunc, arrRef);
+//    llvm::Function *jitFunc = llvm::Function::Create(
+//            llvm::FunctionType::get(builder.getVoidTy(), false),
+//            llvm::Function::ExternalLinkage,
+//            "jit_compiled_function",
+//            &module);
+//
+//    llvm::BasicBlock *entry = llvm::BasicBlock::Create(context, "entry", jitFunc);
+//    builder.SetInsertPoint(entry);
+//
+//    size_t pc = 0;
+//    while (pc < bytecode.size()) {
+//        Bytecode instruction = static_cast<Bytecode>(bytecode[pc++]);
+//        switch (instruction) { /// TODO: дописать трансляцию для всех инструкций bytecode.h
+//            case Bytecode::Push: {
+//                int value = bytecode[pc++];
+//                llvm::Value *llvmValue = llvm::ConstantInt::get(context, llvm::APInt(32, value));
+//                stackIR.push(llvmValue);
+//                break;
+//            }
+//
+//            case Bytecode::Add: {
+//                // Simplified example of IR translation for Add
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *sum = builder.CreateAdd(lhs, rhs, "addtmp");
+//                stackIR.push(sum);
+//                break;
+//            }
+//
+//            case Bytecode::Subtract: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *diff = builder.CreateSub(lhs, rhs, "subtmp");
+//                stackIR.push(diff);
+//                break;
+//            }
+//
+//            case Bytecode::Multiply: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *product = builder.CreateMul(lhs, rhs, "multmp");
+//                stackIR.push(product);
+//                break;
+//            }
+//
+//            case Bytecode::Divide: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *quotient = builder.CreateSDiv(lhs, rhs, "divtmp");
+//                stackIR.push(quotient);
+//                break;
+//            }
+//
+//            case Bytecode::Equal: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *cmp = builder.CreateICmpEQ(lhs, rhs, "eqtmp");
+//                stackIR.push(cmp);
+//                break;
+//            }
+//
+//            case Bytecode::NotEqual: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *cmp = builder.CreateICmpNE(lhs, rhs, "netmp");
+//                stackIR.push(cmp);
+//                break;
+//            }
+//
+//            case Bytecode::LessThan: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *cmp = builder.CreateICmpSLT(lhs, rhs, "lttmp");
+//                stackIR.push(cmp);
+//                break;
+//            }
+//
+//            case Bytecode::GreaterThan: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *cmp = builder.CreateICmpSGT(lhs, rhs, "gttmp");
+//                stackIR.push(cmp);
+//                break;
+//            }
+//
+//            case Bytecode::LessOrEqual: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *cmp = builder.CreateICmpSLE(lhs, rhs, "letmp");
+//                stackIR.push(cmp);
+//                break;
+//            }
+//
+//            case Bytecode::GreaterOrEqual: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *cmp = builder.CreateICmpSGE(lhs, rhs, "getmp");
+//                stackIR.push(cmp);
+//                break;
+//            }
+//
+//
+//            case Bytecode::And: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *andOp = builder.CreateAnd(lhs, rhs, "andtmp");
+//                stackIR.push(andOp);
+//                break;
+//            }
+//
+//            case Bytecode::Or: {
+//                llvm::Value *rhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *lhs = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *orOp = builder.CreateOr(lhs, rhs, "ortmp");
+//                stackIR.push(orOp);
+//                break;
+//            }
+//
+//            case Bytecode::Not: {
+//                llvm::Value *operand = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *notOp = builder.CreateNot(operand, "nottmp");
+//                stackIR.push(notOp);
+//                break;
+//            }
+//
+//            case Bytecode::LoadVar: {
+//                int varNameID = bytecode[pc++];
+//                std::string varName = namesTable[varNameID];
+//                llvm::Value *var = builder.CreateLoad(globalVariables[varName].getLLVMType(context),
+//                                                      globalVariables[varName].toLLVMValue(context), "loadtmp");
+//                stackIR.push(var);
+//                break;
+//            }
+//
+//                 case Bytecode::StoreArray: {
+//                     Value indexValue = valueStack.top(); valueStack.pop();
+//                     Value valueToStore = valueStack.top(); valueStack.pop();
+//                     int stringID = bytecode[pc++];
+//                     std::string arrayName = GetStringByID(stringID);
+//                     auto *arrayPtr = llvm::ConstantArray::get(ArrayTable[indexValue.Data.IntVal]);
+//                     llvm::Value *index = indexValue.toLLVMValue(context);
+//                     llvm::Value *number = valueToStore.toLLVMValue(context);
+//                     llvm::Value *elementPtr = builder.CreateGEP(arrayPtr, index, "elementPtr");
+//                     builder.CreateStore(number, elementPtr);
+//
+//
+//                     break;
+//                 }
+//
+//            case Bytecode::Jump: {
+//                llvm::BasicBlock *target = builder.GetInsertBlock(); // Placeholder for actual jump target logic
+//                builder.CreateBr(target);
+//                break;
+//            }
+//
+//            case Bytecode::JumpIfTrue: {
+//                llvm::Value *condition = stackIR.top();
+//                stackIR.pop();
+//                llvm::BasicBlock *trueBlock = llvm::BasicBlock::Create(context, "trueBlock", jitFunc);
+//                llvm::BasicBlock *falseBlock = llvm::BasicBlock::Create(context, "falseBlock", jitFunc);
+//                builder.CreateCondBr(condition, trueBlock, falseBlock);
+//                builder.SetInsertPoint(falseBlock);
+//                break;
+//            }
+//
+//            case Bytecode::JumpIfFalse: {
+//                llvm::Value *condition = stackIR.top();
+//                stackIR.pop();
+//                llvm::BasicBlock *trueBlock = llvm::BasicBlock::Create(context, "trueBlock", jitFunc);
+//                llvm::BasicBlock *falseBlock = llvm::BasicBlock::Create(context, "falseBlock", jitFunc);
+//                builder.CreateCondBr(condition, falseBlock, trueBlock);
+//                builder.SetInsertPoint(falseBlock);
+//                break;
+//            }
+//
+//                // case Bytecode::Print: {
+//                //     // Извлечение значения из стека
+//                //     Value number = valueStack.top();
+//                //     valueStack.pop();
+//                //
+//                //     // Преобразование значения в llvm::Value*
+//                //     llvm::Value *llvmValue = number.toLLVMValue(context, builder, module);
+//                //
+//                //     // Получение типа значения
+//                //     llvm::Type *valueType = number.getLLVMType(context);
+//                //
+//                //     // Создание форматной строки для printf
+//                //     std::string formatStr;
+//                //     if (valueType == llvm::Type::getInt32Ty(context)) {
+//                //         formatStr = "%d\n";
+//                //     } else if (valueType == llvm::Type::getDoubleTy(context)) {
+//                //         formatStr = "%f\n";
+//                //     } else if (valueType == llvm::Type::getInt1Ty(context)) {
+//                //         formatStr = "%d\n";
+//                //     } else if (valueType == llvm::Type::getInt8PtrTy(context)) {
+//                //         formatStr = "%s\n";
+//                //     } else {
+//                //         throw std::runtime_error("Unsupported type for print");
+//                //     }
+//                //
+//                //     // Создание глобальной переменной для форматной строки
+//                //     llvm::Constant *formatStrConstant = llvm::ConstantDataArray::getString(context, formatStr, true);
+//                //     llvm::GlobalVariable *formatStrVar = new llvm::GlobalVariable(
+//                //         module,
+//                //         formatStrConstant->getType(),
+//                //         true,
+//                //         llvm::GlobalValue::PrivateLinkage,
+//                //         formatStrConstant,
+//                //         ".number"
+//                //     );
+//                //     formatStrVar->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
+//                //     llvm::Value *formatStrPtr = builder.CreateGlobalStringPtr(formatStrVar);
+//                //
+//                //     // Получение функции printf
+//                //     llvm::FunctionType *printfType = llvm::FunctionType::get(
+//                //         llvm::Type::getInt32Ty(context),
+//                //         {llvm::Type::getInt8PtrTy(context)},
+//                //         true
+//                //     );
+//                //     llvm::Function *printfFunc = llvm::Function::Create(
+//                //         printfType,
+//                //         llvm::Function::ExternalLinkage,
+//                //         "printf",
+//                //         module
+//                //     );
+//                //
+//                //     // Создание вызова функции printf
+//                //     std::vector<llvm::Value*> printfArgs = {formatStrPtr, llvmValue};
+//                //     builder.CreateCall(printfFunc, printfArgs);
+//                //
+//                //     break;
+//                // }
+//
+//            case Bytecode::NoOp: {
+//                break;
+//            }
+//
+//            case Bytecode::StoreVar: { /// TODO: й fix
+//                llvm::Value *value = stackIR.top();
+//                stackIR.pop();
+//                int varNameID = bytecode[pc++];
+//
+//                std::string varName = namesTable[varNameID];
+//                builder.CreateStore(value, globalVariables[varName].toLLVMValue(context));
+//                break;
+//            }
+//
+//            case Bytecode::Print: { /// TODO: й fix
+//                llvm::Value *value = stackIR.top();
+//                stackIR.pop();
+//                llvm::Function *printfFunc = module.getFunction("printf");
+//                if (!printfFunc) {
+//                    llvm::FunctionType *printfType = llvm::FunctionType::get(builder.getInt32Ty(),
+//                                                                             llvm::PointerType::getUnqual(context),
+//                                                                             true);
+//                    printfFunc = llvm::Function::Create(printfType, llvm::Function::ExternalLinkage, "printf",
+//                                                        &module);
+//                }
+//                llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
+//                builder.CreateCall(printfFunc, {formatStr, value});
+//                break;
+//            }
+//
+//            case Bytecode::Call: { /// TODO: й fix
+//                int funcNameID = bytecode[pc++];
+//                std::string funcName = namesTable[funcNameID];
+//                llvm::Function *calledFunction = (functionTable.find(funcName)->second).GenerateLLVMFunction(
+//                        context, module);
+//                builder.CreateCall(calledFunction);
+//                break;
+//            }
+//
+//            case Bytecode::Return: {
+//                builder.CreateRetVoid();
+//                break;
+//            }
+//
+//            case Bytecode::CreateArray: {
+//                llvm::Value *size = stackIR.top();
+//                stackIR.pop();
+//                llvm::Type *arrayType = llvm::ArrayType::get(builder.getInt32Ty(), 0); // Array of int
+//                llvm::Value *arrayPtr = builder.CreateAlloca(arrayType, size, "arraytmp");
+//                stackIR.push(arrayPtr);
+//                break;
+//            }
+//
+//            case Bytecode::LoadArray: { /// TODO: й fix globalVariables[varName].getLLVMType(context),globalVariables[varName].toLLVMValue(context)?
+//                llvm::Value *index = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *arrayPtr = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *elementPtr = builder.CreateGEP(arrayPtr->getType(), arrayPtr, index, "elementptrtmp");
+//                llvm::Value *loadedValue = builder.CreateLoad(elementPtr->getType(), elementPtr, "loadarraytmp");
+//                stackIR.push(loadedValue);
+//                break;
+//            }
+//
+//            case Bytecode::StoreArray: { /// TODO: й fix
+//                llvm::Value *value = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *index = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *arrayPtr = stackIR.top();
+//                stackIR.pop();
+//                llvm::Value *elementPtr = builder.CreateGEP(arrayPtr->getType(), value, index, "elementptrtmp");
+//                builder.CreateStore(value, elementPtr);
+//                break;
+//            }
+//
+//            case Bytecode::Halt: { /// TODO: й ?
+//                builder.CreateRetVoid();
+//                return;
+//            }
+//
+//            default:
+//                throw std::runtime_error("Unknown instruction in JITCompile");
+//        }
+//    }
+//
+//    builder.CreateRetVoid();
+//
+//    std::string errStr;
+//    llvm::ExecutionEngine *execEngine = llvm::EngineBuilder(std::make_unique<llvm::Module>("jit_module", context))
+//            .setErrorStr(&errStr)
+//            .setEngineKind(llvm::EngineKind::JIT)
+//            .create();
+//
+//    if (!execEngine) {
+//        throw std::runtime_error("Failed to create ExecutionEngine: " + errStr);
+//    }
+//
+//    execEngine->finalizeObject();
+//    auto arrRef = llvm::ArrayRef<llvm::GenericValue>();
+//    execEngine->runFunction(jitFunc, arrRef);
 }

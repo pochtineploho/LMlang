@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <sstream>
+#include "Mapper/mapper.h"
 //#include "../vm/vm.h"
 
 //byteCodeGener GetBytecodeGenerator(std::istream &input) {
@@ -66,10 +67,9 @@
 //}
 
 void RunCode(std::ifstream &input) {
-    //auto bytecodeGenerator = example();
-    int i = 1;
-//    VM virtualMachine;
-//    virtualMachine.LoadExecutionStack(bytecodeGenerator.GetExecutionStack());
-//    virtualMachine.LoadStringTable(bytecodeGenerator.GetStringTable());
-//    virtualMachine.Execute(bytecodeGenerator.GetBytecodeStream());
+    mapper mapper;
+    mapper.map(input);
+    VM virtualMachine;
+    virtualMachine.LoadStringTable(mapper.stringTable);
+    virtualMachine.Execute(mapper.commands);
 }
