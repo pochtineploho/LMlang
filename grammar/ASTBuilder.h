@@ -2,8 +2,7 @@
 // Created by alex on 17.01.25.
 //
 
-#ifndef ASTBUILDER_H
-#define ASTBUILDER_H
+#pragma once
 #include <any>
 
 #include "LMlangGrammarVisitor.h"
@@ -68,5 +67,3 @@ public:
 
     std::any visitArrayInitWithCapacity(LMlangGrammarParser::ArrayInitWithCapacityContext *context) override;
 };
-
-#endif //ASTBUILDER_H

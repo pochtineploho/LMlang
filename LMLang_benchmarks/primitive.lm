@@ -1,4 +1,3 @@
-f(x,y) {
-    a = 3+foo;
-    x and y;
+func int main() {
+    int n = 10000;
 }
