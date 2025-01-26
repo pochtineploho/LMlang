@@ -225,9 +225,13 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
         if (context.LPAREN()!= null && context.expression() != null && context.RPAREN()!= null) {
             return visit(context.expression(0));
         }
+
         if (context.expression(0) != null && context.LBRACK()!= null && context.expression(1) != null && context.RBRACK()!= null) {
-            return visit(context.primaryExpression());
+            String array = context.expression(0).getText();
+            ASTNode index = visit(context.expression(1));
+            return new ArrayAccessNode(index, array);
         }
+
         if (context.ADD() != null || context.MULT() != null || context.COMPOP() != null ||
                 context.SUB() != null || context.DIV() != null || context.AND() != null || context.OR() != null) {
 
@@ -260,6 +264,14 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
                     visit(context.expression(0))
             );
         }
+
+        if (context.INCR() != null && context.expression() != null) {
+            return new UnaryOperationNode(
+                    context.INCR().getText(),
+                    visit(context.expression(0))
+            );
+        }
+
         if (context.NOT() != null && context.expression() != null) {
             return new UnaryOperationNode(
                     context.NOT().getText(),
@@ -336,7 +348,7 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
 
     @Override
     public ASTNode visitArrayAccess(LMlangGrammarParser.ArrayAccessContext ctx) {
-        return new ArrayAccessNode(visit(ctx.expression()), visit(ctx.ID()));
+        return new ArrayAccessNode(visit(ctx.expression()), ctx.ID().getText());
     }
 
     @Override

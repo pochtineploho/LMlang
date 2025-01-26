@@ -51,6 +51,7 @@ printStatement: PRINT LPAREN expression RPAREN;
 expression:
       LPAREN expression RPAREN
     | NEG expression
+    | INCR expression
     | NOT expression
     | expression AND expression
     | expression OR expression
@@ -98,13 +99,14 @@ CONTINUE: 'continue';
 FOR: 'for';
 
 BOOL: 'true' | 'false';
-INT: [0-9]+;
-DOUBLE: [0-9]+ DOT [0-9]*;
+INT: '-'? [0-9]+;
+DOUBLE: '-'? [0-9]+ DOT [0-9]*;
 CHAR: '\'' . '\'';
 STRING: '"' ( ~['"] | '""' )* '"';
 ID: [a-zA-Z_][a-zA-Z_0-9]*;
 
 NEG: '--';
+INCR: '++';
 MULT: '*';      // Умножение
 DIV: '/';       // Деление
 ADD: '+';       // Сложение
