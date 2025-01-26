@@ -32,7 +32,6 @@ public class ArgumentListNode implements ASTNode {
     public void BytecodeGeneration(bytecodeHolder bch){
         for (ASTNode argument : arguments) {
             argument.BytecodeGeneration(bch);
-
         }
     }
 }
