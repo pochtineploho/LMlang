@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ArrayAccessNode implements ASTNode {
 
     private ASTNode index;
-    private ASTNode array;
+    private String array;
 
     @Override
     public String GetTypeName() {
