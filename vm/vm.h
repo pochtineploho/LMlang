@@ -26,7 +26,7 @@ class GC {
 public:
     GC() {GC_INIT(); }
 
-    void *Allocate(size_t size) {
+    void* Allocate(size_t size) {
         return GC_MALLOC(size);
     }
 
@@ -42,7 +42,7 @@ private:
     std::unordered_map<int, int> loopCounters; // Map to track loop instruction usage
     const int hotLoopThreshold = 10;          // Threshold for marking a loop as hot
     llvm::IRBuilder<> builder;
-    std::stack<llvm::APInt *> stackIR; // IR representation of the stack'
+    std::stack<llvm::APInt*> stackIR; // IR representation of the stack'
 
     GC gc;
     llvm::LLVMContext context;
@@ -57,14 +57,19 @@ private:
     std::unordered_map<std::string, size_t> functionTable;
     std::unordered_map<uint64_t, size_t> jumpPointerTable;
 
-    std::string GetNameByIndex(const Command &command);
+    std::string GetNameByIndex(const Command& command);
+
     std::optional<llvm::APInt> FindInVariablesStack(const std::string& name);
 
-    void CheckType(const Command &command, Command::CommandType type);
-    void CheckValueStack(const Command &command, int size);
-    void CheckFunctions(const Command &command,  const std::string& function);
-    void CheckCallStack(const Command &command, int size);
-    void CheckPointer(const Command &command, llvm::APInt* ptr);
+    void CheckType(const Command& command, Command::CommandType type);
+
+    void CheckValueStack(const Command& command, int size);
+
+    void CheckFunctions(const Command& command, const std::string& function);
+
+    void CheckCallStack(const Command& command, int size);
+
+    void CheckPointer(const Command& command, llvm::APInt* ptr);
 
 public:
     VM() : gc(), context(), module("jit_module", context), builder(context) {
@@ -73,23 +78,23 @@ public:
         llvm::InitializeNativeTargetAsmParser();
     }
 
-    void LoadExecutionStack(const std::stack<llvm::APInt> &executionStack);
+    void LoadExecutionStack(const std::stack<llvm::APInt>& executionStack);
 
-    void LoadStringTable(const std::unordered_map<std::string, int> &stringTable);
+    void LoadStringTable(const std::unordered_map<std::string, int>& stringTable);
 
     /// Выполнение байткода
-    void Execute(const std::vector<Command> &commands);
+    void Execute(const std::vector<Command>& commands);
 
-    int HandleCommand(const Command &command);
+    int HandleCommand(const Command& command);
 
-    size_t FindLoopStart(const std::vector<Command> &bytecode, size_t pc);
+    size_t FindLoopStart(const std::vector<Command>& bytecode, size_t pc);
 
-    size_t FindLoopEnd(const std::vector<Command> &bytecode, size_t pc);
+    size_t FindLoopEnd(const std::vector<Command>& bytecode, size_t pc);
 
-    std::vector<uint8_t> LoopBytecode(const std::vector<uint8_t> &bytecode, size_t loopStart, size_t jumpTarget);
+    std::vector<uint8_t> LoopBytecode(const std::vector<uint8_t>& bytecode, size_t loopStart, size_t jumpTarget);
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<uint8_t> &bytecode);
+    void JITCompile(const std::vector<uint8_t>& bytecode);
 /*
     // Arithmetic operations
     Add = 0,        // 0: Stack: [..., a, b] -> [..., a + b]

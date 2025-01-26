@@ -45,20 +45,18 @@ llvm_map_components_to_libnames(
 
 set(SOURCES
         vm/vm.cpp
-        codeRunner/CodeRunner.h
-        bytecodeGenerator/bytecode.h
-        Mapper/mapper.cpp
         main.cpp
+        codeRunner/CodeRunner.cpp
+        Mapper/mapper.cpp
+        bytecodeGenerator/bytecode.cpp
 )
+
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 
-
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
-
-
 
 
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)

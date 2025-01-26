@@ -9,37 +9,37 @@
 
 #include "vm.h"
 
-void VM::CheckType(const Command &command, Command::CommandType type) {
+void VM::CheckType(const Command& command, Command::CommandType type) {
     if (command.type != type) {
         throw std::runtime_error("Bytecode error on " + BytecodeToString(command.bytecode));
     }
 }
 
-void VM::CheckValueStack(const Command &command, int size) {
+void VM::CheckValueStack(const Command& command, int size) {
     if (valueStack.size() < size) {
         throw std::runtime_error("Value stack error on " + BytecodeToString(command.bytecode));
     }
 }
 
-void VM::CheckFunctions(const Command &command, const std::string &function) {
+void VM::CheckFunctions(const Command& command, const std::string& function) {
     if (functionTable.find(function) == functionTable.end()) {
         throw std::runtime_error(BytecodeToString(command.bytecode) + " function not found: " + function);
     }
 }
 
-void VM::CheckCallStack(const Command &command, int size) {
+void VM::CheckCallStack(const Command& command, int size) {
     if (callStack.size() < size) {
         throw std::runtime_error("Call stack error on " + BytecodeToString(command.bytecode));
     }
 }
 
-void VM::CheckPointer(const Command &command, llvm::APInt *ptr) {
+void VM::CheckPointer(const Command& command, llvm::APInt* ptr) {
     if (!ptr) {
         throw std::runtime_error(BytecodeToString(command.bytecode) + ": null pointer error");
     }
 }
 
-std::string VM::GetNameByIndex(const Command &command) {
+std::string VM::GetNameByIndex(const Command& command) {
     auto var_iter = namesTable.find(command.str_index);
     if (var_iter != namesTable.end()) {
         return var_iter->second;
@@ -48,9 +48,9 @@ std::string VM::GetNameByIndex(const Command &command) {
             "Variable error on" + BytecodeToString(command.bytecode) + " " + std::to_string(command.str_index));
 }
 
-std::optional<llvm::APInt> VM::FindInVariablesStack(const std::string &name) {
+std::optional<llvm::APInt> VM::FindInVariablesStack(const std::string& name) {
     for (long long i = variablesStack.size() - 1; i >= 0; --i) {
-        const auto &localVars = variablesStack[i];
+        const auto& localVars = variablesStack[i];
         if (localVars.find(name) != localVars.end()) {
             return localVars.at(name);
         }
@@ -58,18 +58,18 @@ std::optional<llvm::APInt> VM::FindInVariablesStack(const std::string &name) {
     return std::nullopt;
 }
 
-void VM::LoadExecutionStack(const std::stack<llvm::APInt> &executionStack) {
+void VM::LoadExecutionStack(const std::stack<llvm::APInt>& executionStack) {
     valueStack = executionStack;
 }
 
-void VM::LoadStringTable(const std::unordered_map<std::string, int> &stringTable) {
-    for (const auto &[str, id]: stringTable) {
+void VM::LoadStringTable(const std::unordered_map<std::string, int>& stringTable) {
+    for (const auto& [str, id]: stringTable) {
         namesTable[id] = str; // Reverse mapping: ID -> string
     }
 }
 
 /// Выполнение байткода
-void VM::Execute(const std::vector<Command> &commands) {
+void VM::Execute(const std::vector<Command>& commands) {
     if (commands.empty()) {
         return;
     }
@@ -105,7 +105,7 @@ void VM::Execute(const std::vector<Command> &commands) {
     }
 }
 
-int VM::HandleCommand(const Command &command) {
+int VM::HandleCommand(const Command& command) {
     switch (command.bytecode) {
         case Bytecode::Push: {
             CheckType(command, Command::Empty);
@@ -336,7 +336,7 @@ int VM::HandleCommand(const Command &command) {
             if (!memory.isIntN(sizeof(size_t))) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
-            void *allocated = gc.Allocate(memory.getLimitedValue() * sizeof(size_t));
+            void* allocated = gc.Allocate(memory.getLimitedValue() * sizeof(size_t));
             if (!allocated) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
             }
@@ -369,7 +369,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             auto* array_ptr = reinterpret_cast<llvm::APInt*>(array.getLimitedValue());
             CheckPointer(command, array_ptr);
-            auto *index_ptr = reinterpret_cast<llvm::APInt*>(&array_ptr[index.getLimitedValue()]);
+            auto* index_ptr = reinterpret_cast<llvm::APInt*>(&array_ptr[index.getLimitedValue()]);
             *index_ptr = value;
             break;
         }
@@ -445,12 +445,12 @@ int VM::HandleCommand(const Command &command) {
     return 0;
 }
 
-size_t VM::FindLoopStart(const std::vector<Command> &bytecode, size_t pc) {
+size_t VM::FindLoopStart(const std::vector<Command>& bytecode, size_t pc) {
     size_t jumpTarget = static_cast<size_t>(bytecode[pc - 1].number.bitsToDouble());
     return jumpTarget;
 }
 
-size_t VM::FindLoopEnd(const std::vector<Command> &bytecode, size_t pc) {
+size_t VM::FindLoopEnd(const std::vector<Command>& bytecode, size_t pc) {
     size_t loopEnd = pc;
 
     while (loopEnd < bytecode.size()) {
@@ -466,7 +466,7 @@ size_t VM::FindLoopEnd(const std::vector<Command> &bytecode, size_t pc) {
     return bytecode.size();
 }
 
-std::vector<uint8_t> VM::LoopBytecode(const std::vector<uint8_t> &bytecode, size_t loopStart, size_t jumpTarget) {
+std::vector<uint8_t> VM::LoopBytecode(const std::vector<uint8_t>& bytecode, size_t loopStart, size_t jumpTarget) {
     if (jumpTarget >= loopStart || loopStart >= bytecode.size()) {
         throw std::runtime_error("Invalid loop bounds");
     }
@@ -475,7 +475,7 @@ std::vector<uint8_t> VM::LoopBytecode(const std::vector<uint8_t> &bytecode, size
 }
 
 /// Трансляция в LLVM IR
-void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
+void VM::JITCompile(const std::vector<uint8_t>& bytecode) {
 //    llvm::Function *jitFunc = llvm::Function::Create(
 //            llvm::FunctionType::get(builder.getVoidTy(), false),
 //            llvm::Function::ExternalLinkage,

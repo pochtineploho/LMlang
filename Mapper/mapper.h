@@ -1,6 +1,7 @@
 //
 // Created by alever.
 //
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -14,8 +15,9 @@
 class mapper {
 private:
     Command BytecodeMapper(const bytecode& bytecode) {
-        if (bytecode.withStringID && bytecode.withValue){
-            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID, llvm::APInt(64, bytecode.value)};
+        if (bytecode.withStringID && bytecode.withValue) {
+            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID,
+                           llvm::APInt(64, bytecode.value)};
         } else if (bytecode.withStringID) {
             return Command{StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID};
         } else if (bytecode.withValue) {
@@ -29,7 +31,7 @@ public:
     std::unordered_map<std::string, int> stringTable;
     std::vector<Command> commands;
 
-    void map(std::ifstream &input) {
+    void map(std::ifstream& input) {
         using json = nlohmann::json;
 
         json inputJson;
@@ -43,7 +45,7 @@ public:
         }
 
 
-        for (const auto& bytecode : holder.bytecodes) {
+        for (const auto& bytecode: holder.bytecodes) {
             commands.emplace_back(BytecodeMapper(bytecode));
         }
         stringTable = std::unordered_map<std::string, int>(std::move(holder.stringTable));

@@ -2,6 +2,7 @@
 // Created by alever.
 //
 #pragma once
+
 #include "bytecode.h"
 #include <nlohmann/json.hpp>
 

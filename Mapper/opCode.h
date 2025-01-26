@@ -2,6 +2,7 @@
 // Created by alever.
 //
 #pragma once
+
 #include <string>
 #include <map>
 #include <vector>
@@ -41,27 +42,44 @@ enum struct opCode {
 
 // Map for converting opCode to string and back
 static std::map<opCode, std::string> opCodeToString = {
-    {opCode::Add, "Add"}, {opCode::Subtract, "Subtract"}, {opCode::Multiply, "Multiply"},
-    {opCode::Divide, "Divide"}, {opCode::Equal, "Equal"}, {opCode::NotEqual, "NotEqual"},
-    {opCode::LessThan, "LessThan"}, {opCode::GreaterThan, "GreaterThan"},
-    {opCode::LessOrEqual, "LessOrEqual"}, {opCode::GreaterOrEqual, "GreaterOrEqual"},
-    {opCode::And, "And"}, {opCode::Or, "Or"}, {opCode::Not, "Not"}, {opCode::Push, "Push"},
-    {opCode::LoadVar, "LoadVar"}, {opCode::StoreVar, "StoreVar"}, {opCode::Jump, "Jump"},
-    {opCode::JumpIfTrue, "JumpIfTrue"}, {opCode::JumpIfFalse, "JumpIfFalse"},
-    {opCode::Print, "Print"}, {opCode::Call, "Call"}, {opCode::Return, "Return"},
-    {opCode::CreateArray, "CreateArray"}, {opCode::LoadArray, "LoadArray"},
-    {opCode::StoreArray, "StoreArray"}, {opCode::NoOp, "NoOp"}, {opCode::Halt, "Halt"}
+        {opCode::Add,            "Add"},
+        {opCode::Subtract,       "Subtract"},
+        {opCode::Multiply,       "Multiply"},
+        {opCode::Divide,         "Divide"},
+        {opCode::Equal,          "Equal"},
+        {opCode::NotEqual,       "NotEqual"},
+        {opCode::LessThan,       "LessThan"},
+        {opCode::GreaterThan,    "GreaterThan"},
+        {opCode::LessOrEqual,    "LessOrEqual"},
+        {opCode::GreaterOrEqual, "GreaterOrEqual"},
+        {opCode::And,            "And"},
+        {opCode::Or,             "Or"},
+        {opCode::Not,            "Not"},
+        {opCode::Push,           "Push"},
+        {opCode::LoadVar,        "LoadVar"},
+        {opCode::StoreVar,       "StoreVar"},
+        {opCode::Jump,           "Jump"},
+        {opCode::JumpIfTrue,     "JumpIfTrue"},
+        {opCode::JumpIfFalse,    "JumpIfFalse"},
+        {opCode::Print,          "Print"},
+        {opCode::Call,           "Call"},
+        {opCode::Return,         "Return"},
+        {opCode::CreateArray,    "CreateArray"},
+        {opCode::LoadArray,      "LoadArray"},
+        {opCode::StoreArray,     "StoreArray"},
+        {opCode::NoOp,           "NoOp"},
+        {opCode::Halt,           "Halt"}
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(opCode, {
-    {opCode::Add, "Add"}, {opCode::Subtract, "Subtract"}, {opCode::Multiply, "Multiply"},
-    {opCode::Divide, "Divide"}, {opCode::Equal, "Equal"}, {opCode::NotEqual, "NotEqual"},
-    {opCode::LessThan, "LessThan"}, {opCode::GreaterThan, "GreaterThan"},
-    {opCode::LessOrEqual, "LessOrEqual"}, {opCode::GreaterOrEqual, "GreaterOrEqual"},
-    {opCode::And, "And"}, {opCode::Or, "Or"}, {opCode::Not, "Not"}, {opCode::Push, "Push"},
-    {opCode::LoadVar, "LoadVar"}, {opCode::StoreVar, "StoreVar"}, {opCode::Jump, "Jump"},
-    {opCode::JumpIfTrue, "JumpIfTrue"}, {opCode::JumpIfFalse, "JumpIfFalse"},
-    {opCode::Print, "Print"}, {opCode::Call, "Call"}, {opCode::Return, "Return"},
-    {opCode::CreateArray, "CreateArray"}, {opCode::LoadArray, "LoadArray"},
-    {opCode::StoreArray, "StoreArray"}, {opCode::NoOp, "NoOp"}, {opCode::Halt, "Halt"}
+    { opCode::Add, "Add" }, { opCode::Subtract, "Subtract" }, { opCode::Multiply, "Multiply" },
+    { opCode::Divide, "Divide" }, { opCode::Equal, "Equal" }, { opCode::NotEqual, "NotEqual" },
+    { opCode::LessThan, "LessThan" }, { opCode::GreaterThan, "GreaterThan" },
+    { opCode::LessOrEqual, "LessOrEqual" }, { opCode::GreaterOrEqual, "GreaterOrEqual" },
+    { opCode::And, "And" }, { opCode::Or, "Or" }, { opCode::Not, "Not" }, { opCode::Push, "Push" },
+    { opCode::LoadVar, "LoadVar" }, { opCode::StoreVar, "StoreVar" }, { opCode::Jump, "Jump" },
+    { opCode::JumpIfTrue, "JumpIfTrue" }, { opCode::JumpIfFalse, "JumpIfFalse" },
+    { opCode::Print, "Print" }, { opCode::Call, "Call" }, { opCode::Return, "Return" },
+    { opCode::CreateArray, "CreateArray" }, { opCode::LoadArray, "LoadArray" },
+    { opCode::StoreArray, "StoreArray" }, { opCode::NoOp, "NoOp" }, { opCode::Halt, "Halt" }
 });
