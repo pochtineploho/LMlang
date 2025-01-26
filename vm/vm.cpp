@@ -311,7 +311,6 @@ int VM::HandleCommand(const Command &command) {
             variablesStack.emplace_back();
             callStack.emplace(pointer + 1);
             pointer = functionTable[func_name];
-            isFunctionExec = true;
             break;
         }
 
@@ -436,7 +435,6 @@ int VM::HandleCommand(const Command &command) {
             pointer = callStack.top();
             callStack.pop();
             variablesStack.pop_back();
-            isFunctionExec = false;
             break;
         }
 
