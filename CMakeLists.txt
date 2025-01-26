@@ -54,6 +54,8 @@ set(SOURCES
         grammar/ASTBuilder.h
         grammar/ASTBuilder.cpp
         codeRunner/CodeRunner.h
+        vm/vm2.h
+        vm/vm2.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
