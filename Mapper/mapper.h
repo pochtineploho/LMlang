@@ -12,6 +12,19 @@
 #include "../bytecodeGenerator/bytecode.h"
 
 class mapper {
+private:
+    Command BytecodeMapper(const bytecode& bytecode) {
+        if (bytecode.withStringID && bytecode.withValue){
+            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID, llvm::APInt(64, bytecode.value)};
+        } else if (bytecode.withStringID) {
+            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID};
+        } else if (bytecode.withValue) {
+            return Command{StringToBytecode(opCodeToString[bytecode.opCode]), llvm::APInt(64, bytecode.value)};
+        } else {
+            return Command(StringToBytecode(opCodeToString[bytecode.opCode]));
+        }
+    }
+
 public:
     std::unordered_map<std::string, int> stringTable;
     std::vector<Command> commands;
@@ -31,7 +44,7 @@ public:
 
 
         for (const auto& bytecode : holder.bytecodes) {
-            commands.emplace_back(StringToBytecode(opCodeToString[bytecode.opCode]), bytecode.stringID, llvm::APInt(64, bytecode.value));
+            commands.emplace_back(BytecodeMapper(bytecode));
         }
         stringTable = std::unordered_map<std::string, int>(std::move(holder.stringTable));
     }
