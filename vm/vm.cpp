@@ -328,25 +328,6 @@ int VM::HandleCommand(const Command &command) {
             break;
         }
 
-        case Bytecode::DeleteArray: {
-//                    int index = stack.top().Data.IntVal; stack.pop();
-//                    int arrayID = stack.top().Data.IntVal; stack.pop();
-//                    if (ArrayTable.find(arrayID) != ArrayTable.end()) {
-//                        auto& array = ArrayTable[arrayID];
-//                        if (index >= 0 && index < array.size()) {
-//                            array.erase(array.begin() + index);
-//                        } else {
-//                            throw std::out_of_range("Invalid index for DeleteArray operation");
-//                        }
-//
-//                        if (array.empty()) {
-//                            ArrayTable.erase(arrayID);
-//                        }
-//                    } else {
-//                        throw std::runtime_error("Array with the given ID does not exist");
-//                    }
-        }
-
         case Bytecode::Jump: {
             auto value = stack.top();
             stack.pop();

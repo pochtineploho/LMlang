@@ -118,7 +118,6 @@ std::string BytecodeToString(Bytecode code) {
             { Bytecode::CreateArray, "CreateArray" },
             { Bytecode::LoadArray, "LoadArray" },
             { Bytecode::StoreArray, "StoreArray" },
-            { Bytecode::DeleteArray, "DeleteArray" },
             { Bytecode::NoOp, "NoOp" },
             { Bytecode::Halt, "Halt" }
     };
