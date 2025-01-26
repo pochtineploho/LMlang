@@ -9,27 +9,31 @@
 
 #include "vm.h"
 
-std::string VM::GetStringByID(int id) {
-    auto it = namesMap.find(id);
-    if (it == namesMap.end()) {
-        throw std::runtime_error("String ID not found in table: " + std::to_string(id));
-    }
-    return it->second;
-}
-
 void VM::CheckType(const Command &command, Command::CommandType type) {
     if (command.type != type) {
         throw std::runtime_error("Bytecode error on " + BytecodeToString(command.bytecode));
     }
 }
 
-void VM::CheckStack(const Command &command, int size) {
+void VM::CheckValueStack(const Command &command, int size) {
     if (valueStack.size() < size) {
-        throw std::runtime_error("Stack error on " + BytecodeToString(command.bytecode));
+        throw std::runtime_error("Value stack error on " + BytecodeToString(command.bytecode));
     }
 }
 
-std::string VM::GetVariableName(const Command &command) {
+void VM::CheckFunctions(const Command &command, const std::string &function) {
+    if (functionTable.find(function) == functionTable.end()) {
+        throw std::runtime_error(BytecodeToString(command.bytecode) + " function not found: " + function);
+    }
+}
+
+void VM::CheckCallStack(const Command &command, int size) {
+    if (callStack.size() < size) {
+        throw std::runtime_error("Call stack error on " + BytecodeToString(command.bytecode));
+    }
+}
+
+std::string VM::GetNameByIndex(const Command &command) {
     auto var_iter = namesMap.find(command.str_index);
     if (var_iter != namesMap.end()) {
         return var_iter->second;
@@ -98,7 +102,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Add: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -109,7 +113,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Subtract: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -120,7 +124,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Multiply: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -131,7 +135,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Divide: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -143,7 +147,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::And: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -154,7 +158,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Or: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -165,7 +169,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Not: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 1);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
             valueStack.emplace(value != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
@@ -174,7 +178,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Equal: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -185,7 +189,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::NotEqual: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -196,7 +200,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::GreaterThan: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -207,7 +211,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::GreaterOrEqual: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -218,7 +222,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::LessThan: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -229,7 +233,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::LessOrEqual: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 2);
+            CheckValueStack(command, 2);
             auto rhs = valueStack.top();
             valueStack.pop();
             auto lhs = valueStack.top();
@@ -240,7 +244,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::LoadVar: {
             CheckType(command, Command::OnlyStr);
-            auto var_name = GetVariableName(command);
+            auto var_name = GetNameByIndex(command);
             std::optional<llvm::APInt> foundValue = FindInVariablesStack(var_name);
             if (foundValue) {
                 valueStack.push(*foundValue);
@@ -254,10 +258,10 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::StoreVar: {
             CheckType(command, Command::OnlyStr);
-            CheckStack(command, 1);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
-            auto var_name = GetVariableName(command);
+            auto var_name = GetNameByIndex(command);
             if (variablesStack.empty()) {
                 variablesStack.emplace_back();
             }
@@ -268,7 +272,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Print: {
             CheckType(command, Command::Empty);
-            CheckStack(command, 1);
+            CheckValueStack(command, 1);
             auto value = valueStack.top();
             valueStack.pop();
             llvm::SmallString<64> buffer;
@@ -278,29 +282,33 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::Call: {
-            CheckType(command, Command::OnlyStr);
-            CheckStack(command, 1);
+            CheckType(command, Command::StrAndNum);
+            std::string func_name = GetNameByIndex(command);
+            CheckFunctions(command, func_name);
+            CheckValueStack(command, 1);
 
-            std::string funcName = GetStringByID(bytecode[pc++]);
-            int argCount = bytecode[pc++];
-
-            int funcAddress = FunctionTable.find(funcName)->second.GetAddress();
-            if (funcAddress == -1) {
-                throw std::runtime_error("Undefined function: " + funcName);
-            }
-
-            valueStack.emplace(static_cast<int>(pc));
-            pc = funcAddress;
+            int args_size = command.number.getLimitedValue();
+            CheckValueStack(command, args_size);
+            variablesStack.emplace_back();
+            callStack.emplace(pointer + 1);
+            pointer = functionTable[func_name];
+            isFunctionExec = true;
             break;
         }
+
         case Bytecode::Return: {
-            if (valueStack.empty()) {
-                throw std::runtime_error("Call valueStack underflow: Return without Call");
+            CheckCallStack(command, 1);
+            if (!variablesStack.empty()) {
+                variablesStack.pop_back();
             }
-            pc = valueStack.top().Int;
-            valueStack.pop();
+            pointer = callStack.top() - 1;
+            callStack.pop();
+            if (valueStack.empty()) {
+                valueStack.push(llvm::APInt(128, 0));
+            }
             break;
         }
+
         case Bytecode::CreateArray: {
             size_t size = valueStack.top().Data.IntVal;
             valueStack.pop();
@@ -707,7 +715,7 @@ void VM::JITCompile(const std::vector<uint8_t> &bytecode) {
             case Bytecode::Call: { /// TODO: й fix
                 int funcNameID = bytecode[pc++];
                 std::string funcName = namesMap[funcNameID];
-                llvm::Function *calledFunction = (FunctionTable.find(funcName)->second).GenerateLLVMFunction(
+                llvm::Function *calledFunction = (functionTable.find(funcName)->second).GenerateLLVMFunction(
                         context, module);
                 builder.CreateCall(calledFunction);
                 break;
