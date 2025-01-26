@@ -37,13 +37,12 @@ llvm_map_components_to_libnames(
 
 set(SOURCES
         gcMemoryManager/gcMemoryManager.cpp
+        vm/vm.h
         vm/vm.cpp
         main.cpp
         grammar/ASTNode.cpp
         grammar/ASTBuilder.cpp
         codeRunner/CodeRunner.h
-        vm/vm2.h
-        vm/vm2.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

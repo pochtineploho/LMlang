@@ -44,15 +44,22 @@ private:
     llvm::LLVMContext context;
     llvm::Module module;
 
-    std::unordered_map<int, std::string> variablesNames;
+    std::unordered_map<int, std::string> namesMap;
     std::stack<llvm::APInt> valueStack;
-    std::stack<std::unordered_map<std::string, llvm::APInt>> localVariablesStack;
-    std::unordered_map<std::string, llvm::APInt> globalVariables;
+    std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
+    
+    std::stack<size_t> callStack;
+    size_t pointer;
+    std::unordered_map<std::string, size_t> functionTable;
+    bool isFunctionExec; // TODO delete
 
-    std::string GetStringByID(int id);
-    std::string GetVariableName(const Command &command);
+    std::string GetNameByIndex(const Command &command);
+    std::optional<llvm::APInt> FindInVariablesStack(const std::string& name);
+
     void CheckType(const Command &command, Command::CommandType type);
-    void CheckStack(const Command &command, int size);
+    void CheckValueStack(const Command &command, int size);
+    void CheckFunctions(const Command &command,  const std::string& function);
+    void CheckCallStack(const Command &command, int size);
 
 public:
     VM() : gc(), context(), module("jit_module", context), builder(context) {
