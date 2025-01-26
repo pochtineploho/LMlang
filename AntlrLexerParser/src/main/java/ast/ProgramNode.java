@@ -33,6 +33,8 @@ public class ProgramNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        for(ASTNode child : children) {
+            child.BytecodeGeneration(bch);
+        }
     }
 }
