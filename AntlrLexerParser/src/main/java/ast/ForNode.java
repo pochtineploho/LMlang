@@ -38,7 +38,9 @@ public class ForNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-        init.BytecodeGeneration(bch);
+        if(init != null){
+            init.BytecodeGeneration(bch);
+        }
         Long for_begin = bch.getControlFlowCounter();
         bch.setControlFlowCounter(for_begin + 1);
         Long for_end = bch.getControlFlowCounter();
@@ -46,7 +48,9 @@ public class ForNode implements ASTNode {
         condition.BytecodeGeneration(bch);
         bch.getBytecodes().add(new bytecode(opCode.JumpIfFalse, for_end, 0, true, false)); // To condition
         body.BytecodeGeneration(bch);
-        increment.BytecodeGeneration(bch);
+        if(increment != null){
+            increment.BytecodeGeneration(bch);
+        }
         bch.getBytecodes().add(new bytecode(opCode.Jump, for_begin, 0, true, false)); // To condition
         bch.getBytecodes().add(new bytecode(opCode.NoOp, for_end, 0, true, false)); // To condition
 
