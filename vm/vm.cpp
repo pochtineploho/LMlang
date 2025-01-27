@@ -414,7 +414,6 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Jump: {
             CheckType(command, Command::OnlyNum);
-            CheckValueStack(command, 1);
             pointer = jumpPointerTable[command.number.getLimitedValue()];
             break;
         }
