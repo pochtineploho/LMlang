@@ -73,13 +73,26 @@ void VM::Execute(const std::vector<Command> &commands) {
     if (commands.empty()) {
         return;
     }
-    for (int pc = 0; pc < commands.size(); pc++) {
-        Command command = commands[pc];
-        if (command.bytecode != Bytecode::FuncDecl) {
-            continue;
+    for (size_t pc = 0; pc < commands.size(); ++pc) {
+        const Command& command = commands[pc];
+
+        if (command.bytecode == Bytecode::FuncDecl) {
+            pointer = pc;
+            if (HandleCommand(command) != 0) {
+                return;
+            }
         }
-        pointer = pc;
-        HandleCommand(command);
+
+        if (command.bytecode == Bytecode::Jump ||
+            command.bytecode == Bytecode::JumpIfTrue ||
+            command.bytecode == Bytecode::JumpIfFalse) {
+            size_t target = command.number.getLimitedValue();
+            if (target < commands.size()) {
+                jumpPointerTable[target] = pc;
+            } else {
+                throw std::runtime_error("Invalid jump target: " + std::to_string(target));
+            }
+        }
     }
 
     callStack.push(commands.size());
@@ -635,8 +648,8 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 if (variables.find(varName) == variables.end()) {
                     throw std::runtime_error("Variable not found: " + varName);
                 }
-
-                llvm::Value *value = builder.CreateLoad(variables[varName], varName.c_str());
+                llvm::Value *variablePointer = variables[varName];
+                llvm::Value *value = builder.CreateLoad(variablePointer, varName.c_str());
                 llvmStack.push_back(value);
                 break;
             }
@@ -698,80 +711,80 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 break;
             }
 
-            case Bytecode::Call: {
-                std::string funcName = GetNameByIndex(command);
-                auto funcIter = module.getFunction(funcName);
-                if (!funcIter) {
-                    throw std::runtime_error("Function not found: " + funcName);
-                }
+//            case Bytecode::Call: {
+//                std::string funcName = GetNameByIndex(command);
+//                auto funcIter = module.getFunction(funcName);
+//                if (!funcIter) {
+//                    throw std::runtime_error("Function not found: " + funcName);
+//                }
+//
+//                llvm::Function *calleeFunc = funcIter;
+//
+//                // Считываем аргументы с вершины стека
+//                int argCount = command.number.getLimitedValue();
+//                if (llvmStack.size() < argCount) {
+//                    throw std::runtime_error("JITCompile: Stack underflow on Call");
+//                }
+//
+//                std::vector<llvm::Value *> args;
+//                for (int i = 0; i < argCount; i++) {
+//                    args.insert(args.begin(), llvmStack.back());
+//                    llvmStack.pop_back();
+//                }
+//
+//                // Вызываем функцию
+//                llvm::Value *retVal = builder.CreateCall(calleeFunc, args);
+//                llvmStack.push_back(retVal);
+//                break;
+//            }
 
-                llvm::Function *calleeFunc = funcIter;
+//            case Bytecode::Return: {
+//                if (llvmStack.empty()) {
+//                    throw std::runtime_error("JITCompile: Stack underflow on Return");
+//                }
+//
+//                llvm::Value *returnValue = llvmStack.back();
+//                llvmStack.pop_back();
+//
+//                builder.CreateRet(returnValue);
+//                break;
+//            }
 
-                // Считываем аргументы с вершины стека
-                int argCount = command.number.getLimitedValue();
-                if (llvmStack.size() < argCount) {
-                    throw std::runtime_error("JITCompile: Stack underflow on Call");
-                }
-
-                std::vector<llvm::Value *> args;
-                for (int i = 0; i < argCount; i++) {
-                    args.insert(args.begin(), llvmStack.back());
-                    llvmStack.pop_back();
-                }
-
-                // Вызываем функцию
-                llvm::Value *retVal = builder.CreateCall(calleeFunc, args);
-                llvmStack.push_back(retVal);
-                break;
-            }
-
-            case Bytecode::Return: {
-                if (llvmStack.empty()) {
-                    throw std::runtime_error("JITCompile: Stack underflow on Return");
-                }
-
-                llvm::Value *returnValue = llvmStack.back();
-                llvmStack.pop_back();
-
-                builder.CreateRet(returnValue);
-                break;
-            }
-
-            case Bytecode::CreateArray: {
-                if (llvmStack.empty()) {
-                    throw std::runtime_error("JITCompile: Stack underflow on CreateArray");
-                }
-
-                llvm::Value *arraySize = llvmStack.back();
-                llvmStack.pop_back();
-
-                // Проверяем, что размер массива больше 0
-                llvm::Value *isSizeZero = builder.CreateICmpEQ(
-                        arraySize, llvm::ConstantInt::get(arraySize->getType(), 0), "isSizeZero");
-                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "error", function);
-                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "continue", function);
-
-                builder.CreateCondBr(isSizeZero, errorBlock, continueBlock);
-
-                // Блок ошибки
-                builder.SetInsertPoint(errorBlock);
-                builder.CreateCall(module.getOrInsertFunction(
-                        "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
-                ), builder.CreateGlobalString("Array size must be greater than zero\n"));
-                builder.CreateRetVoid();
-
-                // Блок продолжения
-                builder.SetInsertPoint(continueBlock);
-
-                // Выделяем память для массива в стеке
-                llvm::Value *array = builder.CreateAlloca(
-                        llvm::Type::getInt32Ty(context), arraySize, "array");
-
-                // Сохраняем указатель на массив в стеке
-                llvmStack.push_back(array);
-                break;
-            }
+//            case Bytecode::CreateArray: {
+//                if (llvmStack.empty()) {
+//                    throw std::runtime_error("JITCompile: Stack underflow on CreateArray");
+//                }
+//
+//                llvm::Value *arraySize = llvmStack.back();
+//                llvmStack.pop_back();
+//
+//                // Проверяем, что размер массива больше 0
+//                llvm::Value *isSizeZero = builder.CreateICmpEQ(
+//                        arraySize, llvm::ConstantInt::get(arraySize->getType(), 0), "isSizeZero");
+//                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "error", function);
+//                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "continue", function);
+//
+//                builder.CreateCondBr(isSizeZero, errorBlock, continueBlock);
+//
+//                // Блок ошибки
+//                builder.SetInsertPoint(errorBlock);
+//                builder.CreateCall(module.getOrInsertFunction(
+//                        "puts",
+//                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
+//                ), builder.CreateGlobalString("Array size must be greater than zero\n"));
+//                builder.CreateRetVoid();
+//
+//                // Блок продолжения
+//                builder.SetInsertPoint(continueBlock);
+//
+//                // Выделяем память для массива в стеке
+//                llvm::Value *array = builder.CreateAlloca(
+//                        llvm::Type::getInt32Ty(context), arraySize, "array");
+//
+//                // Сохраняем указатель на массив в стеке
+//                llvmStack.push_back(array);
+//                break;
+//            }
 
 
             case Bytecode::LoadArray: {
@@ -856,79 +869,55 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 break;
             }
 
-            case Bytecode::FuncDecl: {
-                std::string funcName = GetNameByIndex(command);
-
-                // Создаем прототип функции, если она еще не существует
-                llvm::Function* func = llvm::cast<llvm::Function>(
-                        module.getOrInsertFunction(
-                                funcName,
-                                llvm::FunctionType::get(llvm::Type::getVoidTy(context), false) // Без аргументов, возвращает void
-                        ).getCallee()
-                );
-
-                // Помещаем указатель на эту функцию в таблицу
-                functionTable[funcName] = func;
-                break;
-            }
-
-            case Bytecode::FuncEnd: {
-                // Завершаем текущий блок возвратом
-                if (!builder.GetInsertBlock()->getTerminator()) {
-                    builder.CreateRetVoid();
-                }
-                break;
-            }
-
-            case Bytecode::And: {
-                if (llvmStack.size() < 2) {
-                    throw std::runtime_error("JITCompile: Stack underflow on And");
-                }
-
-                llvm::Value* rhs = llvmStack.back(); // Правый операнд
-                llvmStack.pop_back();
-                llvm::Value* lhs = llvmStack.back(); // Левый операнд
-                llvmStack.pop_back();
-
-                // Создаем инструкцию логического И
-                llvm::Value* result = builder.CreateAnd(lhs, rhs, "andtmp");
-                llvmStack.push_back(result);
-                break;
-            }
-
-            case Bytecode::Or: {
-                if (llvmStack.size() < 2) {
-                    throw std::runtime_error("JITCompile: Stack underflow on Or");
-                }
-
-                llvm::Value* rhs = llvmStack.back(); // Правый операнд
-                llvmStack.pop_back();
-                llvm::Value* lhs = llvmStack.back(); // Левый операнд
-                llvmStack.pop_back();
-
-                // Создаем инструкцию логического ИЛИ
-                llvm::Value* result = builder.CreateOr(lhs, rhs, "ortmp");
-                llvmStack.push_back(result);
-                break;
-            }
-
-            case Bytecode::Not: {
-                if (llvmStack.size() < 1) {
-                    throw std::runtime_error("JITCompile: Stack underflow on Not");
-                }
-
-                llvm::Value* value = llvmStack.back(); // Операнд
-                llvmStack.pop_back();
-
-                // Создаем инструкцию сравнения с 0 (логическое НЕ)
-                llvm::Value* result = builder.CreateICmpEQ(
-                        value,
-                        llvm::ConstantInt::get(value->getType(), 0),
-                        "nottmp"
-                );
-                llvmStack.push_back(result);
-                break;
-            }
+//            case Bytecode::And: {
+//                if (llvmStack.size() < 2) {
+//                    throw std::runtime_error("JITCompile: Stack underflow on And");
+//                }
+//
+//                llvm::Value* rhs = llvmStack.back(); // Правый операнд
+//                llvmStack.pop_back();
+//                llvm::Value* lhs = llvmStack.back(); // Левый операнд
+//                llvmStack.pop_back();
+//
+//                // Создаем инструкцию логического И
+//                llvm::Value* result = builder.CreateAnd(lhs, rhs, "andtmp");
+//                llvmStack.push_back(result);
+//                break;
+//            }
+//
+//            case Bytecode::Or: {
+//                if (llvmStack.size() < 2) {
+//                    throw std::runtime_error("JITCompile: Stack underflow on Or");
+//                }
+//
+//                llvm::Value* rhs = llvmStack.back(); // Правый операнд
+//                llvmStack.pop_back();
+//                llvm::Value* lhs = llvmStack.back(); // Левый операнд
+//                llvmStack.pop_back();
+//
+//                // Создаем инструкцию логического ИЛИ
+//                llvm::Value* result = builder.CreateOr(lhs, rhs, "ortmp");
+//                llvmStack.push_back(result);
+//                break;
+//            }
+//
+//            case Bytecode::Not: {
+//                if (llvmStack.size() < 1) {
+//                    throw std::runtime_error("JITCompile: Stack underflow on Not");
+//                }
+//
+//                llvm::Value* value = llvmStack.back(); // Операнд
+//                llvmStack.pop_back();
+//
+//                // Создаем инструкцию сравнения с 0 (логическое НЕ)
+//                llvm::Value* result = builder.CreateICmpEQ(
+//                        value,
+//                        llvm::ConstantInt::get(value->getType(), 0),
+//                        "nottmp"
+//                );
+//                llvmStack.push_back(result);
+//                break;
+//            }
 
 
             default:
