@@ -357,7 +357,7 @@ int VM::HandleCommand(const Command &command) {
             if (!memory.isIntN(sizeof(size_t) * 8)) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
-            void *allocated = gc.Allocate(memory.getLimitedValue() * sizeof(size_t));
+            void *allocated = gc.Allocate(memory.getLimitedValue() * sizeof(size_t) * 2);
             if (!allocated) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
             }
