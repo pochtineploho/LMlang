@@ -42,19 +42,13 @@
     "withValue" : true,
     "withStringID" : false
   }, {
-    "opCode" : "LoadVar",
-    "value" : 0,
-    "stringID" : 1,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
     "opCode" : "Push",
     "value" : 1,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
   }, {
-    "opCode" : "Equal",
+    "opCode" : "Return",
     "value" : 0,
     "stringID" : 0,
     "withValue" : false,

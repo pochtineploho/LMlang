@@ -189,7 +189,7 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
         ASTNode condition = visit(ctx.expression());
         ifNode.setCondition(condition);
 
-        ASTNode thenNode = visit(ctx.expression());
+        ASTNode thenNode = visit(ctx.statement(0));
         ifNode.setThen(thenNode);
 
         if (ctx.statement(1) != null) {
