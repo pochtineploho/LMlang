@@ -8,16 +8,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
+@AllArgsConstructor
 @NoArgsConstructor
 public class IdentifierNode implements ASTNode {
     private String name;
-    private Boolean load;
-
-    IdentifierNode(String name) {
-        this.name = name;
-        load = true;
-    }
 
     @Override
     public String GetTypeName() {
@@ -30,7 +24,7 @@ public class IdentifierNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         Integer varNameID = bch.getStringTable().size();
         if (bch.getStringTable().get(name) != null){
             varNameID = bch.getStringTable().get(name);

@@ -33,13 +33,13 @@ public class ArrayInitializerNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         Integer arraySize = values.size();
         bch.getBytecodes().add(new bytecode(opCode.Push, arraySize.longValue(), 0, true, false));
         bch.getBytecodes().add(new bytecode(opCode.CreateArray, 0L, 0, false, false));
         for (Integer i = 0; i < arraySize; i++) {
             bch.getBytecodes().add(new bytecode(opCode.Push, i.longValue(), 0, true, false));
-            values.get(i).BytecodeGeneration(bch);
+            values.get(i).BytecodeGeneration(bch, false);
             bch.getBytecodes().add(new bytecode(opCode.FillRawArray, 0L, 0, false, false));
         }
     }

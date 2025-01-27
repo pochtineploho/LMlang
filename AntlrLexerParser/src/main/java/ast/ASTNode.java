@@ -7,5 +7,5 @@ public interface ASTNode {
 
     void Print(int indent);
 
-    void BytecodeGeneration(bytecodeHolder bch);
+    void BytecodeGeneration(bytecodeHolder bch, Boolean load);
 }

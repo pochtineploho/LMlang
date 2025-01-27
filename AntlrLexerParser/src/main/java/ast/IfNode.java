@@ -31,15 +31,15 @@ public class IfNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         Long else_go_to = bch.getControlFlowCounter();
         bch.setControlFlowCounter(else_go_to+1);
-        condition.BytecodeGeneration(bch);
+        condition.BytecodeGeneration(bch, false);
         bch.getBytecodes().add(new bytecode(opCode.JumpIfFalse, else_go_to, 0, true, false)); // To condition
-        then.BytecodeGeneration(bch);
+        then.BytecodeGeneration(bch, false);
         bch.getBytecodes().add(new bytecode(opCode.NoOp, else_go_to, 0, true, false)); // To condition
         if (else_ != null) {
-            else_.BytecodeGeneration(bch);
+            else_.BytecodeGeneration(bch, false);
         }
     }
 }

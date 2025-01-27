@@ -25,8 +25,8 @@ public class CallFunctionNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
-        parameters.BytecodeGeneration(bch);
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
+        parameters.BytecodeGeneration(bch, false);
         Integer varNameID = bch.getStringTable().size();
         if (bch.getStringTable().get(name) != null){
             varNameID = bch.getStringTable().get(name);

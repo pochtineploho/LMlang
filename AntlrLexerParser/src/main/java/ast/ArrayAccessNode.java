@@ -10,18 +10,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class ArrayAccessNode implements ASTNode {
 
     private ASTNode index;
     private String array;
-    private Boolean load;
-
-    ArrayAccessNode(ASTNode index, String array){
-        this.index = index;
-        this.array = array;
-        load = true;
-    }
 
     @Override
     public String GetTypeName() {
@@ -34,7 +28,7 @@ public class ArrayAccessNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         Integer arrNameID = bch.getStringTable().size();
         if (bch.getStringTable().get(array) != null){
             arrNameID = bch.getStringTable().get(array);
@@ -43,13 +37,13 @@ public class ArrayAccessNode implements ASTNode {
         }
         if (load){
             bch.getBytecodes().add(new bytecode(opCode.LoadVar, 0L, arrNameID, false, true));
-            index.BytecodeGeneration(bch);
+            index.BytecodeGeneration(bch, false);
 
             bch.getBytecodes().add(new bytecode(opCode.LoadArray, 0L, 0, false, false));
 
         } else {
             bch.getBytecodes().add(new bytecode(opCode.StoreVar, 0L, arrNameID, false, true));
-            index.BytecodeGeneration(bch);
+            index.BytecodeGeneration(bch, false);
 
             bch.getBytecodes().add(new bytecode(opCode.StoreArray, 0L, 0, false, false));
         }

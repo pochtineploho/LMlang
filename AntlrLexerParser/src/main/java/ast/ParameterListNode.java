@@ -30,10 +30,10 @@ public class ParameterListNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         for (ASTNode argument : parameters) {
             if(argument != null){
-                argument.BytecodeGeneration(bch);
+                argument.BytecodeGeneration(bch, false);
             }
         }
     }

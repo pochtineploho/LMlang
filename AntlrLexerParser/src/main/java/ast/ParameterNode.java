@@ -26,8 +26,8 @@ public class ParameterNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
-        type.BytecodeGeneration(bch);
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
+        type.BytecodeGeneration(bch, false);
         Integer varNameID = bch.getStringTable().size();
         if (bch.getStringTable().get(name) != null){
             varNameID = bch.getStringTable().get(name);

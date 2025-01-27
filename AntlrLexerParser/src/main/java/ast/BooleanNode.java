@@ -21,7 +21,7 @@ public class BooleanNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         if (value){
             bch.getBytecodes().add(new bytecode(opCode.Push, 1L, 0, true, false));
         } else {

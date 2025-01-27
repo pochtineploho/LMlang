@@ -24,8 +24,8 @@ public class ReturnNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
-        returnExpression.BytecodeGeneration(bch);
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
+        returnExpression.BytecodeGeneration(bch, false);
         bch.getBytecodes().add(new bytecode(opCode.Return, 0L, 0, false, false));
     }
 }

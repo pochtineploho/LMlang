@@ -32,9 +32,9 @@ public class ArgumentListNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         for (ASTNode argument : arguments) {
-            argument.BytecodeGeneration(bch);
+            argument.BytecodeGeneration(bch, false);
         }
     }
 }

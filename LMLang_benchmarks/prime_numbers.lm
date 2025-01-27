@@ -2,8 +2,6 @@ func int[] findPrimes(int n) {
     if (n < 2) {
         return {};
     }
-
-
     print(1);
     int[] isPrime = int[n + 1]; // Объявление массива булевых значений
     for (int i = 0; i <= n; ++i) {

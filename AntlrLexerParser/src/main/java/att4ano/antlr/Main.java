@@ -41,7 +41,7 @@ public class Main {
 
             bytecodeHolder bch = new bytecodeHolder();
 
-            ast.BytecodeGeneration(bch);
+            ast.BytecodeGeneration(bch, false);
             //Работает Саша bch
             System.out.println(ast.GetTypeName());
 

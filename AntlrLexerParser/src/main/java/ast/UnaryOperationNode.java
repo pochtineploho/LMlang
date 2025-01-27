@@ -32,8 +32,8 @@ public class UnaryOperationNode implements ASTNode {
     }
 
     @Override
-    public void BytecodeGeneration(bytecodeHolder bch){
-        operand.BytecodeGeneration(bch);
+    public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
+        operand.BytecodeGeneration(bch, false);
         if (operator.equals("++")) {
             bch.getBytecodes().add(new bytecode(opCode.Push, 1L, 0, true, false));
             bch.getBytecodes().add(new bytecode(opCode.Add, 0L, 0, false, false));
