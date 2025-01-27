@@ -570,6 +570,18 @@
     "withValue" : false,
     "withStringID" : true
   }, {
+    "opCode" : "Push",
+    "value" : 1,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "Add",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
     "opCode" : "CreateArray",
     "value" : 0,
     "stringID" : 0,
@@ -732,6 +744,24 @@
     "withValue" : true,
     "withStringID" : false
   }, {
+    "opCode" : "Push",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 7,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "LoadArray",
+    "value" : 0,
+    "stringID" : 6,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
     "opCode" : "LoadVar",
     "value" : 0,
     "stringID" : 6,
@@ -830,6 +860,36 @@
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
+    "stringID" : 9,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Push",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "NotEqual",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "JumpIfFalse",
+    "value" : 10,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "LoadArray",
+    "value" : 0,
     "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
@@ -839,6 +899,24 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
+  }, {
+    "opCode" : "NoOp",
+    "value" : 10,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 1,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
@@ -897,7 +975,8 @@
     "primeCount" : 5,
     "findPrimes" : 0,
     "isPrime" : 2,
+    "primers" : 9,
     "n" : 1
   },
-  "controlFlowCounter" : 10
+  "controlFlowCounter" : 11
 }
