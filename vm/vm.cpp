@@ -134,7 +134,7 @@ void VM::Execute(const std::vector<Command> &commands) {
 int VM::HandleCommand(const Command &command) {
     switch (command.bytecode) {
         case Bytecode::Push: {
-            CheckType(command, Command::Empty);
+            CheckType(command, Command::OnlyNum);
             valueStack.push(command.number);
             break;
         }
@@ -330,7 +330,6 @@ int VM::HandleCommand(const Command &command) {
             CheckType(command, Command::StrAndNum);
             std::string func_name = GetNameByIndex(command);
             CheckFunctions(command, func_name);
-            CheckValueStack(command, 1);
 
             int args_size = command.number.getLimitedValue();
             CheckValueStack(command, args_size);
@@ -462,7 +461,7 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::FuncDecl: {
             CheckType(command, Command::OnlyStr);
             std::string func_name = GetNameByIndex(command);
-            CheckFunctions(command, func_name);
+            // CheckFunctions(command, func_name); ???
             functionTable[func_name] = pointer + 1;
             break;
         }
