@@ -34,20 +34,22 @@ func int[] findPrimes(int n) {
             index = index + 1;
         }
     }
-    primes[index] = 0;
+    primes[primeCount] = 1;
 
     return primes;
 }
 
 func int main() {
     int n = 10000;
-    int[] primes = findPrimes(n);
+    int[] primeb = findPrimes(n);
     for (int i = 0; i < n; ++i) {
-        if (primes[i] != 0){
-            print(primes[i]);
+        print(i);
+        if (primeb[i] == 1){
+            i=n-1;
         } else {
-            i = n;
+            print(primeb[i]);
         }
     }
+
     return 0;
 }

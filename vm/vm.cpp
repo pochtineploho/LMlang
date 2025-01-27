@@ -353,14 +353,15 @@ int VM::HandleCommand(const Command &command) {
             CheckValueStack(command, 1);
             auto memory = valueStack.top();
             valueStack.pop();
-            if (!memory.isIntN(sizeof(size_t) * 8)) {
+            if (!memory.isIntN(sizeof(size_t)*8)) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
-            void *allocated = gc.Allocate(memory.getLimitedValue() * sizeof(size_t) * 2);
+            std::cerr<<memory.getLimitedValue()<<'\n';
+            void *allocated = gc.Allocate(memory.getLimitedValue() *16);
             if (!allocated) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
             }
-            llvm::APInt array_ptr(sizeof(uintptr_t) * 8, reinterpret_cast<uintptr_t>(allocated));
+            llvm::APInt array_ptr(sizeof(uintptr_t)*8, reinterpret_cast<uintptr_t>(allocated));
             valueStack.push(array_ptr);
             break;
         }
