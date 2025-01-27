@@ -18,6 +18,12 @@
     "withValue" : true,
     "withStringID" : false
   }, {
+    "opCode" : "Equal",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
     "opCode" : "JumpIfFalse",
     "value" : 0,
     "stringID" : 0,
@@ -34,6 +40,12 @@
     "value" : 1,
     "stringID" : 0,
     "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "Equal",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
     "withStringID" : false
   }, {
     "opCode" : "NoOp",

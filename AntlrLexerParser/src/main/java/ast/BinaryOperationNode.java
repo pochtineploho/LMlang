@@ -39,6 +39,18 @@ public class BinaryOperationNode implements ASTNode {
             bch.getBytecodes().add(new bytecode(opCode.Multiply, 0L, 0, false, false));
         } else if (operation.equals("/")){
             bch.getBytecodes().add(new bytecode(opCode.Divide, 0L, 0, false, false));
+        } else if (operation.equals("==")){
+            bch.getBytecodes().add(new bytecode(opCode.Equal, 0L, 0, false, false));
+        } else if (operation.equals("!=")){
+            bch.getBytecodes().add(new bytecode(opCode.NotEqual, 0L, 0, false, false));
+        } else if (operation.equals("<")){
+            bch.getBytecodes().add(new bytecode(opCode.LessThan, 0L, 0, false, false));
+        } else if (operation.equals(">")){
+            bch.getBytecodes().add(new bytecode(opCode.GreaterThan, 0L, 0, false, false));
+        } else if (operation.equals("<=")){
+            bch.getBytecodes().add(new bytecode(opCode.LessOrEqual, 0L, 0, false, false));
+        } else if (operation.equals(">=")){
+            bch.getBytecodes().add(new bytecode(opCode.GreaterOrEqual, 0L, 0, false, false));
         }
     }
 }
