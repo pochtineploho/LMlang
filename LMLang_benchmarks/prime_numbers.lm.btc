@@ -26,7 +26,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 2,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -44,7 +44,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 2,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -92,13 +92,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -116,19 +116,19 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -170,7 +170,7 @@
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -188,7 +188,7 @@
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -200,7 +200,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -212,13 +212,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -230,7 +230,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -242,13 +242,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -260,13 +260,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -278,7 +278,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -326,7 +326,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -338,13 +338,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -356,13 +356,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -374,13 +374,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -392,7 +392,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -422,7 +422,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 4,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -458,7 +458,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -470,13 +470,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -488,13 +488,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -506,13 +506,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -524,7 +524,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -554,7 +554,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -578,25 +578,25 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "Call",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 0,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -608,7 +608,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -620,13 +620,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -638,13 +638,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadArray",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -656,7 +656,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 3,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -703,14 +703,14 @@
     "withStringID" : false
   } ],
   "stringTable" : {
-    "primes" : 8,
-    "i" : 8,
+    "primes" : 5,
+    "i" : 3,
     "index" : 6,
     "main" : 7,
-    "primeCount" : 5,
-    "findPrimes" : 8,
-    "isPrime" : 7,
-    "n" : 8
+    "primeCount" : 4,
+    "findPrimes" : 0,
+    "isPrime" : 2,
+    "n" : 1
   },
   "controlFlowCounter" : 9
 }
