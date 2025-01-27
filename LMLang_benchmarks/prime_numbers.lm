@@ -50,7 +50,7 @@ func int[] findPrimes(int n) {
 }
 
 func int main() {
-    int n = 10000;
+    int n = 100;
     int[] primes = findPrimes(n);
 
     return 0;
