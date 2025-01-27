@@ -330,7 +330,7 @@ int VM::HandleCommand(const Command &command) {
             int args_size = command.number.getLimitedValue();
             CheckValueStack(command, args_size);
             variablesStack.emplace_back();
-            callStack.emplace(pointer);  // + 1 ?
+            callStack.emplace(pointer + 1);  // + 1 ?
             pointer = functionTable[func_name];
             break;
         }
