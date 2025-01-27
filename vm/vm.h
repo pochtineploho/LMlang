@@ -39,7 +39,7 @@ public:
 class VM {
 
 private:
-    std::unordered_map<int, int> loopCounters; // Map to track loop instruction usage
+    std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
     const int hotLoopThreshold = 10;          // Threshold for marking a loop as hot
     llvm::IRBuilder<> builder;
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack'
@@ -87,14 +87,14 @@ public:
 
     int HandleCommand(const Command& command);
 
-    size_t FindLoopStart(const std::vector<Command>& bytecode, size_t pc);
+    size_t FindLoopStart(const std::vector<Command>& commands, size_t pc);
 
-    size_t FindLoopEnd(const std::vector<Command>& bytecode, size_t pc);
+    size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc);
 
-    std::vector<uint8_t> LoopBytecode(const std::vector<uint8_t>& bytecode, size_t loopStart, size_t jumpTarget);
+    std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<uint8_t>& bytecode);
+    void JITCompile(const std::vector<Command>& commands);
 /*
     // Arithmetic operations
     Add = 0,        // 0: Stack: [..., a, b] -> [..., a + b]
