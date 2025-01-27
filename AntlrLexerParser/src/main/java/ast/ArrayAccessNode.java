@@ -37,13 +37,13 @@ public class ArrayAccessNode implements ASTNode {
         }
         if (load){
             bch.getBytecodes().add(new bytecode(opCode.LoadVar, 0L, arrNameID, false, true));
-            index.BytecodeGeneration(bch, false);
+            index.BytecodeGeneration(bch, true);
 
             bch.getBytecodes().add(new bytecode(opCode.LoadArray, 0L, 0, false, false));
 
         } else {
             bch.getBytecodes().add(new bytecode(opCode.StoreVar, 0L, arrNameID, false, true));
-            index.BytecodeGeneration(bch, false);
+            index.BytecodeGeneration(bch, true);
 
             bch.getBytecodes().add(new bytecode(opCode.StoreArray, 0L, 0, false, false));
         }

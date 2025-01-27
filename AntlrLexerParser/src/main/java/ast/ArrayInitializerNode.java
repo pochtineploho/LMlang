@@ -39,7 +39,7 @@ public class ArrayInitializerNode implements ASTNode {
         bch.getBytecodes().add(new bytecode(opCode.CreateArray, 0L, 0, false, false));
         for (Integer i = 0; i < arraySize; i++) {
             bch.getBytecodes().add(new bytecode(opCode.Push, i.longValue(), 0, true, false));
-            values.get(i).BytecodeGeneration(bch, false);
+            values.get(i).BytecodeGeneration(bch, true);
             bch.getBytecodes().add(new bytecode(opCode.FillRawArray, 0L, 0, false, false));
         }
     }

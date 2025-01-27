@@ -39,7 +39,7 @@ public class BlockNode implements ASTNode {
     public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         for (ASTNode statement : statements) {
             if (statement != null) {
-                statement.BytecodeGeneration(bch, false);
+                statement.BytecodeGeneration(bch, true);
             }
         }
     }

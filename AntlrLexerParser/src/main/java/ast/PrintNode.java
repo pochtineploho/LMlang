@@ -25,7 +25,7 @@ public class PrintNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
-        expression.BytecodeGeneration(bch, false);
+        expression.BytecodeGeneration(bch, true);
         bch.getBytecodes().add(new bytecode(opCode.Print, 0L, 0, false, false));
     }
 }

@@ -29,8 +29,8 @@ public class BinaryOperationNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
-        left.BytecodeGeneration(bch, false);
-        right.BytecodeGeneration(bch, false);
+        left.BytecodeGeneration(bch, true);
+        right.BytecodeGeneration(bch, true);
         if (operation.equals("+")){
             bch.getBytecodes().add(new bytecode(opCode.Add, 0L, 0, false, false));
         } else if (operation.equals("-")){

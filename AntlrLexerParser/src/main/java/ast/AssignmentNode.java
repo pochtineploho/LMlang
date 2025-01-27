@@ -37,10 +37,6 @@ public class AssignmentNode implements ASTNode {
         rhs.BytecodeGeneration(bch, true);
 
         lhs.BytecodeGeneration(bch, false);
-
-
-
-
     }
 }
 

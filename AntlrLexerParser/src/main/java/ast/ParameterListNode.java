@@ -33,7 +33,7 @@ public class ParameterListNode implements ASTNode {
     public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
         for (ASTNode argument : parameters) {
             if(argument != null){
-                argument.BytecodeGeneration(bch, false);
+                argument.BytecodeGeneration(bch, true);
             }
         }
     }

@@ -33,7 +33,7 @@ public class VariableNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
-        value.BytecodeGeneration(bch, false);
+        value.BytecodeGeneration(bch, true);
         Integer varNameID = bch.getStringTable().size();
         if (bch.getStringTable().get(name) != null){
             varNameID = bch.getStringTable().get(name);
