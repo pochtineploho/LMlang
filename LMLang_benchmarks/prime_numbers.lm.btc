@@ -336,7 +336,7 @@
     "withValue" : false,
     "withStringID" : true
   }, {
-    "opCode" : "Add",
+    "opCode" : "Multiply",
     "value" : 0,
     "stringID" : 0,
     "withValue" : false,
@@ -660,7 +660,7 @@
     "withValue" : true,
     "withStringID" : false
   }, {
-    "opCode" : "LoadVar",
+    "opCode" : "StoreVar",
     "value" : 0,
     "stringID" : 7,
     "withValue" : false,
