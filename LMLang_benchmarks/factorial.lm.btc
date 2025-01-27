@@ -1,0 +1,123 @@
+{
+  "bytecodes" : [ {
+    "opCode" : "FuncDecl",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 1,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Push",
+    "value" : 1,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "JumpIfFalse",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 2,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Push",
+    "value" : 1,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "NoOp",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 2,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 2,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Push",
+    "value" : 1,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "Subtract",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "Call",
+    "value" : 0,
+    "stringID" : 2,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Multiply",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "Return",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "FuncDecl",
+    "value" : 0,
+    "stringID" : 2,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Push",
+    "value" : 20,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "Call",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Print",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "Halt",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  } ],
+  "stringTable" : {
+    "factorial" : 3,
+    "main" : 2,
+    "n" : 2
+  },
+  "controlFlowCounter" : 1
+}

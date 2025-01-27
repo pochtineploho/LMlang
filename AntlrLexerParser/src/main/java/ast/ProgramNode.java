@@ -37,7 +37,9 @@ public class ProgramNode implements ASTNode {
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
         for(ASTNode child : children) {
-            child.BytecodeGeneration(bch);
+            if(child !=null){
+                child.BytecodeGeneration(bch);
+            }
         }
         bch.getBytecodes().add(new bytecode(opCode.Halt, 0L, 0, false, false));
     }
