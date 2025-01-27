@@ -83,14 +83,10 @@ void VM::Execute(const std::vector<Command> &commands) {
             }
         }
 
-        if (command.bytecode == Bytecode::Jump ||
-            command.bytecode == Bytecode::JumpIfTrue ||
-            command.bytecode == Bytecode::JumpIfFalse) {
-            size_t target = command.number.getLimitedValue();
-            if (target < commands.size()) {
-                jumpPointerTable[target] = pc;
-            } else {
-                throw std::runtime_error("Invalid jump target: " + std::to_string(target));
+        if (command.bytecode == Bytecode::NoOp) {
+            pointer = pc;
+            if (HandleCommand(command) != 0) {
+                return;
             }
         }
     }
