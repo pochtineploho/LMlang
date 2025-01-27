@@ -34,9 +34,28 @@ public class AssignmentNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-        rhs.BytecodeGeneration(bch);
+        if (rhs instanceof IdentifierNode) {
+            IdentifierNode id = (IdentifierNode)rhs;
+            id.setLoad(true);
+            id.BytecodeGeneration(bch);
+        } else if (rhs instanceof ArrayAccessNode) {
+            ArrayAccessNode a = (ArrayAccessNode)rhs;
+            a.setLoad(true);
+            a.BytecodeGeneration(bch);
+        } else {
+            rhs.BytecodeGeneration(bch);
+        }
 
-        lhs.BytecodeGeneration(bch);
+        if (lhs instanceof IdentifierNode) {
+            IdentifierNode id = (IdentifierNode)lhs;
+            id.setLoad(false);
+            id.BytecodeGeneration(bch);
+        } else if (lhs instanceof ArrayAccessNode) {
+            ArrayAccessNode a = (ArrayAccessNode)lhs;
+            a.setLoad(false);
+            a.BytecodeGeneration(bch);
+        }
+
 
 
     }

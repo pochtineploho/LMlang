@@ -398,11 +398,11 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::StoreArray: {
             CheckType(command, Command::Empty);
             CheckValueStack(command, 3);
-            llvm::APInt value = valueStack.top();
-            valueStack.pop();
             llvm::APInt index = valueStack.top();
             valueStack.pop();
             llvm::APInt array = valueStack.top();
+            valueStack.pop();
+            llvm::APInt value = valueStack.top();
             valueStack.pop();
             auto *array_ptr = reinterpret_cast<llvm::APInt *>(array.getLimitedValue());
             CheckPointer(command, array_ptr);
