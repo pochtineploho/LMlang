@@ -80,7 +80,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 2,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -103,7 +103,6 @@
     "withStringID" : false
   } ],
   "stringTable" : {
-    "IdentifierNode" : 2,
     "i" : 1,
     "main" : 0
   },

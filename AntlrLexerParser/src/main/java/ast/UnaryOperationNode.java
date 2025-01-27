@@ -43,7 +43,7 @@ public class UnaryOperationNode implements ASTNode {
         }else if (operator.equals("!")) {
             bch.getBytecodes().add(new bytecode(opCode.Not, 0L, 0, false, false));
         }
-        String name = ((IdentifierNode)operand).GetTypeName();
+        String name = ((IdentifierNode)operand).getName();
         Integer varNameID = bch.getStringTable().size();
         if (bch.getStringTable().get(name) != null){
             varNameID = bch.getStringTable().get(name);
