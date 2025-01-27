@@ -1,5 +1,10 @@
 func int main() {
-        for (int i = 0; i <= 20; ++i) {
-            print(i);
-        }
+    int n = 10;
+    bool[] isPrime = bool[n + 1];
+    for (int i = 0; i <= n; ++i) {
+        isPrime[i] = true;
+    }
+    for (int i = 0; i <= n; ++i) {
+        print(isPrime[i]);
+    }
 }

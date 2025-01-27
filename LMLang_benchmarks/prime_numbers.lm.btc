@@ -180,6 +180,12 @@
     "withValue" : false,
     "withStringID" : false
   }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
     "opCode" : "Jump",
     "value" : 1,
     "stringID" : 0,
@@ -330,7 +336,7 @@
     "withValue" : false,
     "withStringID" : true
   }, {
-    "opCode" : "Multiply",
+    "opCode" : "Add",
     "value" : 0,
     "stringID" : 0,
     "withValue" : false,
@@ -398,21 +404,27 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 3,
+    "stringID" : 4,
     "withValue" : false,
     "withStringID" : true
   }, {
-    "opCode" : "Push",
-    "value" : 1,
-    "stringID" : 0,
-    "withValue" : true,
-    "withStringID" : false
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
   }, {
     "opCode" : "Add",
     "value" : 0,
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 4,
+    "withValue" : false,
+    "withStringID" : true
   }, {
     "opCode" : "Jump",
     "value" : 4,
@@ -449,6 +461,12 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
+  }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
   }, {
     "opCode" : "Jump",
     "value" : 2,
@@ -587,6 +605,12 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
+  }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
   }, {
     "opCode" : "Jump",
     "value" : 5,
@@ -780,6 +804,12 @@
     "withValue" : false,
     "withStringID" : false
   }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
     "opCode" : "Jump",
     "value" : 7,
     "stringID" : 0,
@@ -908,7 +938,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 9,
+    "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -1002,6 +1032,12 @@
     "withValue" : false,
     "withStringID" : false
   }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
     "opCode" : "Jump",
     "value" : 9,
     "stringID" : 0,
@@ -1041,7 +1077,6 @@
     "primeCount" : 5,
     "findPrimes" : 0,
     "isPrime" : 2,
-    "primers" : 9,
     "n" : 1
   },
   "controlFlowCounter" : 11

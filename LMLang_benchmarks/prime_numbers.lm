@@ -12,7 +12,7 @@ func int[] findPrimes(int n) {
 
     for (int i = 2; i * i <= n; ++i) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; ++i) {
+            for (int j = i + i; j <= n; j = j + i) {
                 isPrime[j] = false;
             }
         }
@@ -43,7 +43,7 @@ func int main() {
     int n = 10000;
     int[] primes = findPrimes(n);
     for (int i = 0; i < n; ++i) {
-        if (primers[i]!=0){
+        if (primes[i]!=0){
             print(primes[i]);
         } else {
             i = n;
