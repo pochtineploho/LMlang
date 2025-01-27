@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Started work");
         System.out.println(args);
-        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\prime_numbers.lm";
+        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\primitive.lm";
         try {
             // Create a CharStream from the file
             CharStream charStream = CharStreams.fromFileName(filepath);
@@ -48,12 +48,12 @@ public class Main {
             ObjectMapper mapper = new ObjectMapper();
 
             // Create bytecodeHolder with sample data
-            bytecodeHolder holder = new bytecodeHolder();/*
+            /*
             holder.getBytecodes().add(new bytecode(opCode.Add, 123L, 1, true, false));
             holder.getStringTable().put("exampleKey", 42);
 */
             // Serialize bytecodeHolder to JSON
-            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(holder);
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bch);
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath+".btc"))) {
                 writer.write(json);

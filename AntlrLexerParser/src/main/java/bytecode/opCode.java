@@ -38,8 +38,9 @@ public enum opCode {
 
     // Array operations
     CreateArray(23),       // 23: Create an array and store its ID in the table
-    LoadArray(24),         // 24: Load an element from an array by ID and index
-    StoreArray(25),        // 25: Store a value in an array by ID and index
+    FillRawArray(24),
+    LoadArray(25),         // 24: Load an element from an array by ID and index
+    StoreArray(26),        // 25: Store a value in an array by ID and index
 
     NoOp(27),              // 27: No operation
     Halt(28),              // 28: Halt the program

@@ -34,10 +34,13 @@ enum struct opCode {
     Call = 21,
     Return = 22,
     CreateArray = 23,
-    LoadArray = 24,
-    StoreArray = 25,
+    FillRawArray = 24,
+    LoadArray = 25,
+    StoreArray = 26,
     NoOp = 27,
-    Halt = 28
+    Halt = 28,
+    FuncDecl = 29,
+    FuncEnd = 30,
 };
 
 // Map for converting opCode to string and back
@@ -65,21 +68,44 @@ static std::map<opCode, std::string> opCodeToString = {
         {opCode::Call,           "Call"},
         {opCode::Return,         "Return"},
         {opCode::CreateArray,    "CreateArray"},
+        {opCode::FillRawArray,   "FillRawArray"},
         {opCode::LoadArray,      "LoadArray"},
         {opCode::StoreArray,     "StoreArray"},
         {opCode::NoOp,           "NoOp"},
-        {opCode::Halt,           "Halt"}
+        {opCode::Halt,           "Halt"},
+        {opCode::FuncDecl,       "FuncDecl"},
+        {opCode::FuncEnd,        "FuncEnd"}
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(opCode, {
-    { opCode::Add, "Add" }, { opCode::Subtract, "Subtract" }, { opCode::Multiply, "Multiply" },
-    { opCode::Divide, "Divide" }, { opCode::Equal, "Equal" }, { opCode::NotEqual, "NotEqual" },
-    { opCode::LessThan, "LessThan" }, { opCode::GreaterThan, "GreaterThan" },
-    { opCode::LessOrEqual, "LessOrEqual" }, { opCode::GreaterOrEqual, "GreaterOrEqual" },
-    { opCode::And, "And" }, { opCode::Or, "Or" }, { opCode::Not, "Not" }, { opCode::Push, "Push" },
-    { opCode::LoadVar, "LoadVar" }, { opCode::StoreVar, "StoreVar" }, { opCode::Jump, "Jump" },
-    { opCode::JumpIfTrue, "JumpIfTrue" }, { opCode::JumpIfFalse, "JumpIfFalse" },
-    { opCode::Print, "Print" }, { opCode::Call, "Call" }, { opCode::Return, "Return" },
-    { opCode::CreateArray, "CreateArray" }, { opCode::LoadArray, "LoadArray" },
-    { opCode::StoreArray, "StoreArray" }, { opCode::NoOp, "NoOp" }, { opCode::Halt, "Halt" }
+    { opCode::Add, "Add" },
+    { opCode::Subtract, "Subtract" },
+    { opCode::Multiply, "Multiply" },
+    { opCode::Divide, "Divide" },
+    { opCode::Equal, "Equal" },
+    { opCode::NotEqual, "NotEqual" },
+    { opCode::LessThan, "LessThan" },
+    { opCode::GreaterThan, "GreaterThan" },
+    { opCode::LessOrEqual, "LessOrEqual" },
+    { opCode::GreaterOrEqual, "GreaterOrEqual" },
+    { opCode::And, "And" },
+    { opCode::Or, "Or" },
+    { opCode::Not, "Not" },
+    { opCode::Push, "Push" },
+    { opCode::LoadVar, "LoadVar" },
+    { opCode::StoreVar, "StoreVar" },
+    { opCode::Jump, "Jump" },
+    { opCode::JumpIfTrue, "JumpIfTrue" },
+    { opCode::JumpIfFalse, "JumpIfFalse" },
+    { opCode::Print, "Print" },
+    { opCode::Call, "Call" },
+    { opCode::Return, "Return" },
+    { opCode::CreateArray, "CreateArray" },
+    { opCode::FillRawArray, "FillRawArray" },
+    { opCode::LoadArray, "LoadArray" },
+    { opCode::StoreArray, "StoreArray" },
+    { opCode::NoOp, "NoOp" },
+    { opCode::Halt, "Halt" },
+    { opCode::FuncDecl, "FuncDecl" },
+    { opCode::FuncEnd, "FuncEnd" }
 });
