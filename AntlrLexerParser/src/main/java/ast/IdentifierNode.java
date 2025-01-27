@@ -32,6 +32,6 @@ public class IdentifierNode implements ASTNode {
             bch.getStringTable().put(name, varNameID);
         }
 
-        bch.getBytecodes().add(new bytecode(opCode.StoreVar, 0L, varNameID, false, true));
+        bch.getBytecodes().add(new bytecode(opCode.LoadVar, 0L, varNameID, false, true));
     }
 }
