@@ -118,7 +118,6 @@ void VM::Execute(const std::vector<Command> &commands) {
 //                loopExecutionCount[loopStart] = 0;
 //            }
 //        }
-        std::cout<<pointer<<'\n';
         if (HandleCommand(command) != 0) {
             break;
         }
@@ -384,7 +383,6 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::LoadArray: {
-            std::cout<<"LoadArray"<<'\n';
             CheckType(command, Command::Empty);
             CheckValueStack(command, 2);
             llvm::APInt index = valueStack.top();
@@ -446,7 +444,6 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::NoOp: {
-            std::cout<<"NoOp"<<'\n';
             if (command.type == Command::Empty) {
                 break;
             }
