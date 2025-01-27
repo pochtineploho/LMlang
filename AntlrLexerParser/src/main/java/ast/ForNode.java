@@ -44,6 +44,7 @@ public class ForNode implements ASTNode {
         Long for_begin = bch.getControlFlowCounter();
         bch.setControlFlowCounter(for_begin + 1);
         Long for_end = bch.getControlFlowCounter();
+        bch.setControlFlowCounter(for_end + 1);
         bch.getBytecodes().add(new bytecode(opCode.NoOp, for_begin, 0, true, false)); // To condition
         condition.BytecodeGeneration(bch, true);
         bch.getBytecodes().add(new bytecode(opCode.JumpIfFalse, for_end, 0, true, false)); // To condition
