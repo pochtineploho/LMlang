@@ -318,7 +318,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             llvm::SmallString<64> buffer;
             value.toString(buffer, 10, true);
-            std::cout << buffer.c_str();
+            std::cout << buffer.c_str() << std::endl;
             break;
         }
 
@@ -354,7 +354,7 @@ int VM::HandleCommand(const Command &command) {
             CheckValueStack(command, 1);
             auto memory = valueStack.top();
             valueStack.pop();
-            if (!memory.isIntN(sizeof(size_t))) {
+            if (!memory.isIntN(sizeof(size_t) * 8)) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
             void *allocated = gc.Allocate(memory.getLimitedValue() * sizeof(size_t));
