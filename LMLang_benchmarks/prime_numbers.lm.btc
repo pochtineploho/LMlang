@@ -66,18 +66,6 @@
     "withValue" : true,
     "withStringID" : false
   }, {
-    "opCode" : "Push",
-    "value" : 1,
-    "stringID" : 0,
-    "withValue" : true,
-    "withStringID" : false
-  }, {
-    "opCode" : "Print",
-    "value" : 0,
-    "stringID" : 0,
-    "withValue" : false,
-    "withStringID" : false
-  }, {
     "opCode" : "LoadVar",
     "value" : 0,
     "stringID" : 1,
@@ -180,6 +168,18 @@
     "withValue" : false,
     "withStringID" : true
   }, {
+    "opCode" : "Print",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 3,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
     "opCode" : "Push",
     "value" : 1,
     "stringID" : 0,
@@ -211,7 +211,7 @@
     "withStringID" : false
   }, {
     "opCode" : "Push",
-    "value" : 2,
+    "value" : 101,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
@@ -230,7 +230,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 3,
+    "stringID" : 4,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -242,7 +242,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 3,
+    "stringID" : 4,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -266,13 +266,25 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
+    "stringID" : 4,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "Print",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
     "stringID" : 2,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 3,
+    "stringID" : 4,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -290,7 +302,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 3,
+    "stringID" : 4,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -308,7 +320,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 3,
+    "stringID" : 4,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -494,7 +506,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -506,7 +518,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -542,7 +554,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -554,7 +566,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -572,7 +584,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 4,
+    "stringID" : 5,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -638,13 +650,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -734,7 +746,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -752,7 +764,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -800,7 +812,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -812,7 +824,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 5,
+    "stringID" : 6,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -836,7 +848,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 6,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -848,7 +860,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 8,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -950,13 +962,13 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 6,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 8,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -968,7 +980,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 8,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -986,7 +998,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 8,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -1040,13 +1052,13 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 6,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 7,
+    "stringID" : 8,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -1058,7 +1070,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 6,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -1070,7 +1082,7 @@
   }, {
     "opCode" : "FuncDecl",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 9,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -1100,7 +1112,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 6,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -1123,12 +1135,13 @@
     "withStringID" : false
   } ],
   "stringTable" : {
-    "primes" : 6,
+    "primes" : 7,
+    "t" : 4,
     "i" : 3,
-    "index" : 7,
-    "j" : 4,
-    "main" : 8,
-    "primeCount" : 5,
+    "index" : 8,
+    "j" : 5,
+    "main" : 9,
+    "primeCount" : 6,
     "findPrimes" : 0,
     "isPrime" : 2,
     "n" : 1
