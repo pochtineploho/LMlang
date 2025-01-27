@@ -4,7 +4,7 @@ import bytecode.*;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class ContinueNode implements ASTNode {
+public class ContinueNode implements ASTNode {//
 
     @Override
     public String GetTypeName() {

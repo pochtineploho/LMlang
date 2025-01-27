@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompositeNode implements ASTNode {
+public class CompositeNode implements ASTNode {//
     private List<ASTNode> children = new ArrayList<>();
 
     // Метод для добавления дочернего узла
