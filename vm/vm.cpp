@@ -665,8 +665,8 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     throw std::runtime_error("Variable not found: " + varName);
                 }
                 llvm::Value *variablePointer = variables[varName];
-                llvm::Value *value = builder.CreateLoad(variablePointer, varName.c_str());
-                llvmStack.push_back(value);
+//                llvm::Value *value = builder.CreateLoad(variablePointer, varName.c_str());
+//                llvmStack.push_back(value);
                 break;
             }
 
@@ -837,10 +837,10 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                         llvm::Type::getInt32Ty(context), array, index, "elementPtr");
 
                 // Загружаем элемент из массива
-                llvm::Value *value = builder.CreateLoad(elementPtr, "loadValue");
+//                llvm::Value *value = builder.CreateLoad(elementPtr, "loadValue");
 
                 // Сохраняем значение на стеке
-                llvmStack.push_back(value);
+//                llvmStack.push_back(value);
                 break;
             }
 
