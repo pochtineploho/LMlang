@@ -26,7 +26,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 2,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -44,13 +44,13 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 2,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 2,
+    "stringID" : 1,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -68,7 +68,7 @@
   }, {
     "opCode" : "Call",
     "value" : 0,
-    "stringID" : 2,
+    "stringID" : 0,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -98,7 +98,7 @@
   }, {
     "opCode" : "Call",
     "value" : 0,
-    "stringID" : 3,
+    "stringID" : 0,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -115,9 +115,9 @@
     "withStringID" : false
   } ],
   "stringTable" : {
-    "factorial" : 3,
+    "factorial" : 0,
     "main" : 2,
-    "n" : 2
+    "n" : 1
   },
   "controlFlowCounter" : 1
 }

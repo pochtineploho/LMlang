@@ -38,7 +38,11 @@ public class FunctionNode implements ASTNode {
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
         Integer varNameID = bch.getStringTable().size();
-        bch.getStringTable().put(name, varNameID);
+        if (bch.getStringTable().get(name) != null){
+            varNameID = bch.getStringTable().get(name);
+        } else {
+            bch.getStringTable().put(name, varNameID);
+        }
         bch.getBytecodes().add(new bytecode(opCode.FuncDecl, 0L, varNameID, false, true));
         body.BytecodeGeneration(bch);
     }

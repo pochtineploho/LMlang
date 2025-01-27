@@ -29,7 +29,11 @@ public class ParameterNode implements ASTNode {
     public void BytecodeGeneration(bytecodeHolder bch){
         type.BytecodeGeneration(bch);
         Integer varNameID = bch.getStringTable().size();
-        bch.getStringTable().put(name, varNameID);
+        if (bch.getStringTable().get(name) != null){
+            varNameID = bch.getStringTable().get(name);
+        } else {
+            bch.getStringTable().put(name, varNameID);
+        }
         bch.getBytecodes().add(new bytecode(opCode.StoreVar, 0L, varNameID, false, true));
     }
 }
