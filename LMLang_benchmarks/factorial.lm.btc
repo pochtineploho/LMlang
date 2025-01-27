@@ -67,9 +67,9 @@
     "withStringID" : false
   }, {
     "opCode" : "Call",
-    "value" : 0,
+    "value" : 1,
     "stringID" : 0,
-    "withValue" : false,
+    "withValue" : true,
     "withStringID" : true
   }, {
     "opCode" : "Multiply",
@@ -97,9 +97,9 @@
     "withStringID" : false
   }, {
     "opCode" : "Call",
-    "value" : 0,
+    "value" : 1,
     "stringID" : 0,
-    "withValue" : false,
+    "withValue" : true,
     "withStringID" : true
   }, {
     "opCode" : "Print",

@@ -33,7 +33,8 @@ public class CallFunctionNode implements ASTNode {
         } else {
             bch.getStringTable().put(name, varNameID);
         }
-        bch.getBytecodes().add(new bytecode(opCode.Call, 0L, varNameID, false, true));
+        Integer argsAmount = ((ArgumentListNode)parameters).getArguments().size();
+        bch.getBytecodes().add(new bytecode(opCode.Call, argsAmount.longValue(), varNameID, true, true));
     }
 }
 
