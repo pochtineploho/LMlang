@@ -97,7 +97,7 @@ void VM::Execute(const std::vector<Command> &commands) {
 
     callStack.push(commands.size());
     CheckFunctions(commands[0], "main");
-    pointer = functionTable["main"];
+    pointer = functionTable["main"] + 1;
 
     while (pointer < commands.size()) {
         const auto &command = commands[pointer];
@@ -334,7 +334,7 @@ int VM::HandleCommand(const Command &command) {
             int args_size = command.number.getLimitedValue();
             CheckValueStack(command, args_size);
             variablesStack.emplace_back();
-            callStack.emplace(pointer + 1);
+            callStack.emplace(pointer);  // + 1 ?
             pointer = functionTable[func_name];
             break;
         }
@@ -448,7 +448,12 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::NoOp: {
-            CheckType(command, Command::Empty);
+            if (command.type == Command::Empty) {
+                break;
+            }
+            if (command.type == Command::OnlyNum) {
+                jumpPointerTable[command.number.getLimitedValue()] = pointer; // ??
+            }
             break;
         }
 
@@ -462,7 +467,7 @@ int VM::HandleCommand(const Command &command) {
             CheckType(command, Command::OnlyStr);
             std::string func_name = GetNameByIndex(command);
             // CheckFunctions(command, func_name); ???
-            functionTable[func_name] = pointer + 1;
+            functionTable[func_name] = pointer;
             break;
         }
 
