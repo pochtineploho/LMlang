@@ -141,7 +141,7 @@
     "opCode" : "Push",
     "value" : 1,
     "stringID" : 0,
-    "withValue" : false,
+    "withValue" : true,
     "withStringID" : false
   }, {
     "opCode" : "LoadVar",
@@ -189,7 +189,7 @@
     "opCode" : "Push",
     "value" : 0,
     "stringID" : 0,
-    "withValue" : false,
+    "withValue" : true,
     "withStringID" : false
   }, {
     "opCode" : "Push",
@@ -207,7 +207,7 @@
     "opCode" : "Push",
     "value" : 0,
     "stringID" : 0,
-    "withValue" : false,
+    "withValue" : true,
     "withStringID" : false
   }, {
     "opCode" : "Push",
@@ -351,7 +351,7 @@
     "opCode" : "Push",
     "value" : 0,
     "stringID" : 0,
-    "withValue" : false,
+    "withValue" : true,
     "withStringID" : false
   }, {
     "opCode" : "LoadVar",
