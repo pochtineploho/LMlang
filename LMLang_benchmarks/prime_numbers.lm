@@ -3,33 +3,36 @@ func int[] findPrimes(int n) {
         return {};
     }
 
-    bool[] isPrime = bool[n + 1]; // Объявление массива булевых значений
+    int[] isPrime = int[n + 1]; // Объявление массива булевых значений
     for (int i = 0; i <= n; ++i) {
-        isPrime[i] = true;	
+        isPrime[i] = 1;
     }
-    isPrime[0] = false;
-    isPrime[1] = false;
+    isPrime[0] = 0;
+    isPrime[1] = 0;
 
     for (int i = 2; i * i <= n; ++i) {
-        if (isPrime[i]) {
+        if (isPrime[i] == 1) {
             for (int j = i * i; j <= n; j = j + i) {
-                isPrime[j] = false;
+                isPrime[j] = 0;
             }
         }
     }
 
     int primeCount = 0;
+    print(primeCount);
     for (int i = 2; i <= n; ++i) {
-        if (isPrime[i]) {
+        if (isPrime[i] == 1) {
             primeCount = primeCount + 1;
         }
     }
-
+    print(primeCount);
     int[] primes = int[primeCount + 1]; // Инициализация массива с заданной емкостью
     int index = 0;
     for (int i = 2; i <= n; ++i) {
     	
-        if (isPrime[i]) {
+        if (isPrime[i] == 1) {
+            print(i);
+
             primes[index] = i;
             index = index + 1;
         }
@@ -42,13 +45,7 @@ func int[] findPrimes(int n) {
 func int main() {
     int n = 10000;
     int[] primes = findPrimes(n);
-    for (int i = 0; i < n; ++i) {
-        if (primes[i]!=0){
-            print(primes[i]);
-        } else {
-            i = n;
-        }
-    }
+
     return 0;
 }
 
