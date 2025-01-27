@@ -34,6 +34,10 @@ public class AssignmentNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
+        rhs.BytecodeGeneration(bch);
+
+        lhs.BytecodeGeneration(bch);
+
 
     }
 }

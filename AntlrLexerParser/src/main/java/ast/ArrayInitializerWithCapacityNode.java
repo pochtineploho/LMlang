@@ -29,7 +29,8 @@ public class ArrayInitializerWithCapacityNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-
+        capacity.BytecodeGeneration(bch);
+        bch.getBytecodes().add(new bytecode(opCode.CreateArray, 0L, 0, false, false));
     }
 }
 

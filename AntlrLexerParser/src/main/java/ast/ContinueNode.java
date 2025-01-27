@@ -18,7 +18,7 @@ public class ContinueNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
-        bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, 0, false, false));
+        bch.getBytecodes().add(new bytecode(opCode.Jump, 0L, 0, false, false));
     }
 }
 

@@ -35,7 +35,7 @@ public class IfNode implements ASTNode {
         condition.BytecodeGeneration(bch);
         then.BytecodeGeneration(bch);
         else_.BytecodeGeneration(bch);
-        bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, 0, false, false));
+        bch.getBytecodes().add(new bytecode(opCode.Jump, 0L, 0, false, false));
     }
 }
 

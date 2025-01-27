@@ -954,6 +954,5 @@ void VM::JITCompile(const std::vector<Command> &commands) {
     }
 
     builder.CreateRetVoid();
-
     module.print(llvm::errs(), nullptr);
 }

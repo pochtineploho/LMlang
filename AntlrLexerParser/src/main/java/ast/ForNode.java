@@ -39,10 +39,11 @@ public class ForNode implements ASTNode {
     @Override
     public void BytecodeGeneration(bytecodeHolder bch){
         init.BytecodeGeneration(bch);
+        bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, 0, false, false)); // To condition
         condition.BytecodeGeneration(bch);
         increment.BytecodeGeneration(bch);
         body.BytecodeGeneration(bch);
-        bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, 0, false, false));
+        bch.getBytecodes().add(new bytecode(opCode.Jump, 0L, 0, false, false)); // To condition
     }
 }
 
