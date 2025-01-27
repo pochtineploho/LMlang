@@ -25,7 +25,7 @@ func int[] findPrimes(int n) {
         }
     }
 
-    int[] primes = int[primeCount]; // Инициализация массива с заданной емкостью
+    int[] primes = int[primeCount + 1]; // Инициализация массива с заданной емкостью
     index = 0;	
     for (int i = 2; i <= n; ++i) {
     	
@@ -34,6 +34,7 @@ func int[] findPrimes(int n) {
             index = index + 1;
         }
     }
+    primes[index] = 0;
 
     return primes;
 }
@@ -42,7 +43,11 @@ func int main() {
     int n = 10000;
     int[] primes = findPrimes(n);
     for (int i = 0; i < n; ++i) {
-        print(primes[i]);
+        if (primers[i]!=0){
+            print(primes[i]);
+        } else {
+            i = n;
+        }
     }
     return 0;
 }
