@@ -102,26 +102,26 @@ void VM::Execute(const std::vector<Command> &commands) {
     while (pointer < commands.size()) {
         const auto &command = commands[pointer];
 
-        if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfTrue ||
-            command.bytecode == Bytecode::JumpIfFalse) {
-            size_t loopStart = FindLoopStart(commands, pointer);
-            size_t loopEnd = FindLoopEnd(commands, pointer);
-
-            if (loopExecutionCount.find(loopStart) == loopExecutionCount.end()) {
-                loopExecutionCount[loopStart] = 0;
-            }
-
-            loopExecutionCount[loopStart]++;
-
-            if (loopExecutionCount[loopStart] >= hotLoopThreshold) {
-                std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
-
-                std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
-                JITCompile(hotLoopCommands);
-
-                loopExecutionCount[loopStart] = 0;
-            }
-        }
+//        if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfTrue ||
+//            command.bytecode == Bytecode::JumpIfFalse) {
+//            size_t loopStart = FindLoopStart(commands, pointer);
+//            size_t loopEnd = FindLoopEnd(commands, pointer);
+//
+//            if (loopExecutionCount.find(loopStart) == loopExecutionCount.end()) {
+//                loopExecutionCount[loopStart] = 0;
+//            }
+//
+//            loopExecutionCount[loopStart]++;
+//
+//            if (loopExecutionCount[loopStart] >= hotLoopThreshold) {
+//                std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
+//
+//                std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
+//                JITCompile(hotLoopCommands);
+//
+//                loopExecutionCount[loopStart] = 0;
+//            }
+//        }
 
         if (HandleCommand(command) != 0) {
             break;
@@ -433,6 +433,7 @@ int VM::HandleCommand(const Command &command) {
                     pointer = jumpPointerTable[command.number.getLimitedValue()];
                 }
             }
+            break;
         }
 
         case Bytecode::JumpIfTrue: {
@@ -445,6 +446,7 @@ int VM::HandleCommand(const Command &command) {
                     pointer = jumpPointerTable[command.number.getLimitedValue()];
                 }
             }
+            break;
         }
 
         case Bytecode::NoOp: {
