@@ -39,12 +39,12 @@ int main() {
         int check = itemCheck(stretchTree, 0, stretchDepth);
 
         int[] longLivedTree = int[MAX_NODES];
-        for (int i = 0; i < MAX_NODES; i++) {
+        for (int i = 0; i < MAX_NODES; ++i) {
             longLivedTree[i] = 0;
         }
         bottomUpTree(longLivedTree, 0, 0, maxDepth);
 
-        for (int depth = minDepth; depth <= maxDepth; depth += 2) {
+        for (int depth = minDepth; depth <= maxDepth; depth = depth + 2) {
             int iterations = 1;
             for (int i = 0; i < (maxDepth - depth + minDepth); ++i) {
                 iterations = iterations * 2;
