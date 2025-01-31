@@ -203,7 +203,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             auto lhs = valueStack.top();
             valueStack.pop();
-            valueStack.emplace(rhs != 0 || lhs != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
+            valueStack.emplace(rhs != 0 || lhs != 0 ? llvm::APInt(1, 1) : llvm::APInt(1, 0));
             break;
         }
 
@@ -268,6 +268,7 @@ int VM::HandleCommand(const Command &command) {
             auto lhs = valueStack.top();
             valueStack.pop();
             valueStack.emplace(1, lhs.slt(rhs));
+            // std::cerr << lhs.getLimitedValue() << "<" << rhs.getLimitedValue() << " : " << lhs.slt(rhs) << "\n";
             break;
         }
 
@@ -279,6 +280,7 @@ int VM::HandleCommand(const Command &command) {
             auto lhs = valueStack.top();
             valueStack.pop();
             valueStack.emplace(1, lhs.sle(rhs));
+            std::cerr << lhs.getLimitedValue() << "<=" << rhs.getLimitedValue() << " : " << lhs.sle(rhs) << "\n";
             break;
         }
 
@@ -310,7 +312,7 @@ int VM::HandleCommand(const Command &command) {
             break;
         }
 
-        case Bytecode::Print: {
+        case Bytecode::Print: { // TODO print n
             CheckType(command, Command::Empty);
             CheckValueStack(command, 1);
             auto value = valueStack.top();
@@ -356,7 +358,6 @@ int VM::HandleCommand(const Command &command) {
             if (!memory.isIntN(sizeof(size_t)*8)) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
-            std::cerr<<memory.getLimitedValue()<<'\n';
             void *allocated = gc.Allocate(memory.getLimitedValue() * 16 + 16);
             if (!allocated) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
@@ -474,7 +475,6 @@ int VM::HandleCommand(const Command &command) {
             if (functionTable.empty()) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": call stack is empty");
             }
-            // ??
             pointer = callStack.top();
             callStack.pop();
             variablesStack.pop_back();
@@ -945,3 +945,5 @@ void VM::JITCompile(const std::vector<Command> &commands) {
     builder.CreateRetVoid();
     module.print(llvm::errs(), nullptr);
 }
+
+// TODO в for переменная должна быть на новом уровне
