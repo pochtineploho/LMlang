@@ -192,7 +192,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             auto lhs = valueStack.top();
             valueStack.pop();
-            valueStack.emplace(rhs != 0 && lhs != 0 ? llvm::APInt(1, 0) : llvm::APInt(1, 1));
+            valueStack.emplace(rhs != 0 && lhs != 0 ? llvm::APInt(1, 1) : llvm::APInt(1, 0));
             break;
         }
 
