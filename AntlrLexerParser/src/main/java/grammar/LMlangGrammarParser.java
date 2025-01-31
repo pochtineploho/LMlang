@@ -1,6 +1,4 @@
-// Generated from LMlangGrammar.g4 by ANTLR 4.13.2
-package grammar;
-
+package grammar;// Generated from LMlangGrammar.g4 by ANTLR 4.13.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -135,15 +133,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_program; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterProgram(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterProgram(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitProgram(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitProgram(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitProgram(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitProgram(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -240,15 +238,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_functionDecl; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterFunctionDecl(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterFunctionDecl(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitFunctionDecl(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitFunctionDecl(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitFunctionDecl(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitFunctionDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -307,15 +305,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_returnType; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterReturnType(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterReturnType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitReturnType(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitReturnType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitReturnType(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitReturnType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -378,15 +376,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_parameterList; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterParameterList(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterParameterList(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitParameterList(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitParameterList(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitParameterList(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitParameterList(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -441,15 +439,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_parameter; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterParameter(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterParameter(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitParameter(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitParameter(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitParameter(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitParameter(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -494,15 +492,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_type; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterType(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitType(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitType(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -530,7 +528,7 @@ public class LMlangGrammarParser extends Parser {
 			setState(100);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
@@ -592,15 +590,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_primitiveType; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterPrimitiveType(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterPrimitiveType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitPrimitiveType(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitPrimitiveType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitPrimitiveType(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitPrimitiveType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -651,15 +649,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_block; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterBlock(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterBlock(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitBlock(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitBlock(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitBlock(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitBlock(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -741,15 +739,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_statement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitStatement(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -885,15 +883,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_forStatement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterForStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterForStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitForStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitForStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitForStatement(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitForStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1005,15 +1003,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_forInit; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterForInit(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterForInit(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitForInit(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitForInit(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitForInit(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitForInit(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1073,15 +1071,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_forPost; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterForPost(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterForPost(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitForPost(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitForPost(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitForPost(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitForPost(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1136,15 +1134,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_varDecl; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterVarDecl(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterVarDecl(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitVarDecl(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitVarDecl(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitVarDecl(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitVarDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1200,15 +1198,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_assignment; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterAssignment(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitAssignment(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitAssignment(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1259,15 +1257,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_ifStatement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterIfStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterIfStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitIfStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitIfStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitIfStatement(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitIfStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1322,15 +1320,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_breakStatement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterBreakStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterBreakStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitBreakStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitBreakStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitBreakStatement(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitBreakStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1365,15 +1363,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_continueStatement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterContinueStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterContinueStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitContinueStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitContinueStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitContinueStatement(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitContinueStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1411,15 +1409,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_returnStatement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterReturnStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterReturnStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitReturnStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitReturnStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitReturnStatement(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitReturnStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1470,15 +1468,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_printStatement; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterPrintStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterPrintStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitPrintStatement(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitPrintStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitPrintStatement(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitPrintStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1512,27 +1510,27 @@ public class LMlangGrammarParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExpressionContext extends ParserRuleContext {
-		public TerminalNode LPAREN() { return getToken(LMlangGrammarParser.LPAREN, 0); }
+		public PrimaryExpressionContext primaryExpression() {
+			return getRuleContext(PrimaryExpressionContext.class,0);
+		}
+		public TerminalNode NEG() { return getToken(LMlangGrammarParser.NEG, 0); }
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
 		}
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
-		public TerminalNode RPAREN() { return getToken(LMlangGrammarParser.RPAREN, 0); }
-		public TerminalNode NEG() { return getToken(LMlangGrammarParser.NEG, 0); }
 		public TerminalNode INCR() { return getToken(LMlangGrammarParser.INCR, 0); }
 		public TerminalNode NOT() { return getToken(LMlangGrammarParser.NOT, 0); }
-		public PrimaryExpressionContext primaryExpression() {
-			return getRuleContext(PrimaryExpressionContext.class,0);
-		}
-		public TerminalNode AND() { return getToken(LMlangGrammarParser.AND, 0); }
-		public TerminalNode OR() { return getToken(LMlangGrammarParser.OR, 0); }
+		public TerminalNode LPAREN() { return getToken(LMlangGrammarParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(LMlangGrammarParser.RPAREN, 0); }
 		public TerminalNode MULT() { return getToken(LMlangGrammarParser.MULT, 0); }
 		public TerminalNode DIV() { return getToken(LMlangGrammarParser.DIV, 0); }
 		public TerminalNode ADD() { return getToken(LMlangGrammarParser.ADD, 0); }
 		public TerminalNode SUB() { return getToken(LMlangGrammarParser.SUB, 0); }
 		public TerminalNode COMPOP() { return getToken(LMlangGrammarParser.COMPOP, 0); }
+		public TerminalNode AND() { return getToken(LMlangGrammarParser.AND, 0); }
+		public TerminalNode OR() { return getToken(LMlangGrammarParser.OR, 0); }
 		public TerminalNode LBRACK() { return getToken(LMlangGrammarParser.LBRACK, 0); }
 		public TerminalNode RBRACK() { return getToken(LMlangGrammarParser.RBRACK, 0); }
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
@@ -1541,15 +1539,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_expression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterExpression(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitExpression(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitExpression(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1575,41 +1573,41 @@ public class LMlangGrammarParser extends Parser {
 			case 1:
 				{
 				setState(205);
-				match(LPAREN);
-				setState(206);
-				expression(0);
-				setState(207);
-				match(RPAREN);
+				primaryExpression();
 				}
 				break;
 			case 2:
 				{
-				setState(209);
+				setState(206);
 				match(NEG);
-				setState(210);
-				expression(12);
+				setState(207);
+				expression(11);
 				}
 				break;
 			case 3:
 				{
-				setState(211);
+				setState(208);
 				match(INCR);
-				setState(212);
-				expression(11);
+				setState(209);
+				expression(10);
 				}
 				break;
 			case 4:
 				{
-				setState(213);
+				setState(210);
 				match(NOT);
-				setState(214);
-				expression(10);
+				setState(211);
+				expression(2);
 				}
 				break;
 			case 5:
 				{
-				setState(215);
-				primaryExpression();
+				setState(212);
+				match(LPAREN);
+				setState(213);
+				expression(0);
+				setState(214);
+				match(RPAREN);
 				}
 				break;
 			}
@@ -1617,7 +1615,7 @@ public class LMlangGrammarParser extends Parser {
 			setState(246);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,20,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
@@ -1632,7 +1630,7 @@ public class LMlangGrammarParser extends Parser {
 						setState(218);
 						if (!(precpred(_ctx, 9))) throw new FailedPredicateException(this, "precpred(_ctx, 9)");
 						setState(219);
-						match(AND);
+						match(MULT);
 						setState(220);
 						expression(10);
 						}
@@ -1644,7 +1642,7 @@ public class LMlangGrammarParser extends Parser {
 						setState(221);
 						if (!(precpred(_ctx, 8))) throw new FailedPredicateException(this, "precpred(_ctx, 8)");
 						setState(222);
-						match(OR);
+						match(DIV);
 						setState(223);
 						expression(9);
 						}
@@ -1656,7 +1654,7 @@ public class LMlangGrammarParser extends Parser {
 						setState(224);
 						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
 						setState(225);
-						match(MULT);
+						match(ADD);
 						setState(226);
 						expression(8);
 						}
@@ -1668,7 +1666,7 @@ public class LMlangGrammarParser extends Parser {
 						setState(227);
 						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
 						setState(228);
-						match(DIV);
+						match(SUB);
 						setState(229);
 						expression(7);
 						}
@@ -1680,7 +1678,7 @@ public class LMlangGrammarParser extends Parser {
 						setState(230);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(231);
-						match(ADD);
+						match(COMPOP);
 						setState(232);
 						expression(6);
 						}
@@ -1692,7 +1690,7 @@ public class LMlangGrammarParser extends Parser {
 						setState(233);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
 						setState(234);
-						match(SUB);
+						match(AND);
 						setState(235);
 						expression(5);
 						}
@@ -1704,7 +1702,7 @@ public class LMlangGrammarParser extends Parser {
 						setState(236);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
 						setState(237);
-						match(COMPOP);
+						match(OR);
 						setState(238);
 						expression(4);
 						}
@@ -1714,7 +1712,7 @@ public class LMlangGrammarParser extends Parser {
 						_localctx = new ExpressionContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(239);
-						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+						if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
 						setState(240);
 						match(LBRACK);
 						setState(241);
@@ -1774,15 +1772,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_primaryExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterPrimaryExpression(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterPrimaryExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitPrimaryExpression(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitPrimaryExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitPrimaryExpression(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitPrimaryExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1908,15 +1906,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_arrayInit; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterArrayInit(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterArrayInit(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitArrayInit(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitArrayInit(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArrayInit(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArrayInit(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1987,15 +1985,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_arrayInitWithCapacity; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterArrayInitWithCapacity(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterArrayInitWithCapacity(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitArrayInitWithCapacity(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitArrayInitWithCapacity(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArrayInitWithCapacity(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArrayInitWithCapacity(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2045,15 +2043,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_argumentList; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterArgumentList(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterArgumentList(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitArgumentList(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitArgumentList(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArgumentList(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArgumentList(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2110,15 +2108,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_arrayAccess; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterArrayAccess(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterArrayAccess(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitArrayAccess(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitArrayAccess(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArrayAccess(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitArrayAccess(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2164,15 +2162,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_functionCall; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterFunctionCall(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterFunctionCall(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitFunctionCall(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitFunctionCall(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitFunctionCall(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitFunctionCall(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2225,15 +2223,15 @@ public class LMlangGrammarParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_assignable; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).enterAssignable(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).enterAssignable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LMlangGrammarListener ) ((LMlangGrammarListener)listener).exitAssignable(this);
+			if ( listener instanceof LMlangGrammarListener) ((LMlangGrammarListener)listener).exitAssignable(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof LMlangGrammarVisitor ) return ((LMlangGrammarVisitor<? extends T>)visitor).visitAssignable(this);
+			if ( visitor instanceof LMlangGrammarVisitor) return ((LMlangGrammarVisitor<? extends T>)visitor).visitAssignable(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2307,7 +2305,7 @@ public class LMlangGrammarParser extends Parser {
 		case 8:
 			return precpred(_ctx, 3);
 		case 9:
-			return precpred(_ctx, 1);
+			return precpred(_ctx, 12);
 		}
 		return true;
 	}
@@ -2448,25 +2446,25 @@ public class LMlangGrammarParser extends Parser {
 		"\u0000\u0000\u0000\u00c6#\u0001\u0000\u0000\u0000\u00c7\u00c8\u0005\t"+
 		"\u0000\u0000\u00c8\u00c9\u0005 \u0000\u0000\u00c9\u00ca\u0003&\u0013\u0000"+
 		"\u00ca\u00cb\u0005!\u0000\u0000\u00cb%\u0001\u0000\u0000\u0000\u00cc\u00cd"+
-		"\u0006\u0013\uffff\uffff\u0000\u00cd\u00ce\u0005 \u0000\u0000\u00ce\u00cf"+
-		"\u0003&\u0013\u0000\u00cf\u00d0\u0005!\u0000\u0000\u00d0\u00d9\u0001\u0000"+
-		"\u0000\u0000\u00d1\u00d2\u0005\u0015\u0000\u0000\u00d2\u00d9\u0003&\u0013"+
-		"\f\u00d3\u00d4\u0005\u0016\u0000\u0000\u00d4\u00d9\u0003&\u0013\u000b"+
-		"\u00d5\u00d6\u0005\u001c\u0000\u0000\u00d6\u00d9\u0003&\u0013\n\u00d7"+
-		"\u00d9\u0003(\u0014\u0000\u00d8\u00cc\u0001\u0000\u0000\u0000\u00d8\u00d1"+
-		"\u0001\u0000\u0000\u0000\u00d8\u00d3\u0001\u0000\u0000\u0000\u00d8\u00d5"+
-		"\u0001\u0000\u0000\u0000\u00d8\u00d7\u0001\u0000\u0000\u0000\u00d9\u00f6"+
+		"\u0006\u0013\uffff\uffff\u0000\u00cd\u00d9\u0003(\u0014\u0000\u00ce\u00cf"+
+		"\u0005\u0015\u0000\u0000\u00cf\u00d9\u0003&\u0013\u000b\u00d0\u00d1\u0005"+
+		"\u0016\u0000\u0000\u00d1\u00d9\u0003&\u0013\n\u00d2\u00d3\u0005\u001c"+
+		"\u0000\u0000\u00d3\u00d9\u0003&\u0013\u0002\u00d4\u00d5\u0005 \u0000\u0000"+
+		"\u00d5\u00d6\u0003&\u0013\u0000\u00d6\u00d7\u0005!\u0000\u0000\u00d7\u00d9"+
+		"\u0001\u0000\u0000\u0000\u00d8\u00cc\u0001\u0000\u0000\u0000\u00d8\u00ce"+
+		"\u0001\u0000\u0000\u0000\u00d8\u00d0\u0001\u0000\u0000\u0000\u00d8\u00d2"+
+		"\u0001\u0000\u0000\u0000\u00d8\u00d4\u0001\u0000\u0000\u0000\u00d9\u00f6"+
 		"\u0001\u0000\u0000\u0000\u00da\u00db\n\t\u0000\u0000\u00db\u00dc\u0005"+
-		"\u001d\u0000\u0000\u00dc\u00f5\u0003&\u0013\n\u00dd\u00de\n\b\u0000\u0000"+
-		"\u00de\u00df\u0005\u001e\u0000\u0000\u00df\u00f5\u0003&\u0013\t\u00e0"+
-		"\u00e1\n\u0007\u0000\u0000\u00e1\u00e2\u0005\u0017\u0000\u0000\u00e2\u00f5"+
-		"\u0003&\u0013\b\u00e3\u00e4\n\u0006\u0000\u0000\u00e4\u00e5\u0005\u0018"+
+		"\u0017\u0000\u0000\u00dc\u00f5\u0003&\u0013\n\u00dd\u00de\n\b\u0000\u0000"+
+		"\u00de\u00df\u0005\u0018\u0000\u0000\u00df\u00f5\u0003&\u0013\t\u00e0"+
+		"\u00e1\n\u0007\u0000\u0000\u00e1\u00e2\u0005\u0019\u0000\u0000\u00e2\u00f5"+
+		"\u0003&\u0013\b\u00e3\u00e4\n\u0006\u0000\u0000\u00e4\u00e5\u0005\u001a"+
 		"\u0000\u0000\u00e5\u00f5\u0003&\u0013\u0007\u00e6\u00e7\n\u0005\u0000"+
-		"\u0000\u00e7\u00e8\u0005\u0019\u0000\u0000\u00e8\u00f5\u0003&\u0013\u0006"+
-		"\u00e9\u00ea\n\u0004\u0000\u0000\u00ea\u00eb\u0005\u001a\u0000\u0000\u00eb"+
+		"\u0000\u00e7\u00e8\u0005\u001b\u0000\u0000\u00e8\u00f5\u0003&\u0013\u0006"+
+		"\u00e9\u00ea\n\u0004\u0000\u0000\u00ea\u00eb\u0005\u001d\u0000\u0000\u00eb"+
 		"\u00f5\u0003&\u0013\u0005\u00ec\u00ed\n\u0003\u0000\u0000\u00ed\u00ee"+
-		"\u0005\u001b\u0000\u0000\u00ee\u00f5\u0003&\u0013\u0004\u00ef\u00f0\n"+
-		"\u0001\u0000\u0000\u00f0\u00f1\u0005$\u0000\u0000\u00f1\u00f2\u0003&\u0013"+
+		"\u0005\u001e\u0000\u0000\u00ee\u00f5\u0003&\u0013\u0004\u00ef\u00f0\n"+
+		"\f\u0000\u0000\u00f0\u00f1\u0005$\u0000\u0000\u00f1\u00f2\u0003&\u0013"+
 		"\u0000\u00f2\u00f3\u0005%\u0000\u0000\u00f3\u00f5\u0001\u0000\u0000\u0000"+
 		"\u00f4\u00da\u0001\u0000\u0000\u0000\u00f4\u00dd\u0001\u0000\u0000\u0000"+
 		"\u00f4\u00e0\u0001\u0000\u0000\u0000\u00f4\u00e3\u0001\u0000\u0000\u0000"+

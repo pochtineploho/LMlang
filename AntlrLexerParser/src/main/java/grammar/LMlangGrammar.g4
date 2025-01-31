@@ -49,19 +49,19 @@ returnStatement: RETURN expression?;
 printStatement: PRINT LPAREN expression RPAREN;
 
 expression:
-      LPAREN expression RPAREN
+      primaryExpression
+    | expression LBRACK expression RBRACK            // arrayAccess
     | NEG expression
     | INCR expression
+    | expression MULT expression                     // multiplication
+    | expression DIV expression                      // division
+    | expression ADD expression                      // addition
+    | expression SUB expression                      // subtraction
+    | expression COMPOP expression                   // comparison
+    | expression AND expression                      // logicalAnd
+    | expression OR expression                       // logicalOr
     | NOT expression
-    | expression AND expression
-    | expression OR expression
-    | expression MULT expression    // Умножение
-    | expression DIV expression     // Деление
-    | expression ADD expression     // Сложение
-    | expression SUB expression     // Вычитание
-    | expression COMPOP expression
-    | primaryExpression
-    | expression LBRACK expression RBRACK
+    | LPAREN expression RPAREN
     ;
 
 primaryExpression:

@@ -234,7 +234,7 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             auto lhs = valueStack.top();
             valueStack.pop();
-            valueStack.emplace(1, lhs.ne(rhs));
+            valueStack.emplace(1, !lhs.eq(rhs));
             break;
         }
 
@@ -357,7 +357,7 @@ int VM::HandleCommand(const Command &command) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
             std::cerr<<memory.getLimitedValue()<<'\n';
-            void *allocated = gc.Allocate(memory.getLimitedValue() *16);
+            void *allocated = gc.Allocate(memory.getLimitedValue() * 16 + 16);
             if (!allocated) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
             }

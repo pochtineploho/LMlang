@@ -226,11 +226,6 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
             return visit(context.expression(0));
         }
 
-        if (context.expression(0) != null && context.LBRACK()!= null && context.expression(1) != null && context.RBRACK()!= null) {
-            String array = context.expression(0).getText();
-            ASTNode index = visit(context.expression(1));
-            return new ArrayAccessNode(index, array);
-        }
 
         if (context.ADD() != null || context.MULT() != null || context.COMPOP() != null ||
                 context.SUB() != null || context.DIV() != null || context.AND() != null || context.OR() != null) {
@@ -258,6 +253,7 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
                     binaryOp
             );
         }
+
         if (context.NEG() != null && context.expression() != null) {
             return new UnaryOperationNode(
                     context.NEG().getText(),
@@ -278,6 +274,13 @@ public class ASTBuilder implements LMlangGrammarVisitor<ASTNode> {
                     visit(context.expression(0))
             );
         }
+
+        if (context.expression(0) != null && context.LBRACK()!= null && context.expression(1) != null && context.RBRACK()!= null) {
+            String array = context.expression(0).getText();
+            ASTNode index = visit(context.expression(1));
+            return new ArrayAccessNode(index, array);
+        }
+
         if (context.primaryExpression() != null) {
             return visit(context.primaryExpression());
         }
