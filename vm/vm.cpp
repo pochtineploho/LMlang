@@ -268,7 +268,6 @@ int VM::HandleCommand(const Command &command) {
             auto lhs = valueStack.top();
             valueStack.pop();
             valueStack.emplace(1, lhs.slt(rhs));
-            // std::cerr << lhs.getLimitedValue() << "<" << rhs.getLimitedValue() << " : " << lhs.slt(rhs) << "\n";
             break;
         }
 
@@ -280,7 +279,6 @@ int VM::HandleCommand(const Command &command) {
             auto lhs = valueStack.top();
             valueStack.pop();
             valueStack.emplace(1, lhs.sle(rhs));
-            std::cerr << lhs.getLimitedValue() << "<=" << rhs.getLimitedValue() << " : " << lhs.sle(rhs) << "\n";
             break;
         }
 

@@ -1,27 +1,27 @@
 // Функция для построения дерева в массиве
-func int bottomUpTree(int[] nodes, int index, int item, int depth) {
+func int[] bottomUpTree(int[] nodes, int index, int item, int depth) {
     nodes[index] = item;
     if (depth > 0) {
-        bottomUpTree(nodes, 2 * index + 1, 2 * item - 1, depth - 1);
-        bottomUpTree(nodes, 2 * index + 2, 2 * item, depth - 1);
+        nodes = bottomUpTree(nodes, 2 * index + 1, 2 * item - 1, depth - 1);
+        nodes = bottomUpTree(nodes, 2 * index + 2, 2 * item, depth - 1);
     }
+    return nodes;
 }
 
 // Функция для вычисления itemCheck
 func int itemCheck(int[] nodes, int index, int depth) {
-    if (index >= MAX_NODES || (2 * index + 1) >= MAX_NODES) {
+    if ((2 * index + 1) >= MAX_NODES) {
         return nodes[index];
     }
     return nodes[index] + itemCheck(nodes, 2 * index + 1, depth - 1) - itemCheck(nodes, 2 * index + 2, depth - 1);
 }
 
 func int main() {
-    int MAX_NODES = 8192; // Достаточно большое значение для массива
-    int[] nodes = int[MAX_NODES];
+    int MAX_NODES = 300; // Достаточно большое значение для массива
     int[] posTree = int[MAX_NODES];
     int[] negTree = int[MAX_NODES];
     int ret = 0;
-    for (int n = 4; n <= 7; ++n) {
+    for (int n = 4; n <= 7; n=n+1) {
         int minDepth = 4;
         int maxDepth = 0;
         if (minDepth + 2 > n) {
@@ -32,32 +32,33 @@ func int main() {
         int stretchDepth = maxDepth + 1;
 
         int[] stretchTree = int[MAX_NODES];
-        for (int i1 = 0; i1 < MAX_NODES; ++i1) {
-            stretchTree[i1] = 0;
+        for (int i = 0; i < MAX_NODES; i=i+1) {
+            stretchTree[i] = 0;
         }
-        bottomUpTree(stretchTree, 0, 0, stretchDepth);
+        stretchTree = bottomUpTree(stretchTree, 0, 0, stretchDepth);
         int check = itemCheck(stretchTree, 0, stretchDepth);
 
         int[] longLivedTree = int[MAX_NODES];
-        for (int i2 = 0; i2 < MAX_NODES; ++i2){
-            longLivedTree[i2] = 0;
+        for (int i = 0; i < MAX_NODES; i=i+1){
+            longLivedTree[i] = 0;
         }
-        bottomUpTree(longLivedTree, 0, 0, maxDepth);
+        longLivedTree = bottomUpTree(longLivedTree, 0, 0, maxDepth);
 
         for (int depth = minDepth; depth <= maxDepth; depth = depth + 2) {
             int iterations = 1;
-            for (int i3 = 0; i3 < (maxDepth - depth + minDepth); ++i3) {
+            for (int i = 0; i < ((maxDepth - depth) + minDepth); i=i+1) {
                 iterations = iterations * 2;
             }
             check = 0;
-            for (int i4 = 1; i4 <= iterations; ++i4) {
-                for (int j = 0; j < MAX_NODES; ++j) {
+            for (int i = 1; i <= iterations; i=i+1) {
+                for (int j = 0; j < MAX_NODES; j=j+1) {
                     posTree[j] = 0;
                     negTree[j] = 0;
                 }
-                int minI4 = 0-i4;
-                bottomUpTree(posTree, 0, i4, depth);
-                bottomUpTree(negTree, 0, minI4, depth);
+
+
+                posTree = bottomUpTree(posTree, 0, i, depth);
+                negTree = bottomUpTree(negTree, 0, 0-i, depth);
                 check = check + itemCheck(posTree, 0, depth) + itemCheck(negTree, 0, depth);
             }
         }
@@ -67,9 +68,10 @@ func int main() {
 
     int expected = -4;
     if (ret != expected) {
-        print(32303);
+        print(ret);
         return 1;
+    } else {
+        print(3333);
     }
-
     return 0;
 }
