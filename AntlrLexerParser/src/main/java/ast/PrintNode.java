@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PrintNode implements ASTNode {
-    private ASTNode expression;
+    private ASTNode expression; // TODO: й print n
 
     @Override
     public String GetTypeName() {

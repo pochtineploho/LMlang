@@ -50,6 +50,10 @@ func int[] merge(int[] left, int leftSize, int[] right, int rightSize) {
         k = k + 1;
     }
 
+    for(int o = 0; o < leftSize + rightSize; ++o) {
+        print(result[o]);
+    }
+    print(1111);
     return result;
 }
 func int main() {
