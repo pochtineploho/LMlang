@@ -27,19 +27,7 @@ func int[] merge(int[] left, int leftSize, int[] right, int rightSize) {
     int j = 0;
     int k = 0;
 
-    for (int t1 = 0; t1 < leftSize; t1 = t1 + 1) {
-        print(left[t1]);
-    }
-    print(4444);
-
-    for (int t = 0; t < rightSize; t = t + 1) {
-        print(right[t]);
-    }
-    print(3333);
-
     for (i < leftSize && j < rightSize) {
-
-        print(j);
         if (left[i] <= right[j]) {
             result[k] = left[i];
             i = i + 1;
@@ -61,11 +49,7 @@ func int[] merge(int[] left, int leftSize, int[] right, int rightSize) {
         j = j + 1;
         k = k + 1;
     }
-    print(2222);
-    for(int o = 0; o < leftSize + rightSize; ++o) {
-        // print(result[o]);
-    }
-    print(1111);
+
     return result;
 }
 func int main() {
