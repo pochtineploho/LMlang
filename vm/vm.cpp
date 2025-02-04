@@ -97,12 +97,15 @@ void VM::Execute(const std::vector<Command> &commands) {
                 ++noOpIndex;
             }
             if (noOpIndex < commands.size()) {
-                loopStartToNoOp[pc] = noOpIndex;
+                loopStartToNoOp[noOpIndex] = 1;
             }
         }
     }
 
-    size_t pointer = 0;
+    callStack.push(commands.size());
+    CheckFunctions(commands[0], "main");
+    pointer = functionTable["main"] + 1;
+
     while (pointer < commands.size()) {
         const auto& command = commands[pointer];
 
@@ -293,9 +296,7 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::LoadVar: {
             CheckType(command, Command::OnlyStr);
             auto var_name = GetNameByIndex(command);
-            if (var_name == "primes") {
-                std::cerr << "primes"<<'\n';
-            }
+
             std::optional<llvm::APInt> foundValue = FindInVariablesStack(var_name);
             if (foundValue) {
                 valueStack.push(*foundValue);
@@ -546,6 +547,9 @@ std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size
 
 /// Трансляция в LLVM IR
 void VM::JITCompile(const std::vector<Command> &commands) {
+    for (Command c : commands){
+        std::cerr<<BytecodeToString(c.bytecode)<<'\n';
+    }
     llvm::FunctionType *funcType = llvm::FunctionType::get(
             llvm::Type::getVoidTy(context),
             false
