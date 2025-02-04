@@ -70,53 +70,42 @@ void VM::LoadStringTable(const std::unordered_map<std::string, int> &stringTable
 
 /// Выполнение байткода
 void VM::Execute(const std::vector<Command> &commands) {
-    if (commands.empty()) {
-        return;
-    }
-    for (size_t pc = 0; pc < commands.size(); ++pc) {
-        const Command& command = commands[pc];
-
-        if (command.bytecode == Bytecode::FuncDecl) {
-            pointer = pc;
-            if (HandleCommand(command) != 0) {
-                return;
+    size_t pointer = 0;
+    for (size_t i = 0; i < commands.size(); ++i) {
+        if (commands[i].bytecode == Bytecode::ForBegin) {
+            size_t noOpIndex = i + 1;
+            while (noOpIndex < commands.size() && commands[noOpIndex].bytecode != Bytecode::NoOp) {
+                ++noOpIndex;
             }
-        }
-
-        if (command.bytecode == Bytecode::NoOp) {
-            pointer = pc;
-            if (HandleCommand(command) != 0) {
-                return;
+            if (noOpIndex < commands.size()) {
+                loopStartToNoOp[i] = noOpIndex;
             }
         }
     }
-
-    callStack.push(commands.size());
-    CheckFunctions(commands[0], "main");
-    pointer = functionTable["main"] + 1;
 
     while (pointer < commands.size()) {
-        const auto &command = commands[pointer];
-//        if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfTrue ||
-//            command.bytecode == Bytecode::JumpIfFalse) {
-//            size_t loopStart = FindLoopStart(commands, pointer);
-//            size_t loopEnd = FindLoopEnd(commands, pointer);
-//
-//            if (loopExecutionCount.find(loopStart) == loopExecutionCount.end()) {
-//                loopExecutionCount[loopStart] = 0;
-//            }
-//
-//            loopExecutionCount[loopStart]++;
-//
-//            if (loopExecutionCount[loopStart] >= hotLoopThreshold) {
-//                std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
-//
-//                std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
-//                JITCompile(hotLoopCommands);
-//
-//                loopExecutionCount[loopStart] = 0;
-//            }
-//        }
+        const auto& command = commands[pointer];
+
+        if (command.bytecode == Bytecode::NoOp && loopStartToNoOp.contains(pointer)) {
+            size_t loopStart = FindLoopStart(commands, pointer);
+            size_t loopEnd = FindLoopEnd(commands, pointer);
+
+            if (!loopExecutionCount.contains(loopStart)) {
+                loopExecutionCount[loopStart] = 0;
+            }
+
+            loopExecutionCount[loopStart]++;
+
+            if (loopExecutionCount[loopStart] >= hotLoopThreshold) {
+                std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
+
+                std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
+                JITCompile(hotLoopCommands);
+
+                loopExecutionCount[loopStart] = 0;
+            }
+        }
+
         if (HandleCommand(command) != 0) {
             break;
         }
@@ -502,22 +491,23 @@ int VM::HandleCommand(const Command &command) {
     return 0;
 }
 
-size_t VM::FindLoopStart(const std::vector<Command> &commands, size_t pc) {
-    const auto &command = commands[pc];
-    if (command.bytecode == Bytecode::Jump && command.number.getLimitedValue() < pc) {
-        return command.number.getLimitedValue();
-    }
-    return pc;
-}
-
-size_t VM::FindLoopEnd(const std::vector<Command> &commands, size_t pc) {
-    const auto &command = commands[pc];
-    if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfTrue ||
-        command.bytecode == Bytecode::JumpIfFalse) {
+size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t pc) {
+    const auto& command = commands[pc];
+    if (command.bytecode == Bytecode::ForBegin) {
         return pc;
     }
     return commands.size();
 }
+
+
+size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc) {
+    const auto& command = commands[pc];
+    if (command.bytecode == Bytecode::ForEnd) {
+        return pc;
+    }
+    return commands.size(); // Если не найдено, возвращаем размер списка команд
+}
+
 
 std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size_t loopStart, size_t loopEnd) {
     std::vector<Command> loopCommands;
@@ -865,11 +855,11 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     throw std::runtime_error("JITCompile: Stack underflow on StoreArray");
                 }
 
-                llvm::Value *value = llvmStack.back(); // Значение для сохранения
+                llvm::Value *value = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value *index = llvmStack.back(); // Индекс массива
+                llvm::Value *index = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value *array = llvmStack.back(); // Указатель на массив
+                llvm::Value *array = llvmStack.back();
                 llvmStack.pop_back();
 
                 // Проверяем, что индекс >= 0

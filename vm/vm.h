@@ -57,6 +57,8 @@ private:
     std::unordered_map<std::string, size_t> functionTable;
     std::unordered_map<uint64_t, size_t> jumpPointerTable;
 
+    std::unordered_map<size_t, size_t> loopStartToNoOp;
+
     std::string GetNameByIndex(const Command& command);
 
     std::optional<llvm::APInt> FindInVariablesStack(const std::string& name);
