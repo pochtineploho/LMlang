@@ -90,26 +90,24 @@ void VM::Execute(const std::vector<Command> &commands) {
                 return;
             }
         }
-    }
 
-    size_t pointer = 0;
-    for (size_t i = 0; i < commands.size(); ++i) {
-        if (commands[i].bytecode == Bytecode::ForBegin) {
-            size_t noOpIndex = i + 1;
+        if (command.bytecode == Bytecode::ForBegin) {
+            size_t noOpIndex = pc + 1;
             while (noOpIndex < commands.size() && commands[noOpIndex].bytecode != Bytecode::NoOp) {
                 ++noOpIndex;
             }
             if (noOpIndex < commands.size()) {
-                loopStartToNoOp[i] = noOpIndex;
+                loopStartToNoOp[pc] = noOpIndex;
             }
         }
     }
 
+    size_t pointer = 0;
     while (pointer < commands.size()) {
         const auto& command = commands[pointer];
 
         if (command.bytecode == Bytecode::NoOp && loopStartToNoOp.contains(pointer)) {
-            size_t loopStart = pointer - 1;
+            size_t loopStart = FindLoopStart(commands, pointer);
             size_t loopEnd = FindLoopEnd(commands, pointer, commands[loopStart].number);
 
             if (!loopExecutionCount.contains(loopStart)) {
@@ -514,10 +512,14 @@ int VM::HandleCommand(const Command &command) {
 }
 
 size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t pc) {
-    const auto& command = commands[pc];
-    if (command.bytecode == Bytecode::ForBegin) {
+    while (commands[pc].bytecode != Bytecode::ForBegin || pc != 0) {
+        --pc;
+    }
+
+    if (pc != 0) {
         return pc;
     }
+
     return commands.size();
 }
 
@@ -625,10 +627,10 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 builder.SetInsertPoint(errorBlock);
                 builder.CreateCall(module.getOrInsertFunction(
-                        "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
+                    "puts",
+                    llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
                 ), builder.CreateGlobalString("Division by zero error!"));
-                builder.CreateRetVoid();
+                builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 0));
 
                 builder.SetInsertPoint(divideBlock);
                 llvm::Value *result = builder.CreateSDiv(lhs, rhs, "divtmp");
@@ -661,7 +663,14 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 }
 
                 llvm::BasicBlock *trueBlock = blocks[target];
-                llvm::BasicBlock *nextBlock = (i + 1 < commands.size()) ? blocks[i + 1] : nullptr;
+                llvm::BasicBlock *nextBlock;
+
+                if (i + 1 < commands.size()) {
+                    nextBlock = blocks[i + 1];
+                } else {
+                    nextBlock = llvm::BasicBlock::Create(context, "nextBlock", function);
+                    blocks[i + 1] = nextBlock;
+                }
 
                 builder.CreateCondBr(condition, trueBlock, nextBlock);
                 break;
@@ -680,13 +689,20 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 }
 
                 llvm::BasicBlock *falseBlock = blocks[target];
-                llvm::BasicBlock *nextBlock = (i + 1 < commands.size()) ? blocks[i + 1] : nullptr;
+                llvm::BasicBlock *nextBlock;
 
-                condition = builder.CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0),
-                                                 "condfalse");
+                if (i + 1 < commands.size()) {
+                    nextBlock = blocks[i + 1];
+                } else {
+                    nextBlock = llvm::BasicBlock::Create(context, "nextBlock", function);
+                    blocks[i + 1] = nextBlock;
+                }
+
+                condition = builder.CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0), "condfalse");
                 builder.CreateCondBr(condition, falseBlock, nextBlock);
                 break;
             }
+
 
             case Bytecode::LoadVar: {
                 std::string varName = GetNameByIndex(command);
@@ -694,11 +710,14 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 if (variables.find(varName) == variables.end()) {
                     throw std::runtime_error("Variable not found: " + varName);
                 }
+
                 llvm::Value *variablePointer = variables[varName];
-//                llvm::Value *value = builder.CreateLoad(variablePointer, varName.c_str());
-//                llvmStack.push_back(value);
+                llvm::Value *value = builder.CreateLoad(variablePointer->getType(), variablePointer);
+                llvmStack.push_back(value);
+
                 break;
             }
+
 
             case Bytecode::StoreVar: {
                 if (llvmStack.empty()) {
@@ -737,18 +756,21 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvmStack.pop_back();
 
                 llvm::Function *printfFunc = llvm::cast<llvm::Function>(
-                        module.getOrInsertFunction(
-                                "printf",
-                                llvm::FunctionType::get(
-                                        llvm::Type::getInt32Ty(context),
-                                        llvm::PointerType::getUnqual(
-                                                llvm::Type::getInt8Ty(context)),
-                                        true
-                                )
-                        ).getCallee()
+                    module.getOrInsertFunction(
+                        "printf",
+                        llvm::FunctionType::get(
+                            llvm::Type::getInt32Ty(context),
+                            llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)),
+                            true
+                        )
+                    ).getCallee()
                 );
 
                 llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
+
+                if (value->getType() != llvm::Type::getInt32Ty(context)) {
+                    value = builder.CreateIntCast(value, llvm::Type::getInt32Ty(context), true);
+                }
 
                 builder.CreateCall(printfFunc, {formatStr, value});
                 break;
@@ -756,12 +778,10 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
             case Bytecode::Call: {
                 std::string funcName = GetNameByIndex(command);
-                auto funcIter = module.getFunction(funcName);
-                if (!funcIter) {
+                llvm::Function *calleeFunc = module.getFunction(funcName);
+                if (!calleeFunc) {
                     throw std::runtime_error("Function not found: " + funcName);
                 }
-
-                llvm::Function *calleeFunc = funcIter;
 
                 int argCount = command.number.getLimitedValue();
                 if (llvmStack.size() < argCount) {
@@ -799,30 +819,29 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *arraySize = llvmStack.back();
                 llvmStack.pop_back();
 
-                // Проверяем, что размер массива больше 0
                 llvm::Value *isSizeZero = builder.CreateICmpEQ(
-                        arraySize, llvm::ConstantInt::get(arraySize->getType(), 0), "isSizeZero");
+                    arraySize, llvm::ConstantInt::get(arraySize->getType(), 0), "isSizeZero");
                 llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "error", function);
                 llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "continue", function);
 
                 builder.CreateCondBr(isSizeZero, errorBlock, continueBlock);
 
-                // Блок ошибки
                 builder.SetInsertPoint(errorBlock);
-                builder.CreateCall(module.getOrInsertFunction(
+                auto *putsFunc = llvm::cast<llvm::Function>(
+                    module.getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
-                ), builder.CreateGlobalString("Array size must be greater than zero\n"));
+                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                    ).getCallee()
+                );
+                llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array size must be greater than zero\n");
+                builder.CreateCall(putsFunc, errorMessage);
                 builder.CreateRetVoid();
 
-                // Блок продолжения
                 builder.SetInsertPoint(continueBlock);
 
-                // Выделяем память для массива в стеке
                 llvm::Value *array = builder.CreateAlloca(
-                        llvm::Type::getInt32Ty(context), arraySize, "array");
+                    llvm::Type::getInt32Ty(context), arraySize, "array");
 
-                // Сохраняем указатель на массив в стеке
                 llvmStack.push_back(array);
                 break;
             }
@@ -833,41 +852,40 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     throw std::runtime_error("JITCompile: Stack underflow on LoadArray");
                 }
 
-                llvm::Value *index = llvmStack.back(); // Индекс массива
+                llvm::Value *index = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value *array = llvmStack.back(); // Указатель на массив
+                llvm::Value *array = llvmStack.back();
                 llvmStack.pop_back();
 
-                // Проверяем, что индекс >= 0
                 llvm::Value *isIndexNegative = builder.CreateICmpSLT(
-                        index, llvm::ConstantInt::get(index->getType(), 0), "isIndexNegative");
+                    index, llvm::ConstantInt::get(index->getType(), 0), "isIndexNegative");
                 llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "index_error", function);
                 llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "index_continue", function);
 
                 builder.CreateCondBr(isIndexNegative, errorBlock, continueBlock);
 
-                // Блок ошибки
                 builder.SetInsertPoint(errorBlock);
-                builder.CreateCall(module.getOrInsertFunction(
+                auto *putsFunc = llvm::cast<llvm::Function>(
+                    module.getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
-                ), builder.CreateGlobalString("Array index out of bounds\n"));
+                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                    ).getCallee()
+                );
+                llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
+                builder.CreateCall(putsFunc, errorMessage);
                 builder.CreateRetVoid();
 
-                // Блок продолжения
                 builder.SetInsertPoint(continueBlock);
 
-                // Вычисляем указатель на элемент массива
                 llvm::Value *elementPtr = builder.CreateGEP(
-                        llvm::Type::getInt32Ty(context), array, index, "elementPtr");
+                    llvm::Type::getInt32Ty(context), array, index, "elementPtr");
 
-                // Загружаем элемент из массива
-//                llvm::Value *value = builder.CreateLoad(elementPtr, "loadValue");
+                llvm::Value *value = builder.CreateLoad(elementPtr->getType(), elementPtr);
 
-                // Сохраняем значение на стеке
-//                llvmStack.push_back(value);
+                llvmStack.push_back(value);
                 break;
             }
+
 
 
             case Bytecode::StoreArray: {
@@ -884,7 +902,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 // Проверяем, что индекс >= 0
                 llvm::Value *isIndexNegative = builder.CreateICmpSLT(
-                        index, llvm::ConstantInt::get(index->getType(), 0), "isIndexNegative");
+                    index, llvm::ConstantInt::get(index->getType(), 0), "isIndexNegative");
                 llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "index_error", function);
                 llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "index_continue", function);
 
@@ -892,10 +910,14 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 // Блок ошибки
                 builder.SetInsertPoint(errorBlock);
-                builder.CreateCall(module.getOrInsertFunction(
+                auto *putsFunc = llvm::cast<llvm::Function>(
+                    module.getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
-                ), builder.CreateGlobalString("Array index out of bounds\n"));
+                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                    ).getCallee()
+                );
+                llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
+                builder.CreateCall(putsFunc, errorMessage);
                 builder.CreateRetVoid();
 
                 // Блок продолжения
@@ -903,24 +925,24 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 // Вычисляем указатель на элемент массива
                 llvm::Value *elementPtr = builder.CreateGEP(
-                        llvm::Type::getInt32Ty(context), array, index, "elementPtr");
+                    llvm::Type::getInt32Ty(context), array, index, "elementPtr");
 
                 // Сохраняем значение в массив
                 builder.CreateStore(value, elementPtr);
                 break;
             }
 
+
             case Bytecode::And: {
                 if (llvmStack.size() < 2) {
                     throw std::runtime_error("JITCompile: Stack underflow on And");
                 }
 
-                llvm::Value* rhs = llvmStack.back(); // Правый операнд
+                llvm::Value* rhs = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value* lhs = llvmStack.back(); // Левый операнд
+                llvm::Value* lhs = llvmStack.back();
                 llvmStack.pop_back();
 
-                // Создаем инструкцию логического И
                 llvm::Value* result = builder.CreateAnd(lhs, rhs, "andtmp");
                 llvmStack.push_back(result);
                 break;
@@ -931,12 +953,11 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     throw std::runtime_error("JITCompile: Stack underflow on Or");
                 }
 
-                llvm::Value* rhs = llvmStack.back(); // Правый операнд
+                llvm::Value* rhs = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value* lhs = llvmStack.back(); // Левый операнд
+                llvm::Value* lhs = llvmStack.back();
                 llvmStack.pop_back();
 
-                // Создаем инструкцию логического ИЛИ
                 llvm::Value* result = builder.CreateOr(lhs, rhs, "ortmp");
                 llvmStack.push_back(result);
                 break;
@@ -947,19 +968,17 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     throw std::runtime_error("JITCompile: Stack underflow on Not");
                 }
 
-                llvm::Value* value = llvmStack.back(); // Операнд
+                llvm::Value* value = llvmStack.back();
                 llvmStack.pop_back();
 
-                // Создаем инструкцию сравнения с 0 (логическое НЕ)
                 llvm::Value* result = builder.CreateICmpEQ(
-                        value,
-                        llvm::ConstantInt::get(value->getType(), 0),
-                        "nottmp"
+                    value,
+                    llvm::ConstantInt::get(value->getType(), 0),
+                    "nottmp"
                 );
                 llvmStack.push_back(result);
                 break;
             }
-
 
             default:
                 throw std::runtime_error("JITCompile: Unsupported bytecode");
