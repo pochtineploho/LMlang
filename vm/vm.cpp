@@ -285,6 +285,9 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::LoadVar: {
             CheckType(command, Command::OnlyStr);
             auto var_name = GetNameByIndex(command);
+            if (var_name == "primes") {
+                std::cerr << "primes"<<'\n';
+            }
             std::optional<llvm::APInt> foundValue = FindInVariablesStack(var_name);
             if (foundValue) {
                 valueStack.push(*foundValue);
@@ -464,6 +467,24 @@ int VM::HandleCommand(const Command &command) {
             std::string func_name = GetNameByIndex(command);
             // CheckFunctions(command, func_name); ???
             functionTable[func_name] = pointer;
+            break;
+        }
+
+        case Bytecode::ForBegin: {
+            variablesStack.emplace_back();
+            break;
+        }
+
+        case Bytecode::ForEnd: {
+            for (auto i : variablesStack.back() ) {
+                for (long long j = variablesStack.size() - 2; j >= 0; --j) {
+                    if (variablesStack[j].contains(i.first) ) {
+                        variablesStack[j][i.first] = i.second;
+                        break;
+                    }
+                }
+            }
+            variablesStack.pop_back();
             break;
         }
 

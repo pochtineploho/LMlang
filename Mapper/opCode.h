@@ -41,6 +41,8 @@ enum struct opCode {
     Halt = 28,
     FuncDecl = 29,
     FuncEnd = 30,
+    ForBegin = 31,
+    ForEnd = 32,
 };
 
 // Map for converting opCode to string and back
@@ -74,7 +76,9 @@ static std::map<opCode, std::string> opCodeToString = {
         {opCode::NoOp,           "NoOp"},
         {opCode::Halt,           "Halt"},
         {opCode::FuncDecl,       "FuncDecl"},
-        {opCode::FuncEnd,        "FuncEnd"}
+        {opCode::FuncEnd,        "FuncEnd"},
+        {opCode::ForBegin,       "ForBegin"},
+        {opCode::ForEnd,        "ForEnd"}
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(opCode, {
@@ -107,5 +111,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(opCode, {
     { opCode::NoOp, "NoOp" },
     { opCode::Halt, "Halt" },
     { opCode::FuncDecl, "FuncDecl" },
-    { opCode::FuncEnd, "FuncEnd" }
+    { opCode::FuncEnd, "FuncEnd" },
+    {opCode::ForBegin,       "ForBegin"},
+    {opCode::ForEnd,        "ForEnd"}
 });

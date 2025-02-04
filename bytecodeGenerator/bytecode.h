@@ -57,7 +57,9 @@ enum class Bytecode {
     NoOp = 27,        // 27: No operation
     Halt = 28,         // 28: Halt the program
     FuncDecl = 29,
-    FuncEnd = 30
+    FuncEnd = 30,
+    ForBegin = 31,
+    ForEnd = 32
 };
 
 class Command {

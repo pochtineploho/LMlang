@@ -31,13 +31,15 @@ std::string BytecodeToString(Bytecode code) {
             {Bytecode::Call,           "Call"},
             {Bytecode::Return,         "Return"},
             {Bytecode::CreateArray,    "CreateArray"},
-            {Bytecode::FillRawArray,     "FillRawArray"},
+            {Bytecode::FillRawArray,   "FillRawArray"},
             {Bytecode::LoadArray,      "LoadArray"},
             {Bytecode::StoreArray,     "StoreArray"},
             {Bytecode::NoOp,           "NoOp"},
             {Bytecode::Halt,           "Halt"},
             {Bytecode::FuncDecl,       "FuncDecl"},
-            {Bytecode::FuncEnd,        "FuncEnd"}
+            {Bytecode::FuncEnd,        "FuncEnd"},
+            {Bytecode::ForBegin,       "ForBegin"},
+            {Bytecode::ForEnd,         "ForEnd"}
     };
 
     auto it = bytecodeNames.find(code);
@@ -73,13 +75,15 @@ Bytecode StringToBytecode(const std::string& name) {
             {"Call",           Bytecode::Call},
             {"Return",         Bytecode::Return},
             {"CreateArray",    Bytecode::CreateArray},
-            {"FillRawArray",     Bytecode::FillRawArray},
+            {"FillRawArray",   Bytecode::FillRawArray},
             {"LoadArray",      Bytecode::LoadArray},
             {"StoreArray",     Bytecode::StoreArray},
             {"NoOp",           Bytecode::NoOp},
             {"Halt",           Bytecode::Halt},
             {"FuncDecl",       Bytecode::FuncDecl},
-            {"FuncEnd",        Bytecode::FuncEnd}
+            {"FuncEnd",        Bytecode::FuncEnd},
+            {"ForBegin",       Bytecode::ForBegin},
+            {"ForEnd",         Bytecode::ForEnd}
     };
 
     auto it = stringToBytecodeMap.find(name);

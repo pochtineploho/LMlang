@@ -666,6 +666,12 @@
     "withValue" : false,
     "withStringID" : true
   }, {
+    "opCode" : "ForBegin",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
     "opCode" : "Push",
     "value" : 4,
     "stringID" : 0,
@@ -864,6 +870,12 @@
     "withValue" : false,
     "withStringID" : true
   }, {
+    "opCode" : "ForBegin",
+    "value" : 1,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
     "opCode" : "Push",
     "value" : 0,
     "stringID" : 0,
@@ -962,6 +974,12 @@
   }, {
     "opCode" : "NoOp",
     "value" : 9,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "ForEnd",
+    "value" : 1,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
@@ -1050,6 +1068,12 @@
     "withValue" : false,
     "withStringID" : true
   }, {
+    "opCode" : "ForBegin",
+    "value" : 2,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
     "opCode" : "Push",
     "value" : 0,
     "stringID" : 0,
@@ -1152,6 +1176,12 @@
     "withValue" : true,
     "withStringID" : false
   }, {
+    "opCode" : "ForEnd",
+    "value" : 2,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
     "opCode" : "LoadVar",
     "value" : 0,
     "stringID" : 18,
@@ -1187,6 +1217,12 @@
     "stringID" : 18,
     "withValue" : false,
     "withStringID" : true
+  }, {
+    "opCode" : "ForBegin",
+    "value" : 3,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
@@ -1241,6 +1277,12 @@
     "stringID" : 19,
     "withValue" : false,
     "withStringID" : true
+  }, {
+    "opCode" : "ForBegin",
+    "value" : 4,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
   }, {
     "opCode" : "Push",
     "value" : 0,
@@ -1368,6 +1410,12 @@
     "withValue" : true,
     "withStringID" : false
   }, {
+    "opCode" : "ForEnd",
+    "value" : 4,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
     "opCode" : "Push",
     "value" : 0,
     "stringID" : 0,
@@ -1379,6 +1427,12 @@
     "stringID" : 17,
     "withValue" : false,
     "withStringID" : true
+  }, {
+    "opCode" : "ForBegin",
+    "value" : 5,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
   }, {
     "opCode" : "Push",
     "value" : 1,
@@ -1418,6 +1472,12 @@
   }, {
     "opCode" : "JumpIfFalse",
     "value" : 17,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "ForBegin",
+    "value" : 6,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
@@ -1544,6 +1604,12 @@
   }, {
     "opCode" : "NoOp",
     "value" : 19,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "ForEnd",
+    "value" : 6,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
@@ -1740,6 +1806,12 @@
     "withValue" : true,
     "withStringID" : false
   }, {
+    "opCode" : "ForEnd",
+    "value" : 5,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
     "opCode" : "LoadVar",
     "value" : 0,
     "stringID" : 1,
@@ -1772,6 +1844,12 @@
   }, {
     "opCode" : "NoOp",
     "value" : 13,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "ForEnd",
+    "value" : 3,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
@@ -1850,6 +1928,12 @@
   }, {
     "opCode" : "NoOp",
     "value" : 5,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "ForEnd",
+    "value" : 0,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
@@ -1986,5 +2070,6 @@
     "longLivedTree" : 18,
     "bottomUpTree" : 0
   },
-  "controlFlowCounter" : 22
+  "controlFlowCounter" : 22,
+  "controlCycleCounter" : 7
 }

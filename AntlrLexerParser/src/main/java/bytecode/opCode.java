@@ -45,7 +45,9 @@ public enum opCode {
     NoOp(27),              // 27: No operation
     Halt(28),              // 28: Halt the program
     FuncDecl(29),              // 28: Halt the program
-    FuncEnd(30);              // 28: Halt the program
+    FuncEnd(30),              // 28: Halt the program
+    ForBegin(31),              // 28: Halt the program
+    ForEnd(32);              // 28: Halt the program
 
     private final int value;
 

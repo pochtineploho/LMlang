@@ -18,9 +18,11 @@ public class bytecodeHolder {
     private ArrayList<bytecode> bytecodes; // vector<Command>>?
     private Map<String,Integer> stringTable;
     private Long controlFlowCounter;
+    private Long controlCycleCounter;
     public bytecodeHolder() {
         bytecodes = new ArrayList<bytecode>();
         stringTable = new HashMap<String,Integer>();
         controlFlowCounter = 0L;
+        controlCycleCounter = 0L;
     }
 }
