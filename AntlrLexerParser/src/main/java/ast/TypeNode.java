@@ -25,7 +25,7 @@ public class TypeNode implements ASTNode {
 
     @Override
     public void BytecodeGeneration(bytecodeHolder bch, Boolean load){
-        bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, 0, false, false));
+        //bch.getBytecodes().add(new bytecode(opCode.NoOp, 0L, 0, false, false));
     }
 }
 

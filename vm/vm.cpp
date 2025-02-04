@@ -97,7 +97,6 @@ void VM::Execute(const std::vector<Command> &commands) {
 
     while (pointer < commands.size()) {
         const auto &command = commands[pointer];
-
 //        if (command.bytecode == Bytecode::Jump || command.bytecode == Bytecode::JumpIfTrue ||
 //            command.bytecode == Bytecode::JumpIfFalse) {
 //            size_t loopStart = FindLoopStart(commands, pointer);
@@ -447,12 +446,8 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::NoOp: {
-            if (command.type == Command::Empty) {
-                break;
-            }
-            if (command.type == Command::OnlyNum) {
-                jumpPointerTable[command.number.getLimitedValue()] = pointer; // ??
-            }
+            CheckType(command,Command::OnlyNum);
+            jumpPointerTable[command.number.getLimitedValue()] = pointer;
             break;
         }
 
