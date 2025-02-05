@@ -18,6 +18,7 @@
 #include <llvm/ADT/SmallString.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
 
 
@@ -89,7 +90,7 @@ public:
 
     int HandleCommand(const Command& command);
 
-    size_t FindLoopStart(const std::vector<Command>& commands, size_t pc);
+    size_t FindLoopStart(const std::vector<Command>& commands, size_t& pc);
 
     size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc, llvm::APInt commandNumber);
 
