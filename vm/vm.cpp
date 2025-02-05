@@ -145,7 +145,7 @@ int VM::HandleCommand(const Command &command) {
             break;
         }
 
-        case Bytecode::Pop: { // useless
+        case Bytecode::Pop: {
             CheckType(command, Command::Empty);
             valueStack.pop();
             break;
@@ -512,8 +512,8 @@ int VM::HandleCommand(const Command &command) {
     return 0;
 }
 
-size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t pc) {
-    while (commands[pc].bytecode != Bytecode::ForBegin || pc != 0) {
+size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t& pc) {
+    while (commands[pc].bytecode != Bytecode::ForBegin && pc != 0) {
         --pc;
     }
 
@@ -707,7 +707,6 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 break;
             }
 
-
             case Bytecode::LoadVar: {
                 std::string varName = GetNameByIndex(command);
 
@@ -716,9 +715,13 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 }
 
                 llvm::Value *variablePointer = variables[varName];
-                llvm::Value *value = builder.CreateLoad(variablePointer->getType(), variablePointer);
-                llvmStack.push_back(value);
-
+                if (auto *allocaInst = llvm::dyn_cast<llvm::AllocaInst>(variablePointer)) {
+                    llvm::Type *variableType = allocaInst->getAllocatedType();
+                    llvm::Value *value = builder.CreateLoad(variableType, variablePointer);
+                    llvmStack.push_back(value);
+                } else {
+                    throw std::runtime_error("Variable is not an AllocaInst: " + varName);
+                }
                 break;
             }
 
@@ -733,6 +736,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 std::string varName = GetNameByIndex(command);
                 if (variables.find(varName) == variables.end()) {
+                    auto type = value->getType();
                     llvm::AllocaInst *allocaInst = builder.CreateAlloca(value->getType(), nullptr, varName);
                     variables[varName] = allocaInst;
                 }
@@ -904,7 +908,6 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *array = llvmStack.back();
                 llvmStack.pop_back();
 
-                // Проверяем, что индекс >= 0
                 llvm::Value *isIndexNegative = builder.CreateICmpSLT(
                     index, llvm::ConstantInt::get(index->getType(), 0), "isIndexNegative");
                 llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "index_error", function);
@@ -912,7 +915,6 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 builder.CreateCondBr(isIndexNegative, errorBlock, continueBlock);
 
-                // Блок ошибки
                 builder.SetInsertPoint(errorBlock);
                 auto *putsFunc = llvm::cast<llvm::Function>(
                     module.getOrInsertFunction(
@@ -924,14 +926,11 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 builder.CreateCall(putsFunc, errorMessage);
                 builder.CreateRetVoid();
 
-                // Блок продолжения
                 builder.SetInsertPoint(continueBlock);
 
-                // Вычисляем указатель на элемент массива
                 llvm::Value *elementPtr = builder.CreateGEP(
                     llvm::Type::getInt32Ty(context), array, index, "elementPtr");
 
-                // Сохраняем значение в массив
                 builder.CreateStore(value, elementPtr);
                 break;
             }
@@ -984,13 +983,144 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 break;
             }
 
+            case Bytecode::Push: {
+                CheckType(command, Command::OnlyNum);
+                llvmStack.push_back(llvm::ConstantInt::get(builder.getInt64Ty(), command.number));
+                break;
+            }
+
+            case Bytecode::Pop: {
+                CheckType(command, Command::Empty);
+                if (!llvmStack.empty()) {
+                    llvmStack.pop_back();
+                } else {
+                    llvm::errs() << "Error: Stack underflow.\n";
+                }
+                break;
+            }
+
+            case Bytecode::Equal: {
+                if (llvmStack.size() < 2) {
+                    std::cerr << "Error: Not enough values on stack for comparison.\n";
+                    return;
+                }
+                auto rhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto lhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto result = builder.CreateICmpEQ(lhs, rhs, "cmp");
+                llvmStack.push_back(result);
+                break;
+            }
+
+            case Bytecode::NotEqual: {
+                if (llvmStack.size() < 2) {
+                    std::cerr << "Error: Not enough values on stack for comparison.\n";
+                    return;
+                }
+                auto rhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto lhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto result = builder.CreateICmpNE(lhs, rhs, "cmp");
+                llvmStack.push_back(result);
+                break;
+            }
+
+            case Bytecode::GreaterThan: {
+                if (llvmStack.size() < 2) {
+                    std::cerr << "Error: Not enough values on stack for comparison.\n";
+                    return;
+                }
+                auto rhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto lhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto result = builder.CreateICmpSGT(lhs, rhs, "cmp");
+                llvmStack.push_back(result);
+                break;
+            }
+
+            case Bytecode::GreaterOrEqual: {
+                if (llvmStack.size() < 2) {
+                    std::cerr << "Error: Not enough values on stack for comparison.\n";
+                    return;
+                }
+                auto rhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto lhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto result = builder.CreateICmpSGE(lhs, rhs, "cmp");
+                llvmStack.push_back(result);
+                break;
+            }
+
+            case Bytecode::LessThan: {
+                if (llvmStack.size() < 2) {
+                    std::cerr << "Error: Not enough values on stack for comparison.\n";
+                    return;
+                }
+                auto rhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto lhs = llvmStack.back();
+                llvmStack.pop_back();
+
+                auto rtype = rhs->getType();
+                auto rname = rhs->getName();
+
+                auto ltype = lhs->getType();
+                auto lname = lhs->getName();
+
+                auto result = builder.CreateICmpSLT(lhs, rhs, "cmp");
+                llvmStack.push_back(result);
+                break;
+            }
+
+            case Bytecode::LessOrEqual: {
+                if (llvmStack.size() < 2) {
+                    std::cerr << "Error: Not enough values on stack for comparison.\n";
+                    return;
+                }
+                auto rhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto lhs = llvmStack.back();
+                llvmStack.pop_back();
+                auto result = builder.CreateICmpSLE(lhs, rhs, "cmp");
+                llvmStack.push_back(result);
+                break;
+            }
+
+            case Bytecode::ForBegin: {
+                llvmStack.emplace_back();
+                break;
+            }
+
+            case Bytecode::ForEnd: {
+                auto &currentScope = variablesStack.back();
+                for (auto &var : currentScope) {
+                    std::string varName = var.first;
+                    llvm::Value *varValue = llvm::ConstantInt::get(builder.getInt32Ty(), var.second);
+                    for (long long j = variablesStack.size() - 2; j >= 0; --j) {
+                        auto &parentScope = variablesStack[j];
+                        if (parentScope.find(varName) != parentScope.end()) {
+                            llvm::AllocaInst *parentVar = builder.CreateAlloca(builder.getInt32Ty(), nullptr, varName);
+                            llvm::Value *value = llvm::ConstantInt::get(context, parentScope[varName]);
+                            builder.CreateStore(varValue, parentVar);
+                            break;
+                        }
+                    }
+                }
+                variablesStack.pop_back();
+
+                break;
+            }
+
             default:
                 throw std::runtime_error("JITCompile: Unsupported bytecode");
         }
     }
 
     builder.CreateRetVoid();
+    bool isBroken = verifyModule(module, &llvm::errs());
     module.print(llvm::errs(), nullptr);
 }
-
-// TODO в for переменная должна быть на новом уровне
