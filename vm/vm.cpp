@@ -59,13 +59,9 @@ std::optional<llvm::APInt> VM::FindInVariablesStack(const std::string &name) {
     return std::nullopt;
 }
 
-void VM::LoadExecutionStack(const std::stack<llvm::APInt> &executionStack) {
-    valueStack = executionStack;
-}
-
 void VM::LoadStringTable(const std::unordered_map<std::string, int> &stringTable) {
     for (const auto &[str, id]: stringTable) {
-        namesTable[id] = str; // Reverse mapping: ID -> string
+        namesTable[id] = str;
     }
 }
 
@@ -125,6 +121,7 @@ void VM::Execute(const std::vector<Command> &commands) {
 
                 std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
                 JITCompile(hotLoopCommands);
+                pointer = loopEnd;
 
                 loopExecutionCount[loopStart] = 0;
             }
@@ -342,7 +339,7 @@ int VM::HandleCommand(const Command &command) {
             int args_size = command.number.getLimitedValue();
             CheckValueStack(command, args_size);
             variablesStack.emplace_back();
-            callStack.emplace(pointer + 1);  // + 1 ?
+            callStack.emplace(pointer + 1);
             pointer = functionTable[func_name];
             break;
         }
@@ -356,7 +353,7 @@ int VM::HandleCommand(const Command &command) {
             pointer = callStack.top() - 1;
             callStack.pop();
             if (valueStack.empty()) {
-                valueStack.push(llvm::APInt(128, 0));
+                valueStack.emplace(128, 0);
             }
             break;
         }
@@ -471,7 +468,6 @@ int VM::HandleCommand(const Command &command) {
         case Bytecode::FuncDecl: {
             CheckType(command, Command::OnlyStr);
             std::string func_name = GetNameByIndex(command);
-            // CheckFunctions(command, func_name); ???
             functionTable[func_name] = pointer;
             break;
         }
@@ -482,7 +478,7 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::ForEnd: {
-            for (auto i : variablesStack.back() ) {
+            for (const auto& i : variablesStack.back() ) {
                 for (long long j = variablesStack.size() - 2; j >= 0; --j) {
                     if (variablesStack[j].contains(i.first) ) {
                         variablesStack[j][i.first] = i.second;
@@ -526,7 +522,7 @@ size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t& pc) {
 }
 
 
-size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, llvm::APInt commandNumber) {
+size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, const llvm::APInt& commandNumber) {
     for (size_t i = pc; i < commands.size(); ++i) {
         const auto& command = commands[i];
         if (command.bytecode == Bytecode::ForEnd && command.number == commandNumber) {
@@ -751,7 +747,6 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 std::string varName = GetNameByIndex(command);
                 if (variables.find(varName) == variables.end()) {
-                    auto type = value->getType();
                     llvm::AllocaInst *allocaInst = builder.CreateAlloca(value->getType(), nullptr, varName);
                     variables[varName] = allocaInst;
                 }
@@ -808,13 +803,13 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     throw std::runtime_error("Function not found: " + funcName);
                 }
 
-                int argCount = command.number.getLimitedValue();
+                size_t argCount = command.number.getLimitedValue();
                 if (llvmStack.size() < argCount) {
                     throw std::runtime_error("JITCompile: Stack underflow on Call");
                 }
 
                 std::vector<llvm::Value *> args;
-                for (int i = 0; i < argCount; i++) {
+                for (int j = 0; j < argCount; j++) {
                     args.insert(args.begin(), llvmStack.back());
                     llvmStack.pop_back();
                 }
@@ -988,7 +983,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
             }
 
             case Bytecode::Not: {
-                if (llvmStack.size() < 1) {
+                if (llvmStack.empty()) {
                     throw std::runtime_error("JITCompile: Stack underflow on Not");
                 }
 

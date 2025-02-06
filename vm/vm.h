@@ -83,8 +83,6 @@ public:
         llvm::InitializeNativeTargetAsmParser();
     }
 
-    void LoadExecutionStack(const std::stack<llvm::APInt>& executionStack);
-
     void LoadStringTable(const std::unordered_map<std::string, int>& stringTable);
 
     /// Выполнение байткода
@@ -94,7 +92,7 @@ public:
 
     size_t FindLoopStart(const std::vector<Command>& commands, size_t& pc);
 
-    size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc, llvm::APInt commandNumber);
+    size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc, const llvm::APInt& commandNumber);
 
     std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
