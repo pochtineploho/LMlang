@@ -537,6 +537,9 @@ size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, const ll
 std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size_t loopStart, size_t loopEnd) {
     std::vector<Command> loopCommands;
     for (size_t i = loopStart; i <= loopEnd; ++i) {
+        if (commands[i].bytecode == Bytecode::NoOp) {
+            continue;
+        }
         loopCommands.push_back(commands[i]);
     }
     return loopCommands;
@@ -697,7 +700,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *condition = llvmStack.back();
                 llvmStack.pop_back();
 
-                size_t target = command.number.getLimitedValue();
+                size_t target = jumpPointerTable[command.number.getLimitedValue()];
                 if (blocks.find(target) == blocks.end()) {
                     throw std::runtime_error("Invalid jump target");
                 }
@@ -756,7 +759,6 @@ void VM::JITCompile(const std::vector<Command> &commands) {
             }
 
             case Bytecode::NoOp: {
-
                 break;
             }
 
