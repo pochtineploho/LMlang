@@ -119,7 +119,7 @@ void VM::Execute(const std::vector<Command> &commands) {
             loopExecutionCount[loopStart]++;
 
             if (loopExecutionCount[loopStart] >= hotLoopThreshold) {
-                std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
+                // std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
 
                 std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
                 JITCompile(hotLoopCommands, loopStart);
@@ -546,9 +546,9 @@ std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size
 
 /// Трансляция в LLVM IR
 void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
-    for (Command c : commands){
-        std::cerr<<BytecodeToString(c.bytecode)<<'\n';
-    }
+//    for (Command c : commands){
+//        std::cerr<<BytecodeToString(c.bytecode)<<'\n';
+//    }
     llvm::FunctionType *funcType = llvm::FunctionType::get(
             llvm::Type::getVoidTy(*context),
             false
@@ -1142,15 +1142,17 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
     builder.CreateRetVoid();
     bool isBroken = verifyModule(*module, &llvm::errs());
-    module->print(llvm::errs(), nullptr);
+    // module->print(llvm::errs(), nullptr);
 
     std::string errStr;
     ExecutionEngine *executionEngine = EngineBuilder(std::move(module))
             .setErrorStr(&errStr)
+            .setEngineKind(EngineKind::JIT)
             .create();
 
     Function *mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
-    std::vector<llvm::GenericValue> noargs;
-    llvm::GenericValue result = executionEngine->runFunction(mainFunction, noargs);
+    llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
 
+    if (result.IntVal != 0)
+        outs() << "Result: " << result.IntVal << "\n";
 }

@@ -21,6 +21,15 @@
 #include "gc/gc.h"
 #include "../bytecodeGenerator/bytecode.h"
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/ExecutionEngine/MCJIT.h>
+#include <llvm/IR/Function.h>
+#include <llvm/Support/InitLLVM.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/SourceMgr.h>
+#include <llvm/Support/ToolOutputFile.h>
+
+
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
