@@ -120,7 +120,7 @@ void VM::Execute(const std::vector<Command> &commands) {
                 std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
 
                 std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
-                JITCompile(hotLoopCommands);
+                JITCompile(hotLoopCommands, loopStart);
                 pointer = loopEnd;
 
                 loopExecutionCount[loopStart] = 0;
@@ -537,16 +537,13 @@ size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, const ll
 std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size_t loopStart, size_t loopEnd) {
     std::vector<Command> loopCommands;
     for (size_t i = loopStart; i <= loopEnd; ++i) {
-        if (commands[i].bytecode == Bytecode::NoOp) {
-            continue;
-        }
         loopCommands.push_back(commands[i]);
     }
     return loopCommands;
 }
 
 /// Трансляция в LLVM IR
-void VM::JITCompile(const std::vector<Command> &commands) {
+void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
     for (Command c : commands){
         std::cerr<<BytecodeToString(c.bytecode)<<'\n';
     }
@@ -582,6 +579,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
     for (size_t i = 0; i < commands.size(); i++) {
         const Command &command = commands[i];
         builder.SetInsertPoint(blocks[i]);
+
 
         bool hasTerminator = false;
 
@@ -641,9 +639,9 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 builder.SetInsertPoint(errorBlock);
                 builder.CreateCall(module.getOrInsertFunction(
                     "puts",
-                    llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt8Ty(context)}, true)
+                    llvm::FunctionType::get(llvm::Type::getInt64Ty(context), {llvm::Type::getInt8Ty(context)}, true)
                 ), builder.CreateGlobalString("Division by zero error!"));
-                builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 0));
+                builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
 
                 builder.SetInsertPoint(divideBlock);
                 llvm::Value *result = builder.CreateSDiv(lhs, rhs, "divtmp");
@@ -700,7 +698,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *condition = llvmStack.back();
                 llvmStack.pop_back();
 
-                size_t target = jumpPointerTable[command.number.getLimitedValue()];
+                size_t target = jumpPointerTable[command.number.getLimitedValue()] - loopStart;
                 if (blocks.find(target) == blocks.end()) {
                     throw std::runtime_error("Invalid jump target");
                 }
@@ -711,12 +709,11 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 if (i + 1 < commands.size()) {
                     nextBlock = blocks[i + 1];
                 } else {
-                    nextBlock = llvm::BasicBlock::Create(context, "nextBlock", function);
-                    blocks[i + 1] = nextBlock;
+                    throw std::runtime_error("invalid block movement");
                 }
 
                 condition = builder.CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0), "condfalse");
-                builder.CreateCondBr(condition, falseBlock, nextBlock);
+                builder.CreateCondBr(condition, nextBlock, falseBlock);
                 hasTerminator = true;
                 break;
             }
@@ -781,7 +778,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     module.getOrInsertFunction(
                         "printf",
                         llvm::FunctionType::get(
-                            llvm::Type::getInt32Ty(context),
+                            llvm::Type::getInt64Ty(context),
                             llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)),
                             true
                         )
@@ -790,8 +787,8 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
 
-                if (value->getType() != llvm::Type::getInt32Ty(context)) {
-                    value = builder.CreateIntCast(value, llvm::Type::getInt32Ty(context), true);
+                if (value->getType() != llvm::Type::getInt64Ty(context)) {
+                    value = builder.CreateIntCast(value, llvm::Type::getInt64Ty(context), true);
                 }
 
                 builder.CreateCall(printfFunc, {formatStr, value});
@@ -853,7 +850,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 auto *putsFunc = llvm::cast<llvm::Function>(
                     module.getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array size must be greater than zero\n");
@@ -864,7 +861,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 builder.SetInsertPoint(continueBlock);
 
                 llvm::Value *array = builder.CreateAlloca(
-                    llvm::Type::getInt32Ty(context), arraySize, "array");
+                    llvm::Type::getInt64Ty(context), arraySize, "array");
 
                 llvmStack.push_back(array);
                 break;
@@ -892,7 +889,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 auto *putsFunc = llvm::cast<llvm::Function>(
                     module.getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
@@ -903,7 +900,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 builder.SetInsertPoint(continueBlock);
 
                 llvm::Value *elementPtr = builder.CreateGEP(
-                    llvm::Type::getInt32Ty(context), array, index, "elementPtr");
+                    llvm::Type::getInt64Ty(context), array, index, "elementPtr");
 
                 llvm::Value *value = builder.CreateLoad(elementPtr->getType(), elementPtr);
 
@@ -936,7 +933,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 auto *putsFunc = llvm::cast<llvm::Function>(
                     module.getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt32Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
@@ -947,7 +944,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 builder.SetInsertPoint(continueBlock);
 
                 llvm::Value *elementPtr = builder.CreateGEP(
-                    llvm::Type::getInt32Ty(context), array, index, "elementPtr");
+                    llvm::Type::getInt64Ty(context), array, index, "elementPtr");
 
                 builder.CreateStore(value, elementPtr);
                 break;
@@ -1003,7 +1000,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
             case Bytecode::Push: {
                 CheckType(command, Command::OnlyNum);
-                llvmStack.push_back(llvm::ConstantInt::get(builder.getInt32Ty(), command.number));
+                llvmStack.push_back(llvm::ConstantInt::get(builder.getInt64Ty(), command.number));
                 break;
             }
 
@@ -1111,11 +1108,11 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 auto &currentScope = variablesStack.back();
                 for (auto &var : currentScope) {
                     std::string varName = var.first;
-                    llvm::Value *varValue = llvm::ConstantInt::get(builder.getInt32Ty(), var.second);
+                    llvm::Value *varValue = llvm::ConstantInt::get(builder.getInt64Ty(), var.second);
                     for (long long j = variablesStack.size() - 2; j >= 0; --j) {
                         auto &parentScope = variablesStack[j];
                         if (parentScope.find(varName) != parentScope.end()) {
-                            llvm::AllocaInst *parentVar = builder.CreateAlloca(builder.getInt32Ty(), nullptr, varName);
+                            llvm::AllocaInst *parentVar = builder.CreateAlloca(builder.getInt64Ty(), nullptr, varName);
                             llvm::Value *value = llvm::ConstantInt::get(context, parentScope[varName]);
                             builder.CreateStore(varValue, parentVar);
                             break;

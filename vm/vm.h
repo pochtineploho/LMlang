@@ -97,7 +97,7 @@ public:
     std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<Command>& commands);
+    void JITCompile(const std::vector<Command>& commands, size_t loopStart);
 /*
     // Arithmetic operations
     Add = 0,        // 0: Stack: [..., a, b] -> [..., a + b]
