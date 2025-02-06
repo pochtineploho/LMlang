@@ -8,7 +8,9 @@
 #endif //MYANTLRPROJECT_VM_H
 
 #include "vm.h"
-#include <llvm/IR/Instruction.h>
+
+using namespace llvm;
+using namespace llvm::orc;
 
 void VM::CheckType(const Command &command, Command::CommandType type) {
     if (command.type != type) {
@@ -548,17 +550,17 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
         std::cerr<<BytecodeToString(c.bytecode)<<'\n';
     }
     llvm::FunctionType *funcType = llvm::FunctionType::get(
-            llvm::Type::getVoidTy(context),
+            llvm::Type::getVoidTy(*context),
             false
     );
     llvm::Function *function = llvm::Function::Create(
             funcType,
             llvm::Function::ExternalLinkage,
             "jit_compiled_function",
-            &module
+            module.get()
     );
 
-    llvm::BasicBlock *entryBlock = llvm::BasicBlock::Create(context, "entry", function);
+    llvm::BasicBlock *entryBlock = llvm::BasicBlock::Create(*context, "entry", function);
     builder.SetInsertPoint(entryBlock);
 
     std::vector<llvm::Value *> llvmStack;
@@ -566,7 +568,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
     std::unordered_map<size_t, llvm::BasicBlock *> blocks;
     for (size_t i = 0; i < commands.size(); i++) {
-        blocks[i] = llvm::BasicBlock::Create(context, "block_" + std::to_string(i), function);
+        blocks[i] = llvm::BasicBlock::Create(*context, "block_" + std::to_string(i), function);
     }
 
     if (!commands.empty()) {
@@ -630,18 +632,18 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 llvmStack.pop_back();
 
                 llvm::Value *isZero = builder.CreateICmpEQ(rhs, llvm::ConstantInt::get(rhs->getType(), 0), "isZero");
-                llvm::BasicBlock *divideBlock = llvm::BasicBlock::Create(context, "divide", function);
-                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "error", function);
-                llvm::BasicBlock *mergeBlock = llvm::BasicBlock::Create(context, "merge", function);
+                llvm::BasicBlock *divideBlock = llvm::BasicBlock::Create(*context, "divide", function);
+                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(*context, "error", function);
+                llvm::BasicBlock *mergeBlock = llvm::BasicBlock::Create(*context, "merge", function);
 
                 builder.CreateCondBr(isZero, errorBlock, divideBlock);
 
                 builder.SetInsertPoint(errorBlock);
-                builder.CreateCall(module.getOrInsertFunction(
+                builder.CreateCall(module->getOrInsertFunction(
                     "puts",
-                    llvm::FunctionType::get(llvm::Type::getInt64Ty(context), {llvm::Type::getInt8Ty(context)}, true)
+                    llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), {llvm::Type::getInt8Ty(*context)}, true)
                 ), builder.CreateGlobalString("Division by zero error!"));
-                builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(context), 0));
+                builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0));
 
                 builder.SetInsertPoint(divideBlock);
                 llvm::Value *result = builder.CreateSDiv(lhs, rhs, "divtmp");
@@ -682,7 +684,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 if (i + 1 < commands.size()) {
                     nextBlock = blocks[i + 1];
                 } else {
-                    nextBlock = llvm::BasicBlock::Create(context, "nextBlock", function);
+                    nextBlock = llvm::BasicBlock::Create(*context, "nextBlock", function);
                     blocks[i + 1] = nextBlock;
                 }
 
@@ -775,11 +777,11 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 llvmStack.pop_back();
 
                 auto *printfFunc = llvm::cast<llvm::Function>(
-                    module.getOrInsertFunction(
+                    module->getOrInsertFunction(
                         "printf",
                         llvm::FunctionType::get(
-                            llvm::Type::getInt64Ty(context),
-                            llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)),
+                            llvm::Type::getInt64Ty(*context),
+                            llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)),
                             true
                         )
                     ).getCallee()
@@ -787,8 +789,8 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
 
-                if (value->getType() != llvm::Type::getInt64Ty(context)) {
-                    value = builder.CreateIntCast(value, llvm::Type::getInt64Ty(context), true);
+                if (value->getType() != llvm::Type::getInt64Ty(*context)) {
+                    value = builder.CreateIntCast(value, llvm::Type::getInt64Ty(*context), true);
                 }
 
                 builder.CreateCall(printfFunc, {formatStr, value});
@@ -797,7 +799,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
             case Bytecode::Call: {
                 std::string funcName = GetNameByIndex(command);
-                llvm::Function *calleeFunc = module.getFunction(funcName);
+                llvm::Function *calleeFunc = module->getFunction(funcName);
                 if (!calleeFunc) {
                     throw std::runtime_error("Function not found: " + funcName);
                 }
@@ -841,16 +843,16 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 llvm::Value *isSizeZero = builder.CreateICmpEQ(
                     arraySize, llvm::ConstantInt::get(arraySize->getType(), 0), "isSizeZero");
-                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "error", function);
-                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "continue", function);
+                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(*context, "error", function);
+                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(*context, "continue", function);
 
                 builder.CreateCondBr(isSizeZero, errorBlock, continueBlock);
 
                 builder.SetInsertPoint(errorBlock);
                 auto *putsFunc = llvm::cast<llvm::Function>(
-                    module.getOrInsertFunction(
+                    module->getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt64Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array size must be greater than zero\n");
@@ -861,7 +863,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 builder.SetInsertPoint(continueBlock);
 
                 llvm::Value *array = builder.CreateAlloca(
-                    llvm::Type::getInt64Ty(context), arraySize, "array");
+                    llvm::Type::getInt64Ty(*context), arraySize, "array");
 
                 llvmStack.push_back(array);
                 break;
@@ -880,16 +882,16 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 llvm::Value *isIndexNegative = builder.CreateICmpSLT(
                     index, llvm::ConstantInt::get(index->getType(), 0), "isIndexNegative");
-                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "index_error", function);
-                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "index_continue", function);
+                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(*context, "index_error", function);
+                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(*context, "index_continue", function);
 
                 builder.CreateCondBr(isIndexNegative, errorBlock, continueBlock);
 
                 builder.SetInsertPoint(errorBlock);
                 auto *putsFunc = llvm::cast<llvm::Function>(
-                    module.getOrInsertFunction(
+                    module->getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt64Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
@@ -900,7 +902,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 builder.SetInsertPoint(continueBlock);
 
                 llvm::Value *elementPtr = builder.CreateGEP(
-                    llvm::Type::getInt64Ty(context), array, index, "elementPtr");
+                    llvm::Type::getInt64Ty(*context), array, index, "elementPtr");
 
                 llvm::Value *value = builder.CreateLoad(elementPtr->getType(), elementPtr);
 
@@ -924,16 +926,16 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 llvm::Value *isIndexNegative = builder.CreateICmpSLT(
                     index, llvm::ConstantInt::get(index->getType(), 0), "isIndexNegative");
-                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(context, "index_error", function);
-                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(context, "index_continue", function);
+                llvm::BasicBlock *errorBlock = llvm::BasicBlock::Create(*context, "index_error", function);
+                llvm::BasicBlock *continueBlock = llvm::BasicBlock::Create(*context, "index_continue", function);
 
                 builder.CreateCondBr(isIndexNegative, errorBlock, continueBlock);
 
                 builder.SetInsertPoint(errorBlock);
                 auto *putsFunc = llvm::cast<llvm::Function>(
-                    module.getOrInsertFunction(
+                    module->getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt64Ty(context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
@@ -944,7 +946,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 builder.SetInsertPoint(continueBlock);
 
                 llvm::Value *elementPtr = builder.CreateGEP(
-                    llvm::Type::getInt64Ty(context), array, index, "elementPtr");
+                    llvm::Type::getInt64Ty(*context), array, index, "elementPtr");
 
                 builder.CreateStore(value, elementPtr);
                 break;
@@ -1113,7 +1115,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                         auto &parentScope = variablesStack[j];
                         if (parentScope.find(varName) != parentScope.end()) {
                             llvm::AllocaInst *parentVar = builder.CreateAlloca(builder.getInt64Ty(), nullptr, varName);
-                            llvm::Value *value = llvm::ConstantInt::get(context, parentScope[varName]);
+                            llvm::Value *value = llvm::ConstantInt::get(*context, parentScope[varName]);
                             builder.CreateStore(varValue, parentVar);
                             break;
                         }
@@ -1139,6 +1141,22 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
     }
 
     builder.CreateRetVoid();
-    bool isBroken = verifyModule(module, &llvm::errs());
-    module.print(llvm::errs(), nullptr);
+    bool isBroken = verifyModule(*module, &llvm::errs());
+    module->print(llvm::errs(), nullptr);
+
+    auto JIT = cantFail(LLJITBuilder().create()); // Создаем JIT-компилятор
+    auto &JD = JIT->getMainJITDylib();
+    llvm::orc::ThreadSafeModule TSM(std::move(module), std::move(context));
+    llvm::orc::SymbolMap Symbols;
+    cantFail(JD.define(llvm::orc::absoluteSymbols(Symbols)));
+    cantFail(JIT->addIRModule(std::move(TSM)));
+    auto Sym = JIT->lookup("jit_compiled_function");
+    if (!Sym) {
+        llvm::errs() << "Function not found\n";
+    }
+    using FunctionPtrType = void (*)();
+    auto FunctionPtr = reinterpret_cast<FunctionPtrType>(Sym.get().getValue());
+    FunctionPtr();
+
+
 }
