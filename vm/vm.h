@@ -22,6 +22,8 @@
 #include <llvm/Support/TargetSelect.h>
 
 
+
+
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
 public:
@@ -41,7 +43,7 @@ class VM {
 
 private:
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
-    const int hotLoopThreshold = 10;          // Threshold for marking a loop as hot
+    const int hotLoopThreshold = 5;          // Threshold for marking a loop as hot
     llvm::IRBuilder<> builder;
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack'
 

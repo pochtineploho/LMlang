@@ -8,6 +8,7 @@
 #endif //MYANTLRPROJECT_VM_H
 
 #include "vm.h"
+#include <llvm/IR/Instruction.h>
 
 void VM::CheckType(const Command &command, Command::CommandType type) {
     if (command.type != type) {
@@ -572,18 +573,27 @@ void VM::JITCompile(const std::vector<Command> &commands) {
         blocks[i] = llvm::BasicBlock::Create(context, "block_" + std::to_string(i), function);
     }
 
+    if (!commands.empty()) {
+        builder.CreateBr(blocks[0]);
+    } else {
+        builder.CreateRetVoid();
+        return;
+    }
+
     for (size_t i = 0; i < commands.size(); i++) {
         const Command &command = commands[i];
         builder.SetInsertPoint(blocks[i]);
+
+        bool hasTerminator = false;
 
         switch (command.bytecode) {
             case Bytecode::Add: {
                 if (llvmStack.size() < 2) {
                     throw std::runtime_error("JITCompile: Stack underflow on Add");
                 }
-                llvm::Value *rhs = llvmStack.back();
+                auto rhs = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value *lhs = llvmStack.back();
+                auto lhs = llvmStack.back();
                 llvmStack.pop_back();
                 llvm::Value *result = builder.CreateAdd(lhs, rhs, "addtmp");
                 llvmStack.push_back(result);
@@ -642,6 +652,8 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 builder.SetInsertPoint(mergeBlock);
                 llvmStack.push_back(result);
+
+                hasTerminator = true;
                 break;
             }
 
@@ -651,6 +663,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     throw std::runtime_error("Invalid jump target");
                 }
                 builder.CreateBr(blocks[target]);
+                hasTerminator = true;
                 break;
             }
 
@@ -677,6 +690,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 }
 
                 builder.CreateCondBr(condition, trueBlock, nextBlock);
+                hasTerminator = true;
                 break;
             }
 
@@ -704,6 +718,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
                 condition = builder.CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0), "condfalse");
                 builder.CreateCondBr(condition, falseBlock, nextBlock);
+                hasTerminator = true;
                 break;
             }
 
@@ -746,11 +761,13 @@ void VM::JITCompile(const std::vector<Command> &commands) {
             }
 
             case Bytecode::NoOp: {
+
                 break;
             }
 
             case Bytecode::Halt: {
                 builder.CreateRetVoid();
+                hasTerminator = true;
                 return;
             }
 
@@ -763,7 +780,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *value = llvmStack.back();
                 llvmStack.pop_back();
 
-                llvm::Function *printfFunc = llvm::cast<llvm::Function>(
+                auto *printfFunc = llvm::cast<llvm::Function>(
                     module.getOrInsertFunction(
                         "printf",
                         llvm::FunctionType::get(
@@ -816,6 +833,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvmStack.pop_back();
 
                 builder.CreateRet(returnValue);
+                hasTerminator = true;
                 break;
             }
 
@@ -844,6 +862,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array size must be greater than zero\n");
                 builder.CreateCall(putsFunc, errorMessage);
                 builder.CreateRetVoid();
+                hasTerminator = true;
 
                 builder.SetInsertPoint(continueBlock);
 
@@ -882,6 +901,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
                 builder.CreateCall(putsFunc, errorMessage);
                 builder.CreateRetVoid();
+                hasTerminator = true;
 
                 builder.SetInsertPoint(continueBlock);
 
@@ -925,6 +945,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
                 builder.CreateCall(putsFunc, errorMessage);
                 builder.CreateRetVoid();
+                hasTerminator = true;
 
                 builder.SetInsertPoint(continueBlock);
 
@@ -985,7 +1006,7 @@ void VM::JITCompile(const std::vector<Command> &commands) {
 
             case Bytecode::Push: {
                 CheckType(command, Command::OnlyNum);
-                llvmStack.push_back(llvm::ConstantInt::get(builder.getInt64Ty(), command.number));
+                llvmStack.push_back(llvm::ConstantInt::get(builder.getInt32Ty(), command.number));
                 break;
             }
 
@@ -1065,12 +1086,6 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                 auto lhs = llvmStack.back();
                 llvmStack.pop_back();
 
-                auto rtype = rhs->getType();
-                auto rname = rhs->getName();
-
-                auto ltype = lhs->getType();
-                auto lname = lhs->getName();
-
                 auto result = builder.CreateICmpSLT(lhs, rhs, "cmp");
                 llvmStack.push_back(result);
                 break;
@@ -1111,12 +1126,21 @@ void VM::JITCompile(const std::vector<Command> &commands) {
                     }
                 }
                 variablesStack.pop_back();
+                hasTerminator = true;
 
                 break;
             }
 
             default:
                 throw std::runtime_error("JITCompile: Unsupported bytecode");
+        }
+
+        if (!hasTerminator) {
+            if (i + 1 < commands.size()) {
+                builder.CreateBr(blocks[i + 1]);
+            } else {
+                builder.CreateRetVoid();
+            }
         }
     }
 
