@@ -1144,19 +1144,13 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
     bool isBroken = verifyModule(*module, &llvm::errs());
     module->print(llvm::errs(), nullptr);
 
-    auto JIT = cantFail(LLJITBuilder().create()); // Создаем JIT-компилятор
-    auto &JD = JIT->getMainJITDylib();
-    llvm::orc::ThreadSafeModule TSM(std::move(module), std::move(context));
-    llvm::orc::SymbolMap Symbols;
-    cantFail(JD.define(llvm::orc::absoluteSymbols(Symbols)));
-    cantFail(JIT->addIRModule(std::move(TSM)));
-    auto Sym = JIT->lookup("jit_compiled_function");
-    if (!Sym) {
-        llvm::errs() << "Function not found\n";
-    }
-    using FunctionPtrType = void (*)();
-    auto FunctionPtr = reinterpret_cast<FunctionPtrType>(Sym.get().getValue());
-    FunctionPtr();
+    std::string errStr;
+    ExecutionEngine *executionEngine = EngineBuilder(std::move(module))
+            .setErrorStr(&errStr)
+            .create();
 
+    Function *mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
+    std::vector<llvm::GenericValue> noargs;
+    llvm::GenericValue result = executionEngine->runFunction(mainFunction, noargs);
 
 }

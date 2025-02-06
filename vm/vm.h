@@ -20,6 +20,7 @@
 #include <llvm/Support/raw_ostream.h>
 #include "gc/gc.h"
 #include "../bytecodeGenerator/bytecode.h"
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
