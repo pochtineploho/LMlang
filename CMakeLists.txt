@@ -34,7 +34,12 @@ llvm_map_components_to_libnames(
         x86codegen
         x86desc
         x86info
-        x86asmparser)
+        x86asmparser
+        executionengine
+        orcjit
+        native
+        nativecodegen)
+
 
 set(SOURCES
         vm/vm.cpp

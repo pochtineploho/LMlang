@@ -40,13 +40,12 @@ class VM {
 private:
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
     const int hotLoopThreshold = 5;          // Threshold for marking a loop as hot
-    llvm::IRBuilder<> builder;
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack
 
     GC gc;
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;
-
+    llvm::IRBuilder<> builder;
     std::unordered_map<int, std::string> namesTable;
     std::stack<llvm::APInt> valueStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
