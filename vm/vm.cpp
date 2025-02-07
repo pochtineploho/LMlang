@@ -534,7 +534,24 @@ size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, const ll
     return commands.size();
 }
 
+static void initLibFunctions(llvm::ExecutionEngine* engine) {
+    engine->addGlobalMapping("strcmp", reinterpret_cast<uint64_t>(&strcmp));
+    engine->addGlobalMapping("display", reinterpret_cast<uint64_t>(&printf));
+    engine->addGlobalMapping("sdisplay", reinterpret_cast<uint64_t>(&printf));
+}
 
+static void optimizeModule(llvm::Module& module) {
+    llvm::legacy::PassManager passManager;
+
+    passManager.add(llvm::createPromoteMemoryToRegisterPass()); // SSA form
+    passManager.add(llvm::createInstructionCombiningPass()); // Combine instructions
+    passManager.add(llvm::createReassociatePass()); // Reassociate expressions
+    passManager.add(llvm::createGVNPass()); // Eliminate redundant loads/stores
+    passManager.add(llvm::createCFGSimplificationPass()); // Simplify the control flow graph
+    passManager.add(llvm::createDeadCodeEliminationPass()); // Remove dead code
+
+    passManager.run(module);
+}
 
 std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size_t loopStart, size_t loopEnd) {
     std::vector<Command> loopCommands;
@@ -546,9 +563,9 @@ std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size
 
 /// Трансляция в LLVM IR
 void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
-//    for (Command c : commands){
-//        std::cerr<<BytecodeToString(c.bytecode)<<'\n';
-//    }
+    for (const Command& c : commands){
+        std::cerr<<BytecodeToString(c.bytecode)<<'\n';
+    }
     llvm::FunctionType *funcType = llvm::FunctionType::get(
             llvm::Type::getVoidTy(*context),
             false
@@ -775,27 +792,31 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 llvm::Value *value = llvmStack.back();
                 llvmStack.pop_back();
-
-                auto *printfFunc = llvm::cast<llvm::Function>(
-                    module->getOrInsertFunction(
+                llvm::FunctionCallee printfCallee = module->getOrInsertFunction(
                         "printf",
                         llvm::FunctionType::get(
-                            llvm::Type::getInt64Ty(*context),
-                            llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)),
-                            true
+                                llvm::Type::getInt32Ty(*context),
+                                {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))},
+                                true
                         )
-                    ).getCallee()
                 );
 
-                llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
+                auto *printfFunc = llvm::cast<llvm::Function>(printfCallee.getCallee());
 
-                if (value->getType() != llvm::Type::getInt64Ty(*context)) {
-                    value = builder.CreateIntCast(value, llvm::Type::getInt64Ty(*context), true);
+                if (!printfFunc) {
+                    llvm::errs() << "Error: printf function not found!\n";
+                    break;
                 }
 
+                static llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
+                if (value->getType() != llvm::Type::getInt32Ty(*context)) {
+                    value = builder.CreateIntCast(value, llvm::Type::getInt32Ty(*context), true);
+                }
                 builder.CreateCall(printfFunc, {formatStr, value});
+
                 break;
             }
+
 
             case Bytecode::Call: {
                 std::string funcName = GetNameByIndex(command);
@@ -1142,17 +1163,18 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
     builder.CreateRetVoid();
     bool isBroken = verifyModule(*module, &llvm::errs());
-    // module->print(llvm::errs(), nullptr);
+    module->print(llvm::errs(), nullptr);
 
     std::string errStr;
+    optimizeModule(*module);
     ExecutionEngine *executionEngine = EngineBuilder(std::move(module))
             .setErrorStr(&errStr)
-            .setEngineKind(EngineKind::JIT)
+            .setEngineKind(llvm::EngineKind::JIT)
+            .setMCJITMemoryManager(std::make_unique<llvm::SectionMemoryManager>())
             .create();
 
     Function *mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
-    llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
+    initLibFunctions(executionEngine);
 
-    if (result.IntVal != 0)
-        outs() << "Result: " << result.IntVal << "\n";
+    llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
 }
