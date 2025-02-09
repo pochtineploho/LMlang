@@ -792,6 +792,8 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 llvm::Value *value = llvmStack.back();
                 llvmStack.pop_back();
+
+                // Получаем функцию printf
                 llvm::FunctionCallee printfCallee = module->getOrInsertFunction(
                         "printf",
                         llvm::FunctionType::get(
@@ -802,17 +804,40 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 );
 
                 auto *printfFunc = llvm::cast<llvm::Function>(printfCallee.getCallee());
-
                 if (!printfFunc) {
                     llvm::errs() << "Error: printf function not found!\n";
                     break;
                 }
 
+                // Создаем строку формата
                 static llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
+
+                // Приводим value к типу i32, если необходимо
                 if (value->getType() != llvm::Type::getInt32Ty(*context)) {
                     value = builder.CreateIntCast(value, llvm::Type::getInt32Ty(*context), true);
                 }
+
+                // Вызываем printf
                 builder.CreateCall(printfFunc, {formatStr, value});
+
+                // Сбрасываем буфер вывода
+                llvm::FunctionCallee fflushCallee = module->getOrInsertFunction(
+                        "fflush",
+                        llvm::FunctionType::get(
+                                llvm::Type::getInt32Ty(*context),
+                                {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))},
+                                false
+                        )
+                );
+
+                auto *fflushFunc = llvm::cast<llvm::Function>(fflushCallee.getCallee());
+                if (!fflushFunc) {
+                    llvm::errs() << "Error: fflush function not found!\n";
+                    break;
+                }
+
+                llvm::Value *stdoutValue = builder.CreateGlobalStringPtr("stdout");
+                builder.CreateCall(fflushFunc, {stdoutValue});
 
                 break;
             }
@@ -1174,6 +1199,10 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
             .create();
 
     Function *mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
+
+    bool isFuncBroken = verifyFunction(*mainFunction);
+    executionEngine->addGlobalMapping("printf", reinterpret_cast<uint64_t>(printf));
+
     initLibFunctions(executionEngine);
 
     llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
