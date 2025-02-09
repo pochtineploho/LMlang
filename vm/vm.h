@@ -1,30 +1,48 @@
-//
-// Created by admin on 18.01.2025.
-//
 #pragma once
-#ifndef MYANTLRPROJECT_VM_H
-#define MYANTLRPROJECT_VM_H
-
-#endif //MYANTLRPROJECT_VM_H
 
 #include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <stack>
-
-#include "gc/gc.h"
-#include "../bytecodeGenerator/bytecode.h"
 #include <memory>
+#include <optional>
+#include <cstdio>
 #include <llvm/ADT/SmallString.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
-
+#include <llvm/ExecutionEngine/Orc/LLJIT.h>
+#include <llvm/ExecutionEngine/Orc/LLJIT.h>
+#include <llvm/ExecutionEngine/Orc/ThreadSafeModule.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Module.h>
+#include <llvm/Support/Error.h>
+#include <llvm/Support/raw_ostream.h>
+#include "gc/gc.h"
+#include "../bytecodeGenerator/bytecode.h"
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/ExecutionEngine/MCJIT.h>
+#include <llvm/IR/Function.h>
+#include <llvm/Support/InitLLVM.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/SourceMgr.h>
+#include <llvm/Support/ToolOutputFile.h>
+#include <llvm/ExecutionEngine/SectionMemoryManager.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Transforms/InstCombine/InstCombine.h>
+#include <llvm/Transforms/Scalar.h>
+#include <llvm/Transforms/Scalar/GVN.h>
+#include <llvm/Transforms/Utils.h>
+#include <string>  // для работы с типами string
+#include <sstream> // для преобразования типов в строку, например, std::to_string, std::stoi, std::stof
+#include <cstdlib>
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
 public:
-    GC() {GC_INIT(); }
+    GC() { GC_INIT(); }
 
     void* Allocate(size_t size) {
         return GC_MALLOC(size);
@@ -37,17 +55,15 @@ public:
 
 /// Виртуальная машина для исполнения байткода.
 class VM {
-
 private:
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
-    const int hotLoopThreshold = 10;          // Threshold for marking a loop as hot
-    llvm::IRBuilder<> builder;
-    std::stack<llvm::APInt*> stackIR; // IR representation of the stack'
+    const int hotLoopThreshold = 5000;          // Threshold for marking a loop as hot
+    std::stack<llvm::APInt*> stackIR; // IR representation of the stack
 
     GC gc;
-    llvm::LLVMContext context;
-    llvm::Module module;
-
+    std::unique_ptr<llvm::LLVMContext> context;
+    std::unique_ptr<llvm::Module> module;
+    llvm::IRBuilder<> builder;
     std::unordered_map<int, std::string> namesTable;
     std::stack<llvm::APInt> valueStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
@@ -74,13 +90,12 @@ private:
     void CheckPointer(const Command& command, llvm::APInt* ptr);
 
 public:
-    VM() : gc(), context(), module("jit_module", context), builder(context) {
+    VM() : gc(), context(std::make_unique<llvm::LLVMContext>()), module(std::make_unique<llvm::Module>("jit_module", *context)), builder(*context) {
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
         llvm::InitializeNativeTargetAsmParser();
+        llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
     }
-
-    void LoadExecutionStack(const std::stack<llvm::APInt>& executionStack);
 
     void LoadStringTable(const std::unordered_map<std::string, int>& stringTable);
 
@@ -89,54 +104,12 @@ public:
 
     int HandleCommand(const Command& command);
 
-    size_t FindLoopStart(const std::vector<Command>& commands, size_t pc);
+    size_t FindLoopStart(const std::vector<Command>& commands, size_t& pc);
 
-    size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc, llvm::APInt commandNumber);
+    size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc, const llvm::APInt& commandNumber);
 
     std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<Command>& commands);
-/*
-    // Arithmetic operations
-    Add = 0,        // 0: Stack: [..., a, b] -> [..., a + b]
-    Subtract = 1,   // 1: Stack: [..., a, b] -> [..., a - b]
-    Multiply = 2,   // 2: Stack: [..., a, b] -> [..., a * b]
-    Divide = 3,     // 3: Stack: [..., a, b] -> [..., a / b]
-
-    // Comparison operations
-    Equal = 4,      // 4: Stack: [..., a, b] -> [..., a == b]
-    NotEqual = 5,   // 5: Stack: [..., a, b] -> [..., a != b]
-    LessThan = 6,   // 6: Stack: [..., a, b] -> [..., a < b]
-    GreaterThan = 7, // 7: Stack: [..., a, b] -> [..., a > b]
-    LessOrEqual = 8, // 8: Stack: [..., a, b] -> [..., a <= b]
-    GreaterOrEqual = 9, // 9: Stack: [..., a, b] -> [..., a >= b]
-
-    // Logical operations
-    And = 10,       // 10: Stack: [..., a, b] -> [..., a && b]
-    Or = 11,        // 11: Stack: [..., a, b] -> [..., a || b]
-    Not = 12,       // 12: Stack: [..., a] -> [..., !a]
-
-    // Stack manipulation
-    Push = 13,      // 13: Push a constant onto the stack
-
-    // Variables
-    LoadVar = 15,   // 15: Load a variable onto the stack by ID
-    StoreVar = 16,  // 16: Store the top of the stack into a variable by ID
-
-    // Control flow
-    Jump = 17,      // 17: Unconditional jump to an instruction
-    JumpIfTrue = 18, // 18: Jump if the top of the stack is true
-    JumpIfFalse = 19, // 19: Jump if the top of the stack is false
-
-    // Functionality
-    Print = 20,     // 20: Print the top of the stack to the console
-
-    // Array operations
-    LoadArray = 24,   // 24: Load an element from an array by ID and index
-    StoreArray = 25,  // 25: Store a value in an array by ID and index
-
-    NoOp = 27,        // 27: No operation
-    Halt = 28         // 28: Halt the program
-            */
+    void JITCompile(const std::vector<Command>& commands, size_t loopStart);
 };

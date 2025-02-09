@@ -6,12 +6,6 @@
     "withValue" : false,
     "withStringID" : true
   }, {
-    "opCode" : "NoOp",
-    "value" : 0,
-    "stringID" : 0,
-    "withValue" : false,
-    "withStringID" : false
-  }, {
     "opCode" : "StoreVar",
     "value" : 0,
     "stringID" : 1,
