@@ -534,10 +534,12 @@ size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, const ll
     return commands.size();
 }
 
+
 static void initLibFunctions(llvm::ExecutionEngine* engine) {
     engine->addGlobalMapping("strcmp", reinterpret_cast<uint64_t>(&strcmp));
     engine->addGlobalMapping("display", reinterpret_cast<uint64_t>(&printf));
     engine->addGlobalMapping("sdisplay", reinterpret_cast<uint64_t>(&printf));
+    engine->addGlobalMapping("printf", reinterpret_cast<uint64_t>(&printf));
 }
 
 static void optimizeModule(llvm::Module& module) {
@@ -808,7 +810,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                     break;
                 }
 
-                static llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
+                static llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d");
                 if (value->getType() != llvm::Type::getInt32Ty(*context)) {
                     value = builder.CreateIntCast(value, llvm::Type::getInt32Ty(*context), true);
                 }
@@ -1160,21 +1162,29 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
             }
         }
     }
-
     builder.CreateRetVoid();
+
     bool isBroken = verifyModule(*module, &llvm::errs());
+    if (isBroken) {
+        std::cerr<<"BROOOOOOOKEN"<<'\n';
+    }
+
     module->print(llvm::errs(), nullptr);
 
     std::string errStr;
     optimizeModule(*module);
+
     ExecutionEngine *executionEngine = EngineBuilder(std::move(module))
             .setErrorStr(&errStr)
             .setEngineKind(llvm::EngineKind::JIT)
             .setMCJITMemoryManager(std::make_unique<llvm::SectionMemoryManager>())
+            .setVerifyModules(true) // Ensure MCJIT is enabled
             .create();
 
     Function *mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
+
     initLibFunctions(executionEngine);
 
     llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
+    fflush(stdout);
 }

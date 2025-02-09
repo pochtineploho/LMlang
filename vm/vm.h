@@ -6,6 +6,7 @@
 #include <stack>
 #include <memory>
 #include <optional>
+#include <cstdio>
 #include <llvm/ADT/SmallString.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
@@ -54,7 +55,7 @@ public:
 class VM {
 private:
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
-    const int hotLoopThreshold = 5;          // Threshold for marking a loop as hot
+    const int hotLoopThreshold = 5000;          // Threshold for marking a loop as hot
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack
 
     GC gc;
@@ -91,6 +92,7 @@ public:
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
         llvm::InitializeNativeTargetAsmParser();
+        llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
     }
 
     void LoadStringTable(const std::unordered_map<std::string, int>& stringTable);
