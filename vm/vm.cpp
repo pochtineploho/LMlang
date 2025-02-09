@@ -110,8 +110,8 @@ void VM::Execute(const std::vector<Command> &commands) {
         const auto& command = commands[pointer];
 
         if (command.bytecode == Bytecode::NoOp && loopStartToNoOp.contains(pointer)) {
-            size_t loopStart = FindLoopStart(commands, pointer);
-            size_t loopEnd = FindLoopEnd(commands, pointer, commands[loopStart].number);
+            size_t loopStart = FindLoopStart(commands);
+            size_t loopEnd = FindLoopEnd(commands, commands[loopStart].number);
 
             if (!loopExecutionCount.contains(loopStart)) {
                 loopExecutionCount[loopStart] = 0;
@@ -512,21 +512,21 @@ int VM::HandleCommand(const Command &command) {
     return 0;
 }
 
-size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t pc) {
-    while (commands[pc].bytecode != Bytecode::ForBegin || pc != 0) {
-        --pc;
+size_t VM::FindLoopStart(const std::vector<Command>& commands) {
+    while (commands[pointer].bytecode != Bytecode::ForBegin || pointer != 0) {
+        --pointer;
     }
 
-    if (pc != 0) {
-        return pc;
+    if (pointer != 0) {
+        return pointer;
     }
 
     return commands.size();
 }
 
 
-size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, llvm::APInt commandNumber) {
-    for (size_t i = pc; i < commands.size(); ++i) {
+size_t VM::FindLoopEnd(const std::vector<Command>& commands, llvm::APInt commandNumber) {
+    for (size_t i = pointer; i < commands.size(); ++i) {
         const auto& command = commands[i];
         if (command.bytecode == Bytecode::ForEnd && command.number == commandNumber) {
             return i;

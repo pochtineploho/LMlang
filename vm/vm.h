@@ -89,9 +89,9 @@ public:
 
     int HandleCommand(const Command& command);
 
-    size_t FindLoopStart(const std::vector<Command>& commands, size_t pc);
+    size_t FindLoopStart(const std::vector<Command>& commands);
 
-    size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc, llvm::APInt commandNumber);
+    size_t FindLoopEnd(const std::vector<Command>& commands, llvm::APInt commandNumber);
 
     std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
