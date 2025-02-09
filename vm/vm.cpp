@@ -511,7 +511,7 @@ int VM::HandleCommand(const Command &command) {
     return 0;
 }
 
-size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t& pc) {
+size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t pc) {
     while (commands[pc].bytecode != Bytecode::ForBegin && pc != 0) {
         --pc;
     }

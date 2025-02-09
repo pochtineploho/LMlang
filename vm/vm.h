@@ -57,7 +57,7 @@ public:
 class VM {
 private:
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
-    const int hotLoopThreshold = 5000;          // Threshold for marking a loop as hot
+    const long long hotLoopThreshold = 20000000000000;          // Threshold for marking a loop as hot
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack
 
     GC gc;
@@ -104,7 +104,7 @@ public:
 
     int HandleCommand(const Command& command);
 
-    size_t FindLoopStart(const std::vector<Command>& commands, size_t& pc);
+    size_t FindLoopStart(const std::vector<Command>& commands, size_t pc);
 
     size_t FindLoopEnd(const std::vector<Command>& commands, size_t pc, const llvm::APInt& commandNumber);
 
