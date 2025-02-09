@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Started work");
         System.out.println(args);
-        String filepath = "C:/Users/Home/Documents/LMlang/LMLang_benchmarks/factorial.lm";
+        String filepath = "C:/Users/Home/Documents/LMlang/LMLang_benchmarks/primitive.lm";
         try {
             // Create a CharStream from the file
             CharStream charStream = CharStreams.fromFileName(filepath);

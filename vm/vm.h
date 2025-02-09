@@ -35,7 +35,9 @@
 #include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/Scalar/GVN.h>
 #include <llvm/Transforms/Utils.h>
-
+#include <string>  // для работы с типами string
+#include <sstream> // для преобразования типов в строку, например, std::to_string, std::stoi, std::stof
+#include <cstdlib>
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
