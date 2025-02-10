@@ -107,7 +107,6 @@ void VM::Execute(const std::vector<Command> &commands) {
 
     while (pointer < commands.size()) {
         const auto& command = commands[pointer];
-
         if (command.bytecode == Bytecode::NoOp && loopStartToNoOp.contains(pointer)) {
             size_t loopStart = FindLoopStart(commands, pointer);
             size_t loopEnd = FindLoopEnd(commands, pointer, commands[loopStart].number);
@@ -322,7 +321,7 @@ int VM::HandleCommand(const Command &command) {
             break;
         }
 
-        case Bytecode::Print: { // TODO print n
+        case Bytecode::Print: { // TODO й print n
             CheckType(command, Command::Empty);
             CheckValueStack(command, 1);
             auto value = valueStack.top();
@@ -425,7 +424,7 @@ int VM::HandleCommand(const Command &command) {
 
         case Bytecode::Jump: {
             CheckType(command, Command::OnlyNum);
-            pointer = jumpPointerTable[command.number.getLimitedValue()];
+            pointer = jumpPointerTable[command.number.getLimitedValue()] - 1;
             break;
         }
 
@@ -583,7 +582,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
     builder.SetInsertPoint(entryBlock);
 
     std::vector<llvm::Value *> llvmStack;
-    std::unordered_map<std::string, llvm::AllocaInst *> variables;
+    std::unordered_map<std::string, llvm::AllocaInst *> variables; // TODO й подгрузить нужные variables
 
     std::unordered_map<size_t, llvm::BasicBlock *> blocks;
     for (size_t i = 0; i < commands.size(); i++) {
@@ -676,7 +675,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
             }
 
             case Bytecode::Jump: {
-                size_t target = command.number.getLimitedValue();
+                size_t target = jumpPointerTable[command.number.getLimitedValue()] - loopStart;
                 if (blocks.find(target) == blocks.end()) {
                     throw std::runtime_error("Invalid jump target");
                 }
@@ -692,7 +691,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 llvm::Value *condition = llvmStack.back();
                 llvmStack.pop_back();
 
-                size_t target = command.number.getLimitedValue();
+                size_t target = jumpPointerTable[command.number.getLimitedValue()] - loopStart;
                 if (blocks.find(target) == blocks.end()) {
                     throw std::runtime_error("Invalid jump target");
                 }
@@ -734,7 +733,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 }
 
                 condition = builder.CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0), "condfalse");
-                builder.CreateCondBr(condition, nextBlock, falseBlock);
+                builder.CreateCondBr(condition, falseBlock, nextBlock);
                 hasTerminator = true;
                 break;
             }
@@ -794,6 +793,9 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 llvm::Value *value = llvmStack.back();
                 llvmStack.pop_back();
+
+//                FunctionType *printfType = FunctionType::get(builder.getInt32Ty(), {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))}, true);
+//                Function *printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module.get());
 
                 // Получаем функцию printf
                 llvm::FunctionCallee printfCallee = module->getOrInsertFunction(
@@ -1205,4 +1207,16 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
     initLibFunctions(executionEngine);
 
     llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
+
+    delete executionEngine;
+    // TODO й отгрузить изменённые variables(логику см в ForEnd):
+    //            for (const auto& i : variables из JITCompile ) {
+    //                for (long long j = variablesStack.size() - 2; j >= 0; --j) {
+    //                    if (variablesStack[j].contains(i.first) ) {
+    //                        variablesStack[j][i.first] = i.second;
+    //                        break;
+    //                    }
+    //                }
+    //            }
+    //            variablesStack.pop_back();
 }
