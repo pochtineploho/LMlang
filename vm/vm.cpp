@@ -584,8 +584,8 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart,
 
     std::vector<llvm::Value *> llvmStack;
     std::unordered_map<std::string, llvm::AllocaInst *> variables;
-    for (const auto &var: vars) {
-        llvm::Type *type = llvm::Type::getInt64Ty(*context); /// TODO double ???
+    for (const auto &var: vars) { //
+        llvm::Type *type = llvm::Type::getInt64Ty(*context); /// TODO придумать, как передать массив + double ???
         llvm::AllocaInst *allocaInst = builder.CreateAlloca(type, nullptr, "alloca");
         llvm::APInt value = FindInVariablesStack(var).value(); /// TODO check needed ?
         llvm::ConstantInt *constantInt = llvm::ConstantInt::get(*context, value);
