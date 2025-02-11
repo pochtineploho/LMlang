@@ -9,52 +9,47 @@
 
 #include "vm.h"
 
-using namespace llvm;
-using namespace llvm::orc;
-
-void VM::CheckType(const Command &command, Command::CommandType type) {
+void VM::CheckType(const Command &command, const Command::CommandType type) {
     if (command.type != type) {
         throw std::runtime_error("Bytecode error on " + BytecodeToString(command.bytecode));
     }
 }
 
-void VM::CheckValueStack(const Command &command, int size) {
+void VM::CheckValueStack(const Command &command, const int size) {
     if (valueStack.size() < size) {
         throw std::runtime_error("Value stack error on " + BytecodeToString(command.bytecode));
     }
 }
 
 void VM::CheckFunctions(const Command &command, const std::string &function) {
-    if (functionTable.find(function) == functionTable.end()) {
+    if (!functionTable.contains(function)) {
         throw std::runtime_error(BytecodeToString(command.bytecode) + " function not found: " + function);
     }
 }
 
-void VM::CheckCallStack(const Command &command, int size) {
+void VM::CheckCallStack(const Command &command, const int size) {
     if (callStack.size() < size) {
         throw std::runtime_error("Call stack error on " + BytecodeToString(command.bytecode));
     }
 }
 
-void VM::CheckPointer(const Command &command, llvm::APInt *ptr) {
+void VM::CheckPointer(const Command &command, const llvm::APInt *ptr) {
     if (!ptr) {
         throw std::runtime_error(BytecodeToString(command.bytecode) + ": null pointer error");
     }
 }
 
 std::string VM::GetNameByIndex(const Command &command) {
-    auto var_iter = namesTable.find(command.str_index);
-    if (var_iter != namesTable.end()) {
+    if (const auto var_iter = namesTable.find(command.str_index); var_iter != namesTable.end()) {
         return var_iter->second;
     }
     throw std::runtime_error(
-            "Variable error on" + BytecodeToString(command.bytecode) + " " + std::to_string(command.str_index));
+        "Variable error on" + BytecodeToString(command.bytecode) + " " + std::to_string(command.str_index));
 }
 
 std::optional<llvm::APInt> VM::FindInVariablesStack(const std::string &name) {
     for (long long i = variablesStack.size() - 1; i >= 0; --i) {
-        const auto &localVars = variablesStack[i];
-        if (localVars.find(name) != localVars.end()) {
+        if (const auto &localVars = variablesStack[i]; localVars.contains(name)) {
             return localVars.at(name);
         }
     }
@@ -74,7 +69,7 @@ void VM::Execute(const std::vector<Command> &commands) {
     }
 
     for (size_t pc = 0; pc < commands.size(); ++pc) {
-        const Command& command = commands[pc];
+        const Command &command = commands[pc];
 
         if (command.bytecode == Bytecode::FuncDecl) {
             pointer = pc;
@@ -106,7 +101,7 @@ void VM::Execute(const std::vector<Command> &commands) {
     pointer = functionTable["main"] + 1;
 
     while (pointer < commands.size()) {
-        const auto& command = commands[pointer];
+        const auto &command = commands[pointer];
         if (command.bytecode == Bytecode::NoOp && loopStartToNoOp.contains(pointer)) {
             size_t loopStart = FindLoopStart(commands, pointer);
             size_t loopEnd = FindLoopEnd(commands, pointer, commands[loopStart].number);
@@ -119,9 +114,14 @@ void VM::Execute(const std::vector<Command> &commands) {
 
             if (loopExecutionCount[loopStart] >= hotLoopThreshold) {
                 // std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
-
+                std::unordered_set<std::string> vars;
+                for (auto ptr = loopStart; ptr <= loopEnd; ++ptr) {
+                    if (commands[ptr].bytecode == Bytecode::LoadVar) {
+                        vars.emplace(GetNameByIndex(commands[ptr]));
+                    }
+                }
                 std::vector<Command> hotLoopCommands = LoopBytecode(commands, loopStart, loopEnd);
-                JITCompile(hotLoopCommands, loopStart);
+                JITCompile(hotLoopCommands, loopStart, vars);
                 pointer = loopEnd;
 
                 loopExecutionCount[loopStart] = 0;
@@ -296,13 +296,12 @@ int VM::HandleCommand(const Command &command) {
             CheckType(command, Command::OnlyStr);
             auto var_name = GetNameByIndex(command);
 
-            std::optional<llvm::APInt> foundValue = FindInVariablesStack(var_name);
-            if (foundValue) {
+            if (std::optional<llvm::APInt> foundValue = FindInVariablesStack(var_name)) {
                 valueStack.push(*foundValue);
             } else {
                 throw std::runtime_error(
-                        "Variable error on " + BytecodeToString(command.bytecode) + " " +
-                        std::to_string(command.str_index));
+                    "Variable error on " + BytecodeToString(command.bytecode) + " " +
+                    std::to_string(command.str_index));
             }
             break;
         }
@@ -321,7 +320,8 @@ int VM::HandleCommand(const Command &command) {
             break;
         }
 
-        case Bytecode::Print: { // TODO й print n
+        case Bytecode::Print: {
+            // TODO й print n
             CheckType(command, Command::Empty);
             CheckValueStack(command, 1);
             auto value = valueStack.top();
@@ -364,14 +364,14 @@ int VM::HandleCommand(const Command &command) {
             CheckValueStack(command, 1);
             auto memory = valueStack.top();
             valueStack.pop();
-            if (!memory.isIntN(sizeof(size_t)*8)) {
+            if (!memory.isIntN(sizeof(size_t) * 8)) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
             }
             void *allocated = gc.Allocate(memory.getLimitedValue() * 16 + 16);
             if (!allocated) {
                 throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
             }
-            llvm::APInt array_ptr(sizeof(uintptr_t)*8, reinterpret_cast<uintptr_t>(allocated));
+            llvm::APInt array_ptr(sizeof(uintptr_t) * 8, reinterpret_cast<uintptr_t>(allocated));
             valueStack.push(array_ptr);
             break;
         }
@@ -385,9 +385,9 @@ int VM::HandleCommand(const Command &command) {
             valueStack.pop();
             llvm::APInt array = valueStack.top();
             valueStack.pop();
-            auto* array_ptr = reinterpret_cast<llvm::APInt*>(array.getLimitedValue());
+            auto *array_ptr = reinterpret_cast<llvm::APInt *>(array.getLimitedValue());
             CheckPointer(command, array_ptr);
-            auto* index_ptr = reinterpret_cast<llvm::APInt*>(&array_ptr[index.getLimitedValue()]);
+            auto *index_ptr = reinterpret_cast<llvm::APInt *>(&array_ptr[index.getLimitedValue()]);
             *index_ptr = value;
             valueStack.push(array);
             break;
@@ -455,7 +455,7 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::NoOp: {
-            CheckType(command,Command::OnlyNum);
+            CheckType(command, Command::OnlyNum);
             jumpPointerTable[command.number.getLimitedValue()] = pointer;
             break;
         }
@@ -479,9 +479,9 @@ int VM::HandleCommand(const Command &command) {
         }
 
         case Bytecode::ForEnd: {
-            for (const auto& i : variablesStack.back() ) {
+            for (const auto &i: variablesStack.back()) {
                 for (long long j = variablesStack.size() - 2; j >= 0; --j) {
-                    if (variablesStack[j].contains(i.first) ) {
+                    if (variablesStack[j].contains(i.first)) {
                         variablesStack[j][i.first] = i.second;
                         break;
                     }
@@ -510,7 +510,7 @@ int VM::HandleCommand(const Command &command) {
     return 0;
 }
 
-size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t pc) {
+size_t VM::FindLoopStart(const std::vector<Command> &commands, size_t pc) {
     while (commands[pc].bytecode != Bytecode::ForBegin && pc != 0) {
         --pc;
     }
@@ -523,10 +523,10 @@ size_t VM::FindLoopStart(const std::vector<Command>& commands, size_t pc) {
 }
 
 
-size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, const llvm::APInt& commandNumber) {
+size_t VM::FindLoopEnd(const std::vector<Command> &commands, size_t pc, const llvm::APInt &commandNumber) {
     for (size_t i = pc; i < commands.size(); ++i) {
-        const auto& command = commands[i];
-        if (command.bytecode == Bytecode::ForEnd && command.number == commandNumber) {
+        if (const auto &command = commands[i]; command.bytecode == Bytecode::ForEnd && command.number ==
+                                               commandNumber) {
             return i;
         }
     }
@@ -534,14 +534,14 @@ size_t VM::FindLoopEnd(const std::vector<Command>& commands, size_t pc, const ll
 }
 
 
-static void initLibFunctions(llvm::ExecutionEngine* engine) {
-    engine->addGlobalMapping("strcmp", reinterpret_cast<uint64_t>(&strcmp));
-    engine->addGlobalMapping("display", reinterpret_cast<uint64_t>(&printf));
-    engine->addGlobalMapping("sdisplay", reinterpret_cast<uint64_t>(&printf));
+static void initLibFunctions(llvm::ExecutionEngine *engine) {
+    // engine->addGlobalMapping("strcmp", reinterpret_cast<uint64_t>(&strcmp));
+    // engine->addGlobalMapping("display", reinterpret_cast<uint64_t>(&printf));
+    // engine->addGlobalMapping("sdisplay", reinterpret_cast<uint64_t>(&printf));
     engine->addGlobalMapping("printf", reinterpret_cast<uint64_t>(&printf));
 }
 
-static void optimizeModule(llvm::Module& module) {
+static void optimizeModule(llvm::Module &module) {
     llvm::legacy::PassManager passManager;
 
     passManager.add(llvm::createPromoteMemoryToRegisterPass()); // SSA form
@@ -563,40 +563,49 @@ std::vector<Command> VM::LoopBytecode(const std::vector<Command> &commands, size
 }
 
 /// Трансляция в LLVM IR
-void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
-    for (const Command& c : commands){
-        std::cerr<<BytecodeToString(c.bytecode)<<'\n';
-    }
+void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart,
+                    const std::unordered_set<std::string> &vars) {
+    // for (const Command &c: commands) {
+    //     std::cerr << BytecodeToString(c.bytecode) << '\n';
+    // }
     llvm::FunctionType *funcType = llvm::FunctionType::get(
-            llvm::Type::getVoidTy(*context),
-            false
+        llvm::Type::getVoidTy(*context),
+        false
     );
     llvm::Function *function = llvm::Function::Create(
-            funcType,
-            llvm::Function::ExternalLinkage,
-            "jit_compiled_function",
-            module.get()
+        funcType,
+        llvm::Function::ExternalLinkage,
+        "jit_compiled_function",
+        module.get()
     );
 
     llvm::BasicBlock *entryBlock = llvm::BasicBlock::Create(*context, "entry", function);
     builder.SetInsertPoint(entryBlock);
 
     std::vector<llvm::Value *> llvmStack;
-    std::unordered_map<std::string, llvm::AllocaInst *> variables; // TODO й подгрузить нужные variables
-
+    std::unordered_map<std::string, llvm::AllocaInst *> variables;
+    for (const auto &var: vars) {
+        llvm::Type *type = llvm::Type::getInt64Ty(*context); /// TODO double ???
+        llvm::AllocaInst *allocaInst = builder.CreateAlloca(type, nullptr, "alloca");
+        llvm::APInt value = FindInVariablesStack(var).value(); /// TODO check needed ?
+        llvm::ConstantInt *constantInt = llvm::ConstantInt::get(*context, value);
+        builder.CreateStore(constantInt, allocaInst);
+        variables.insert(std::make_pair(var, allocaInst));
+    }
     std::unordered_map<size_t, llvm::BasicBlock *> blocks;
-    for (size_t i = 0; i < commands.size(); i++) {
+    size_t beginning = 3;
+    for (size_t i = beginning; i < commands.size(); i++) {
         blocks[i] = llvm::BasicBlock::Create(*context, "block_" + std::to_string(i), function);
     }
 
     if (!commands.empty()) {
-        builder.CreateBr(blocks[0]);
+        builder.CreateBr(blocks[beginning]);
     } else {
         builder.CreateRetVoid();
         return;
     }
 
-    for (size_t i = 0; i < commands.size(); i++) {
+    for (size_t i = beginning; i < commands.size(); i++) {
         const Command &command = commands[i];
         builder.SetInsertPoint(blocks[i]);
 
@@ -658,9 +667,10 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
                 builder.SetInsertPoint(errorBlock);
                 builder.CreateCall(module->getOrInsertFunction(
-                    "puts",
-                    llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), {llvm::Type::getInt8Ty(*context)}, true)
-                ), builder.CreateGlobalString("Division by zero error!"));
+                                       "puts",
+                                       llvm::FunctionType::get(llvm::Type::getInt64Ty(*context),
+                                                               {llvm::Type::getInt8Ty(*context)}, true)
+                                   ), builder.CreateGlobalString("Division by zero error!"));
                 builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0));
 
                 builder.SetInsertPoint(divideBlock);
@@ -676,7 +686,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
             case Bytecode::Jump: {
                 size_t target = jumpPointerTable[command.number.getLimitedValue()] - loopStart;
-                if (blocks.find(target) == blocks.end()) {
+                if (!blocks.contains(target)) {
                     throw std::runtime_error("Invalid jump target");
                 }
                 builder.CreateBr(blocks[target]);
@@ -719,7 +729,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 llvmStack.pop_back();
 
                 size_t target = jumpPointerTable[command.number.getLimitedValue()] - loopStart;
-                if (blocks.find(target) == blocks.end()) {
+                if (!blocks.contains(target)) {
                     throw std::runtime_error("Invalid jump target");
                 }
 
@@ -732,7 +742,8 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                     throw std::runtime_error("invalid block movement");
                 }
 
-                condition = builder.CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0), "condfalse");
+                condition = builder.CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0),
+                                                 "condfalse");
                 builder.CreateCondBr(condition, falseBlock, nextBlock);
                 hasTerminator = true;
                 break;
@@ -741,7 +752,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
             case Bytecode::LoadVar: {
                 std::string varName = GetNameByIndex(command);
 
-                if (variables.find(varName) == variables.end()) {
+                if (!variables.contains(varName)) {
                     throw std::runtime_error("Variable not found: " + varName);
                 }
 
@@ -766,7 +777,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 llvmStack.pop_back();
 
                 std::string varName = GetNameByIndex(command);
-                if (variables.find(varName) == variables.end()) {
+                if (!variables.contains(varName)) {
                     llvm::AllocaInst *allocaInst = builder.CreateAlloca(value->getType(), nullptr, varName);
                     variables[varName] = allocaInst;
                 }
@@ -794,17 +805,17 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 llvm::Value *value = llvmStack.back();
                 llvmStack.pop_back();
 
-//                FunctionType *printfType = FunctionType::get(builder.getInt32Ty(), {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))}, true);
-//                Function *printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module.get());
+                //                FunctionType *printfType = FunctionType::get(builder.getInt32Ty(), {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))}, true);
+                //                Function *printfFunc = Function::Create(printfType, Function::ExternalLinkage, "printf", module.get());
 
                 // Получаем функцию printf
                 llvm::FunctionCallee printfCallee = module->getOrInsertFunction(
-                        "printf",
-                        llvm::FunctionType::get(
-                                llvm::Type::getInt32Ty(*context),
-                                {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))},
-                                true
-                        )
+                    "printf",
+                    llvm::FunctionType::get(
+                        llvm::Type::getInt64Ty(*context),
+                        {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))},
+                        true
+                    )
                 );
 
                 auto *printfFunc = llvm::cast<llvm::Function>(printfCallee.getCallee());
@@ -818,31 +829,31 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 static llvm::Value *formatStr = builder.CreateGlobalStringPtr("%d\n");
 
                 // Приводим value к типу i32, если необходимо
-                if (value->getType() != llvm::Type::getInt32Ty(*context)) {
-                    value = builder.CreateIntCast(value, llvm::Type::getInt32Ty(*context), true);
+                if (value->getType() != llvm::Type::getInt64Ty(*context)) {
+                    value = builder.CreateIntCast(value, llvm::Type::getInt64Ty(*context), true);
                 }
 
                 // Вызываем printf
                 builder.CreateCall(printfFunc, {formatStr, value});
 
                 // Сбрасываем буфер вывода
-//                llvm::FunctionCallee fflushCallee = module->getOrInsertFunction(
-//                        "fflush",
-//                        llvm::FunctionType::get(
-//                                llvm::Type::getInt32Ty(*context),
-//                                {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))},
-//                                false
-//                        )
-//                );
-//
-//                auto *fflushFunc = llvm::cast<llvm::Function>(fflushCallee.getCallee());
-//                if (!fflushFunc) {
-//                    llvm::errs() << "Error: fflush function not found!\n";
-//                    break;
-//                }
-//
-//                llvm::Value *stdoutValue = builder.CreateGlobalStringPtr("stdout");
-//                builder.CreateCall(fflushFunc, {stdoutValue});
+                //                llvm::FunctionCallee fflushCallee = module->getOrInsertFunction(
+                //                        "fflush",
+                //                        llvm::FunctionType::get(
+                //                                llvm::Type::getInt32Ty(*context),
+                //                                {llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context))},
+                //                                false
+                //                        )
+                //                );
+                //
+                //                auto *fflushFunc = llvm::cast<llvm::Function>(fflushCallee.getCallee());
+                //                if (!fflushFunc) {
+                //                    llvm::errs() << "Error: fflush function not found!\n";
+                //                    break;
+                //                }
+                //
+                //                llvm::Value *stdoutValue = builder.CreateGlobalStringPtr("stdout");
+                //                builder.CreateCall(fflushFunc, {stdoutValue});
 
                 break;
             }
@@ -903,7 +914,8 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 auto *putsFunc = llvm::cast<llvm::Function>(
                     module->getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context),
+                                                llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array size must be greater than zero\n");
@@ -942,7 +954,8 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 auto *putsFunc = llvm::cast<llvm::Function>(
                     module->getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context),
+                                                llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
@@ -960,7 +973,6 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 llvmStack.push_back(value);
                 break;
             }
-
 
 
             case Bytecode::StoreArray: {
@@ -986,7 +998,8 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                 auto *putsFunc = llvm::cast<llvm::Function>(
                     module->getOrInsertFunction(
                         "puts",
-                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context), llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
+                        llvm::FunctionType::get(llvm::Type::getInt64Ty(*context),
+                                                llvm::PointerType::getUnqual(llvm::Type::getInt8Ty(*context)), false)
                     ).getCallee()
                 );
                 llvm::Value *errorMessage = builder.CreateGlobalStringPtr("Array index out of bounds\n");
@@ -1009,12 +1022,12 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                     throw std::runtime_error("JITCompile: Stack underflow on And");
                 }
 
-                llvm::Value* rhs = llvmStack.back();
+                llvm::Value *rhs = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value* lhs = llvmStack.back();
+                llvm::Value *lhs = llvmStack.back();
                 llvmStack.pop_back();
 
-                llvm::Value* result = builder.CreateAnd(lhs, rhs, "andtmp");
+                llvm::Value *result = builder.CreateAnd(lhs, rhs, "andtmp");
                 llvmStack.push_back(result);
                 break;
             }
@@ -1024,12 +1037,12 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                     throw std::runtime_error("JITCompile: Stack underflow on Or");
                 }
 
-                llvm::Value* rhs = llvmStack.back();
+                llvm::Value *rhs = llvmStack.back();
                 llvmStack.pop_back();
-                llvm::Value* lhs = llvmStack.back();
+                llvm::Value *lhs = llvmStack.back();
                 llvmStack.pop_back();
 
-                llvm::Value* result = builder.CreateOr(lhs, rhs, "ortmp");
+                llvm::Value *result = builder.CreateOr(lhs, rhs, "ortmp");
                 llvmStack.push_back(result);
                 break;
             }
@@ -1039,10 +1052,10 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
                     throw std::runtime_error("JITCompile: Stack underflow on Not");
                 }
 
-                llvm::Value* value = llvmStack.back();
+                llvm::Value *value = llvmStack.back();
                 llvmStack.pop_back();
 
-                llvm::Value* result = builder.CreateICmpEQ(
+                llvm::Value *result = builder.CreateICmpEQ(
                     value,
                     llvm::ConstantInt::get(value->getType(), 0),
                     "nottmp"
@@ -1158,13 +1171,11 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
             }
 
             case Bytecode::ForEnd: {
-                auto &currentScope = variablesStack.back();
-                for (auto &var : currentScope) {
-                    std::string varName = var.first;
-                    llvm::Value *varValue = llvm::ConstantInt::get(builder.getInt64Ty(), var.second);
+                for (auto &currentScope = variablesStack.back(); auto &[fst, snd]: currentScope) {
+                    std::string varName = fst;
+                    llvm::Value *varValue = llvm::ConstantInt::get(builder.getInt64Ty(), snd);
                     for (long long j = variablesStack.size() - 2; j >= 0; --j) {
-                        auto &parentScope = variablesStack[j];
-                        if (parentScope.find(varName) != parentScope.end()) {
+                        if (auto &parentScope = variablesStack[j]; parentScope.contains(varName)) {
                             llvm::AllocaInst *parentVar = builder.CreateAlloca(builder.getInt64Ty(), nullptr, varName);
                             llvm::Value *value = llvm::ConstantInt::get(*context, parentScope[varName]);
                             builder.CreateStore(varValue, parentVar);
@@ -1193,30 +1204,30 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart) {
 
     builder.CreateRetVoid();
     bool isBroken = verifyModule(*module, &llvm::errs());
-    module->print(llvm::errs(), nullptr);
+    // module->print(llvm::errs(), nullptr);
 
     std::string errStr;
     optimizeModule(*module);
-    ExecutionEngine *executionEngine = EngineBuilder(std::move(module))
+    llvm::ExecutionEngine *executionEngine = llvm::EngineBuilder(std::move(module))
             .setErrorStr(&errStr)
             .setEngineKind(llvm::EngineKind::JIT)
             .setMCJITMemoryManager(std::make_unique<llvm::SectionMemoryManager>())
             .create();
 
-    Function *mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
+    llvm::Function *mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
     initLibFunctions(executionEngine);
 
     llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
 
     delete executionEngine;
-    // TODO й отгрузить изменённые variables(логику см в ForEnd):
-    //            for (const auto& i : variables из JITCompile ) {
-    //                for (long long j = variablesStack.size() - 2; j >= 0; --j) {
-    //                    if (variablesStack[j].contains(i.first) ) {
-    //                        variablesStack[j][i.first] = i.second;
-    //                        break;
-    //                    }
-    //                }
-    //            }
-    //            variablesStack.pop_back();
+    for (const auto &[fst, snd]: variables) {
+        for (long long j = variablesStack.size() - 1; j >= 0; --j) {
+            if (variablesStack[j].contains(fst)) {
+                llvm::Value *loadedValue = builder.CreateLoad(snd->getAllocatedType(), snd);
+                variablesStack[j][fst] = llvm::dyn_cast<llvm::ConstantInt>(loadedValue)->getValue();
+                break;
+            }
+        }
+    }
+    // variablesStack.pop_back();
 }

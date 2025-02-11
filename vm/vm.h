@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <stack>
 #include <memory>
 #include <optional>
@@ -38,6 +39,7 @@
 #include <string>  // для работы с типами string
 #include <sstream> // для преобразования типов в строку, например, std::to_string, std::stoi, std::stof
 #include <cstdlib>
+#include <unordered_set>
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
@@ -87,7 +89,7 @@ private:
 
     void CheckCallStack(const Command& command, int size);
 
-    void CheckPointer(const Command& command, llvm::APInt* ptr);
+    void CheckPointer(const Command& command, const llvm::APInt* ptr);
 
 public:
     VM() : gc(), context(std::make_unique<llvm::LLVMContext>()), module(std::make_unique<llvm::Module>("jit_module", *context)), builder(*context) {
@@ -111,5 +113,5 @@ public:
     std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<Command>& commands, size_t loopStart);
+    void JITCompile(const std::vector<Command> &commands, size_t loopStart, const std::unordered_set<std::string> &vars);
 };
