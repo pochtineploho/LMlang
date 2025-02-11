@@ -702,7 +702,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart,
                 llvmStack.pop_back();
 
                 size_t target = jumpPointerTable[command.number.getLimitedValue()] - loopStart;
-                if (blocks.find(target) == blocks.end()) {
+                if (!blocks.contains(target)) {
                     throw std::runtime_error("Invalid jump target");
                 }
 
@@ -1204,7 +1204,7 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart,
 
     builder.CreateRetVoid();
     bool isBroken = verifyModule(*module, &llvm::errs());
-    // module->print(llvm::errs(), nullptr);
+    module->print(llvm::errs(), nullptr);
 
     std::string errStr;
     optimizeModule(*module);
@@ -1229,5 +1229,4 @@ void VM::JITCompile(const std::vector<Command> &commands, size_t loopStart,
             }
         }
     }
-    // variablesStack.pop_back();
 }

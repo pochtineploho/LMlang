@@ -57,7 +57,6 @@ public:
 
 /// Виртуальная машина для исполнения байткода.
 class VM {
-private:
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
     const long long hotLoopThreshold = 5;          // Threshold for marking a loop as hot
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack
