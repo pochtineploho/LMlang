@@ -37,7 +37,7 @@
     "withStringID" : true
   }, {
     "opCode" : "Push",
-    "value" : 100,
+    "value" : 6,
     "stringID" : 0,
     "withValue" : true,
     "withStringID" : false
@@ -106,6 +106,18 @@
     "value" : 0,
     "stringID" : 0,
     "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "Push",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : true,
+    "withStringID" : false
+  }, {
+    "opCode" : "Return",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
     "withStringID" : false
   }, {
     "opCode" : "Halt",
