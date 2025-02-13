@@ -67,7 +67,9 @@ class VM {
     llvm::IRBuilder<> builder;
     std::unordered_map<int, std::string> namesTable;
     std::stack<llvm::APInt> valueStack;
+    std::stack<llvm::APInt> arraySizeStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
+    std::unordered_map<std::string, llvm::APInt> arrayTable;
 
     std::stack<size_t> callStack;
     size_t pointer;
@@ -112,5 +114,7 @@ public:
     std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<Command> &commands, size_t loopStart, const std::unordered_set<std::string> &vars);
+    void JITCompile(const std::vector<Command> &commands, size_t loopStart,
+                        const std::unordered_set<std::string> &vars,
+                        const std::unordered_set<std::string> &arrays);
 };
