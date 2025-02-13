@@ -582,10 +582,18 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
     // for (const Command &c: commands) {
     //     std::cerr << BytecodeToString(c.bytecode) << '\n';
     // }
+    std::vector<llvm::Type*> paramTypes;
+    for (size_t i = 0; i < vars.size(); i++) {
+        paramTypes.push_back(llvm::PointerType::get(llvm::Type::getInt64Ty(*context), 0));
+    }
+    for (size_t i = 0; i < arrays.size(); i++) {
+        paramTypes.push_back(llvm::PointerType::get(llvm::Type::getInt64Ty(*context), 0));
+    }
+
     llvm::FunctionType* funcType = llvm::FunctionType::get(
-            llvm::Type::getVoidTy(*context),
-            false
+            llvm::Type::getVoidTy(*context), paramTypes, false
     );
+
     llvm::Function* function = llvm::Function::Create(
             funcType,
             llvm::Function::ExternalLinkage,
@@ -597,37 +605,19 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
     builder.SetInsertPoint(entryBlock);
 
     std::vector<llvm::Value*> llvmStack;
-    std::unordered_map<std::string, llvm::AllocaInst*> variables;
-    for (const auto& var: vars) { //
-        llvm::Type* type = llvm::Type::getInt64Ty(*context); /// TODO придумать, как передать массив + double ???
-        llvm::AllocaInst* allocaInst = builder.CreateAlloca(type, nullptr, var);
-        llvm::APInt value = FindInVariablesStack(var).value(); /// TODO check needed ?
-        llvm::ConstantInt* constantInt = llvm::ConstantInt::get(*context, value);
-        builder.CreateStore(constantInt, allocaInst);
-        variables.insert(std::make_pair(var, allocaInst));
+
+    std::unordered_map<std::string, llvm::Value*> variablePointers;
+    std::unordered_map<std::string, llvm::Value*> arrayPointers;
+
+    size_t argIndex = 0;
+    for (const auto& var : vars) {
+        variablePointers[var] = function->getArg(argIndex++);
     }
-    for (const auto& arrayName: arrays) {// создаём и загружаем все нужные массивы
-        llvm::APInt arraySize = arrayTable[arrayName];
-        llvm::ConstantInt *constArraySize = llvm::ConstantInt::get(*context, arraySize);
-        llvm::Value* array = builder.CreateAlloca(
-                llvm::Type::getInt64Ty(*context), constArraySize, "array");
-
-        if (!variables.contains(arrayName)) {
-            llvm::AllocaInst* allocaInst = builder.CreateAlloca(array->getType(), nullptr, arrayName);
-            variables[arrayName] = allocaInst;
-        }
-
-        builder.CreateStore(array, variables[arrayName]);
-
-        llvm::APInt sourceArray = *FindInVariablesStack(arrayName);
-        auto* array_ptr = reinterpret_cast<llvm::APInt*>(sourceArray.getLimitedValue());
-        for( int i = 0;i<arraySize.getSExtValue();i++){
-            llvm::Value* elementPtr = builder.CreateGEP(
-                    llvm::Type::getInt64Ty(*context), array, llvm::ConstantInt::get(*context, llvm::APInt(32,i)), "elementPtr");
-            llvm::Value* value = llvm::ConstantInt::get(*context, array_ptr[i]);
-            builder.CreateStore(value, elementPtr);
-        }
+    for (const auto& arr : arrays) {
+        arrayPointers[arr] = function->getArg(argIndex++);
     }
+
+
     std::unordered_map<size_t, llvm::BasicBlock*> blocks;
     size_t beginning = 3;
     for (size_t i = beginning; i < commands.size(); i++) {
@@ -645,13 +635,6 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
         return;
     }
 
-//    int intValue = 42;
-//
-//    // Create a ConstantInt from the integer value
-//    llvm::ConstantInt *constInt = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), intValue);
-//
-//    // Cast the ConstantInt to a Value
-//    llvm::Value *value = constInt;
 
     for (size_t i = beginning; i < commands.size(); i++) {
         const Command& command = commands[i];
@@ -798,39 +781,59 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                 }
 
                 case Bytecode::LoadVar: {
+//                    std::string varName = GetNameByIndex(command);
+//
+//                    if (!variables.contains(varName)) {
+//                        throw std::runtime_error("Variable not found: " + varName);
+//                    }
+//
+//                    llvm::Value* variablePointer = variables[varName];
+//                    if (auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(variablePointer)) {
+//                        llvm::Type* variableType = allocaInst->getAllocatedType();
+//                        llvm::Value* value = builder.CreateLoad(variableType, variablePointer);
+//                        llvmStack.push_back(value);
+//                    } else {
+//                        throw std::runtime_error("Variable is not an AllocaInst: " + varName);
+//                    }
+//                    break;
                     std::string varName = GetNameByIndex(command);
-
-                    if (!variables.contains(varName)) {
-                        throw std::runtime_error("Variable not found: " + varName);
-                    }
-
-                    llvm::Value* variablePointer = variables[varName];
-                    if (auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(variablePointer)) {
-                        llvm::Type* variableType = allocaInst->getAllocatedType();
-                        llvm::Value* value = builder.CreateLoad(variableType, variablePointer);
-                        llvmStack.push_back(value);
+                    if (!variablePointers.contains(varName)) throw std::runtime_error("Variable not found: " + varName);
+                    llvm::Value* value;
+                    if(variablePointers.contains(varName)){
+                        value = builder.CreateLoad(llvm::Type::getInt64Ty(*context), variablePointers[varName]);
                     } else {
-                        throw std::runtime_error("Variable is not an AllocaInst: " + varName);
+                        value = builder.CreateLoad(llvm::Type::getInt64Ty(*context), arrayPointers[varName]);
                     }
+                    llvmStack.push_back(value);
                     break;
                 }
 
 
                 case Bytecode::StoreVar: {
-                    if (llvmStack.empty()) {
-                        throw std::runtime_error("JITCompile: Stack underflow on StoreVar");
-                    }
-
+//                    if (llvmStack.empty()) {
+//                        throw std::runtime_error("JITCompile: Stack underflow on StoreVar");
+//                    }
+//
+//                    llvm::Value* value = llvmStack.back();
+//                    llvmStack.pop_back();
+//
+//                    std::string varName = GetNameByIndex(command);
+//                    if (!variables.contains(varName)) {
+//                        llvm::AllocaInst* allocaInst = builder.CreateAlloca(value->getType(), nullptr, varName);
+//                        variables[varName] = allocaInst;
+//                    }
+//
+//                    builder.CreateStore(value, variables[varName]);
+//                    break;
+                    if (llvmStack.empty()) throw std::runtime_error("Stack underflow on StoreVar");
                     llvm::Value* value = llvmStack.back();
                     llvmStack.pop_back();
-
                     std::string varName = GetNameByIndex(command);
-                    if (!variables.contains(varName)) {
-                        llvm::AllocaInst* allocaInst = builder.CreateAlloca(value->getType(), nullptr, varName);
-                        variables[varName] = allocaInst;
+                    if(arrayPointers.contains(varName)){
+                        builder.CreateStore(value, arrayPointers[varName]);
+                    } else {
+                        builder.CreateStore(value, variablePointers[varName]);
                     }
-
-                    builder.CreateStore(value, variables[varName]);
                     break;
                 }
 
@@ -1176,26 +1179,89 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
             .setEngineKind(llvm::EngineKind::JIT)
             .setMCJITMemoryManager(std::make_unique<llvm::SectionMemoryManager>())
             .create();
+    using JITFunctionType = void(*)(...);
 
-    llvm::Function* mainFunction = executionEngine->FindFunctionNamed("jit_compiled_function");
+    auto mainFunction = reinterpret_cast<JITFunctionType>(
+            executionEngine->getFunctionAddress("jit_compiled_function")
+    );
     initLibFunctions(executionEngine);
-    llvm::GenericValue result = executionEngine->runFunction(mainFunction, {});
+
+//    for (const auto& arrayName: arrays) {// создаём и загружаем все нужные массивы
+//        llvm::APInt arraySize = arrayTable[arrayName];
+//        llvm::ConstantInt *constArraySize = llvm::ConstantInt::get(*context, arraySize);
+//        llvm::Value* array = builder.CreateAlloca(
+//                llvm::Type::getInt64Ty(*context), constArraySize, "array");
+//
+//        if (!variables.contains(arrayName)) {
+//            llvm::AllocaInst* allocaInst = builder.CreateAlloca(array->getType(), nullptr, arrayName);
+//            variables[arrayName] = allocaInst;
+//        }
+//
+//        builder.CreateStore(array, variables[arrayName]);
+//
+//        llvm::APInt sourceArray = *FindInVariablesStack(arrayName);
+//        auto* array_ptr = reinterpret_cast<llvm::APInt*>(sourceArray.getLimitedValue());
+//        for( int i = 0;i<arraySize.getSExtValue();i++){
+//            llvm::Value* elementPtr = builder.CreateGEP(
+//                    llvm::Type::getInt64Ty(*context), array, llvm::ConstantInt::get(*context, llvm::APInt(32,i)), "elementPtr");
+//            llvm::Value* value = llvm::ConstantInt::get(*context, array_ptr[i]);
+//            builder.CreateStore(value, elementPtr);
+//        }
+//    }
+
+    // Allocate memory in host program for variables and arrays
+    std::unordered_map<std::string, int64_t> hostMemory;
+    std::unordered_map<std::string, std::vector<int64_t>> hostArrays;
+
+    std::vector<llvm::GenericValue> args;
+    for (const auto& var : vars) {
+        hostMemory[var] = FindInVariablesStack(var).value().getSExtValue();
+        llvm::GenericValue gv; gv.PointerVal = &hostMemory[var];
+        args.push_back(gv);
+    }
+    for (const auto& arrayName : arrays) {
+        int64_t arraySize = arrayTable[arrayName].getSExtValue();
+        hostArrays[arrayName].resize(arraySize);
+        llvm::APInt sourceArray = *FindInVariablesStack(arrayName);
+        auto* array_ptr = reinterpret_cast<llvm::APInt*>(sourceArray.getLimitedValue());
+        for(int i=0;i<arraySize;i++){
+            hostArrays[arrayName][i] = llvm::ConstantInt::get(*context, array_ptr[i])->getSExtValue();
+        }
+        llvm::GenericValue gv; gv.PointerVal = hostArrays[arrayName].data();
+        args.push_back(gv);
+    }
+
+    std::vector<void*> argPointers;
+    for (const auto& var : vars) {
+        argPointers.push_back(&hostMemory[var]);
+    }
+    for (const auto& arr : arrays) {
+        argPointers.push_back(hostArrays[arr].data());
+    }
 
 
-    for (const auto& [fst, snd]: variables) {
-        if (variablesStack.back().contains(fst)) {
-            if(arrays.contains(fst)){
-
-            } else {
-                std::cout<<"Var name: "<<fst<<'\n';
-                llvm::Value* variablePointer = variables[fst];
-                auto* allocaInst = llvm::dyn_cast<llvm::AllocaInst>(variablePointer);
-                llvm::Type* variableType = allocaInst->getAllocatedType();
-                llvm::LoadInst* value = builder.CreateLoad(variableType, variablePointer);
-                auto* c = llvm::dyn_cast<llvm::ConstantInt>(value);
-                variablesStack.back()[fst] = c->getSExtValue();
-            }
+    switch (argPointers.size()) { // да-да, не спрашивайте, оно так надо
+        case 0: mainFunction(); break;
+        case 1: mainFunction(argPointers[0]); break;
+        case 2: mainFunction(argPointers[0], argPointers[1]); break;
+        case 3: mainFunction(argPointers[0], argPointers[1], argPointers[2]); break;
+        case 4: mainFunction(argPointers[0], argPointers[1], argPointers[2], argPointers[3]); break;
+        case 5: mainFunction(argPointers[0], argPointers[1], argPointers[2], argPointers[3], argPointers[4]); break;
+        case 6: mainFunction(argPointers[0], argPointers[1], argPointers[2], argPointers[3], argPointers[4], argPointers[5]); break;
+        case 7: mainFunction(argPointers[0], argPointers[1], argPointers[2], argPointers[3], argPointers[4], argPointers[5], argPointers[6]); break;
+        case 8: mainFunction(argPointers[0], argPointers[1], argPointers[2], argPointers[3], argPointers[4], argPointers[5], argPointers[6], argPointers[7]); break;
+        case 9: mainFunction(argPointers[0], argPointers[1], argPointers[2], argPointers[3], argPointers[4], argPointers[5], argPointers[6], argPointers[7], argPointers[8]); break;
+        case 10: mainFunction(argPointers[0], argPointers[1], argPointers[2], argPointers[3], argPointers[4], argPointers[5], argPointers[6], argPointers[7], argPointers[8], argPointers[9]); break;
+        default:
+            throw std::runtime_error("Too many arguments for JIT function.");
+    }
+    
+    for (const auto& [name, value] : hostMemory) {
+        if (variablesStack.back().contains(name)) {
+            std::cout<<"Var name: "<<name<<'\n';
+            variablesStack.back()[name] = value;
         }
     }
+    //Дописать обновление массивов
     delete executionEngine;
 }
