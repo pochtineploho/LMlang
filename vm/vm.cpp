@@ -138,7 +138,7 @@ void VM::Execute(const std::vector<Command>& commands) {
                     JITCompile(hotLoopCommands, loopStart, vars, arrays, false);
                 }
                 pointer = loopEnd - 1;
-                //loopExecutionCount[loopStart] = 0;
+                loopExecutionCount[loopStart] = 0;
             } else {
                 coldCycleFlag = 1;
             }
