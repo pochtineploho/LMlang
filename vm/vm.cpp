@@ -112,7 +112,7 @@ void VM::Execute(const std::vector<Command>& commands) {
 
             loopExecutionCount[loopStart]++;
             //std::cout<<"Loop count of "<<loopStart<<" is "<<loopExecutionCount[loopStart]<<'\n';
-            if (loopExecutionCount[loopStart] >= hotLoopThreshold) {
+            if (loopExecutionCount[loopStart] >= hotLoopThreshold) { // Future: для отключения JIT закоммитить\заифать(с флагом) этот if и раскоммитить строчку после него
                 // std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
 
                 std::unordered_set<std::string> vars;
@@ -138,7 +138,8 @@ void VM::Execute(const std::vector<Command>& commands) {
                     JITCompile(hotLoopCommands, loopStart, vars, arrays, false);
                 }
                 pointer = loopEnd - 1;
-                loopExecutionCount[loopStart] = 0;
+                loopExecutionCount[loopStart] = 0; // Future: обнуление счётчика - если есть, то после каджого JIT начинается снова,
+                                                    // иначе "однажды горячий - горячий всегда"
             } else {
                 coldCycleFlag = 1;
             }
@@ -670,7 +671,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
 
 
         bool hasTerminator = false;
-        if (i>=firstNoOp || withLocal){ // не выполняем ре-иницаизацию итератора
+        if (i>=firstNoOp || withLocal){ // Future: Branch не выполняем ре-иницаизацию итератора
             switch (command.bytecode) {
                 case Bytecode::Add: {
                     if (llvmStack.size() < 2) {
@@ -1252,7 +1253,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
     }
     //Дописать обновление массивов
     delete executionEngine;
-    context = (std::make_unique<llvm::LLVMContext>());
+    context = (std::make_unique<llvm::LLVMContext>()); // Future: очистка JIT, если сохранять циклы, то её нужно убрать + у цикла есть 2 варианта см коммит "Branch"
     module = (std::make_unique<llvm::Module>("jit_module", *context));
     builder = std::make_unique<llvm::IRBuilder<>>(*context);
 }
