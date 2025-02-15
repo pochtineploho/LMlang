@@ -18,11 +18,10 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Started work");
         System.out.println(args);
-        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\primitive2.lm";
+        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\sort.lm";
         try {
             // Create a CharStream from the file
             CharStream charStream = CharStreams.fromFileName(filepath);
-
             // You can now use the charStream with your ANTLR-generated lexer and parser
             // For example:
             // MyLexer lexer = new MyLexer(charStream);

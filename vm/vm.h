@@ -58,14 +58,15 @@ public:
 /// Виртуальная машина для исполнения байткода.
 class VM {
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
-    const long long hotLoopThreshold = 5;          // Threshold for marking a loop as hot
+    const long long hotLoopThreshold = 450;          // Threshold for marking a loop as hot
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack
 
     GC gc;
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;
-    llvm::IRBuilder<> builder;
+    std::unique_ptr<llvm::IRBuilder<>> builder;
     std::unordered_map<int, std::string> namesTable;
+    int JITCounter = 0;
     std::stack<llvm::APInt> valueStack;
     std::stack<llvm::APInt> arraySizeStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
@@ -77,6 +78,7 @@ class VM {
     std::unordered_map<uint64_t, size_t> jumpPointerTable;
 
     std::unordered_map<size_t, size_t> loopStartToNoOp;
+    int coldCycleFlag = 0;
 
     std::string GetNameByIndex(const Command& command);
 
@@ -93,7 +95,7 @@ class VM {
     void CheckPointer(const Command& command, const llvm::APInt* ptr);
 
 public:
-    VM() : gc(), context(std::make_unique<llvm::LLVMContext>()), module(std::make_unique<llvm::Module>("jit_module", *context)), builder(*context) {
+    VM() : gc(), context(std::make_unique<llvm::LLVMContext>()), module(std::make_unique<llvm::Module>("jit_module", *context)), builder(std::make_unique<llvm::IRBuilder<>>(*context)) {
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
         llvm::InitializeNativeTargetAsmParser();
@@ -116,5 +118,6 @@ public:
     /// Трансляция в LLVM IR
     void JITCompile(const std::vector<Command> &commands, size_t loopStart,
                         const std::unordered_set<std::string> &vars,
-                        const std::unordered_set<std::string> &arrays);
+                        const std::unordered_set<std::string> &arrays,
+                        bool withLocal);
 };

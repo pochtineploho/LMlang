@@ -1,0 +1,36 @@
+func int[] quickSort(int[] nums, int left, int right) {
+    int partitionIndex = left;
+    print(left);
+    print(right);
+    for (int i = left; i < right; ++i) {
+
+        //print(i);
+
+        //print(nums[i]);
+        print(111);
+        print(i);
+
+        ++i;
+        print(i);
+        //print(left);
+        //print(right);
+    }
+
+    //for (int i = left; i < right; ++i) {
+        //print(222);
+        //print(i);
+
+        //print(nums[i]);
+    //}
+
+    if (partitionIndex + 8 < right) {
+        nums = quickSort(nums, partitionIndex + 1, right);
+    }
+    return nums;
+}
+
+func int main() {
+    int n = 10;
+    int[] nums = {11,1,9,8,10,7,4,3,2,5};
+    nums = quickSort(nums, 0, 9);
+}

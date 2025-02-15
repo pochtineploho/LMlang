@@ -1,0 +1,25 @@
+func int main() {
+    int[] arr = int[6];
+    arr[0] = 42;
+    arr[1] = 0;
+    arr[2] = 0;
+    arr[3] = 0;
+    arr[4] = 0;
+    arr[5] = 0;
+    for (int i = 1; i < 6; ++i) {
+        int tmp = arr[i];
+        print(tmp);
+        print(i);
+        if (tmp < i) {
+            arr[i] = 42;
+        }
+        print(arr[i]);
+    }
+    print(arr[0]);
+    print(arr[1]);
+    print(arr[2]);
+    print(arr[3]);
+    print(arr[4]);
+    print(arr[5]);
+    return 0;
+}
