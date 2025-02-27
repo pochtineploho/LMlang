@@ -17,8 +17,8 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Started work");
-        System.out.println(args);
-        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\sort.lm";
+        System.out.println(args[0]);
+        String filepath = args[0];
         try {
             // Create a CharStream from the file
             CharStream charStream = CharStreams.fromFileName(filepath);
