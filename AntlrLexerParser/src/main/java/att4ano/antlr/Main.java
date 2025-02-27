@@ -17,12 +17,11 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Started work");
-        System.out.println(args);
-        String filepath = "D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\LMLang_benchmarks\\primitive.lm";
+        System.out.println(args[0]);
+        String filepath = args[0];
         try {
             // Create a CharStream from the file
             CharStream charStream = CharStreams.fromFileName(filepath);
-
             // You can now use the charStream with your ANTLR-generated lexer and parser
             // For example:
             // MyLexer lexer = new MyLexer(charStream);
