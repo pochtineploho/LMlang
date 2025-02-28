@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <stack>
 #include <memory>
 #include <optional>
@@ -38,6 +39,7 @@
 #include <string>  // для работы с типами string
 #include <sstream> // для преобразования типов в строку, например, std::to_string, std::stoi, std::stof
 #include <cstdlib>
+#include <unordered_set>
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {
@@ -55,18 +57,20 @@ public:
 
 /// Виртуальная машина для исполнения байткода.
 class VM {
-private:
     std::unordered_map<size_t, int> loopExecutionCount; // Map to track loop instruction usage
-    const long long hotLoopThreshold = 5;          // Threshold for marking a loop as hot
+    const long long hotLoopThreshold = 450;          // Threshold for marking a loop as hot
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack
 
     GC gc;
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;
-    llvm::IRBuilder<> builder;
+    std::unique_ptr<llvm::IRBuilder<>> builder;
     std::unordered_map<int, std::string> namesTable;
+    int JITCounter = 0;
     std::stack<llvm::APInt> valueStack;
+    std::stack<llvm::APInt> arraySizeStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
+    std::unordered_map<std::string, llvm::APInt> arrayTable;
 
     std::stack<size_t> callStack;
     size_t pointer;
@@ -74,6 +78,7 @@ private:
     std::unordered_map<uint64_t, size_t> jumpPointerTable;
 
     std::unordered_map<size_t, size_t> loopStartToNoOp;
+    int coldCycleFlag = 0;
 
     std::string GetNameByIndex(const Command& command);
 
@@ -87,10 +92,10 @@ private:
 
     void CheckCallStack(const Command& command, int size);
 
-    void CheckPointer(const Command& command, llvm::APInt* ptr);
+    void CheckPointer(const Command& command, const llvm::APInt* ptr);
 
 public:
-    VM() : gc(), context(std::make_unique<llvm::LLVMContext>()), module(std::make_unique<llvm::Module>("jit_module", *context)), builder(*context) {
+    VM() : gc(), context(std::make_unique<llvm::LLVMContext>()), module(std::make_unique<llvm::Module>("jit_module", *context)), builder(std::make_unique<llvm::IRBuilder<>>(*context)) {
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
         llvm::InitializeNativeTargetAsmParser();
@@ -111,5 +116,8 @@ public:
     std::vector<Command> LoopBytecode(const std::vector<Command>& commands, size_t loopStart, size_t jumpTarget);
 
     /// Трансляция в LLVM IR
-    void JITCompile(const std::vector<Command>& commands, size_t loopStart);
+    void JITCompile(const std::vector<Command> &commands, size_t loopStart,
+                        const std::unordered_set<std::string> &vars,
+                        const std::unordered_set<std::string> &arrays,
+                        bool withLocal);
 };
