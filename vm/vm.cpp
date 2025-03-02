@@ -104,7 +104,6 @@ void VM::Execute(const std::vector<Command>& commands) {
         auto command = commands[pointer];
         if (command.bytecode == Bytecode::NoOp && loopStartToNoOp.contains(pointer)) {
             size_t loopStart = FindLoopStart(commands, pointer);
-            size_t loopEnd = FindLoopEnd(commands, pointer, commands[loopStart].number);
 
             if (!loopExecutionCount.contains(loopStart)) {
                 loopExecutionCount[loopStart] = 0;
@@ -115,6 +114,7 @@ void VM::Execute(const std::vector<Command>& commands) {
             if (loopExecutionCount[loopStart] >= hotLoopThreshold) { // Future: для отключения JIT закоммитить\заифать(с флагом) этот if и раскоммитить строчку после него
                 // std::cout << "Hot loop detected: [" << loopStart << " - " << loopEnd << "]" << std::endl;
 
+                size_t loopEnd = FindLoopEnd(commands, pointer, commands[loopStart].number);
                 std::unordered_set<std::string> vars;
                 std::unordered_set<std::string> arrays;
                 for (auto ptr = loopStart; ptr <= loopEnd; ++ptr) {
@@ -569,7 +569,7 @@ static void initLibFunctions(llvm::ExecutionEngine* engine) {
     // engine->addGlobalMapping("strcmp", reinterpret_cast<uint64_t>(&strcmp));
     // engine->addGlobalMapping("display", reinterpret_cast<uint64_t>(&printf));
     // engine->addGlobalMapping("sdisplay", reinterpret_cast<uint64_t>(&printf));
-    engine->addGlobalMapping("printf", reinterpret_cast<uint64_t>(&printf));
+    //engine->addGlobalMapping("printf", reinterpret_cast<uint64_t>(&printf));
 }
 
 static void optimizeModule(llvm::Module& module) {
@@ -649,11 +649,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
         blocks[i] = llvm::BasicBlock::Create(*context, "block_" + std::to_string(i), function);
     }
     size_t firstNoOp = 0; // не выполняем ре-иницаизацию итератора
-    std::string iterName = "";
     while( commands[firstNoOp].bytecode != Bytecode::NoOp){
-        if (commands[firstNoOp].bytecode == Bytecode::StoreVar){
-            iterName = GetNameByIndex(commands[firstNoOp]);
-        }
         firstNoOp++;
     }
 
@@ -1166,7 +1162,6 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
     auto mainFunction = reinterpret_cast<JITFunctionType>(
             executionEngine->getFunctionAddress("jit_compiled_function")
     );
-    initLibFunctions(executionEngine);
 
     // Allocate memory in host program for variables and arrays
     std::unordered_map<std::string, int64_t> hostMemory;
@@ -1251,7 +1246,8 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
             *index_ptr = apInt;
         }
     }
-    //Дописать обновление массивов
+
+
     delete executionEngine;
     context = (std::make_unique<llvm::LLVMContext>()); // Future: очистка JIT, если сохранять циклы, то её нужно убрать + у цикла есть 2 варианта см коммит "Branch"
     module = (std::make_unique<llvm::Module>("jit_module", *context));

@@ -19,6 +19,8 @@ public class Main {
         String filepath = args[0];
 
         try {
+            long elapsedTime = 0;
+
             // Читаем входной файл
             CharStream charStream = CharStreams.fromFileName(filepath);
             LMlangGrammarLexer lexer = new LMlangGrammarLexer(charStream);
@@ -32,10 +34,10 @@ public class Main {
             ASTBuilder builder = new ASTBuilder();
             ASTNode ast = builder.visitProgram(parseTree);
 
+            elapsedTime = (System.nanoTime() - startTime) / 1_000_000;
+
             bytecodeHolder bch = new bytecodeHolder();
             ast.BytecodeGeneration(bch, false);
-
-            System.out.println(ast.GetTypeName());
 
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bch);
@@ -47,8 +49,9 @@ public class Main {
                 System.err.println("An error occurred while saving the file: " + e.getMessage());
             }
 
-            ProcessBuilder pb = new ProcessBuilder("C:\\Users\\Home\\Documents\\LMlang\\cmake-build-debug\\MyANTLRProject.exe", filepath + ".btc");
+            ProcessBuilder pb = new ProcessBuilder("D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\cmake-build-debug\\MyANTLRProject.exe", filepath + ".btc");
             pb.redirectErrorStream(true);
+            startTime = System.nanoTime();
             Process process = pb.start();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -61,7 +64,7 @@ public class Main {
 
             long endTime = System.nanoTime();
 
-            long elapsedTime = (endTime - startTime) / 1_000_000;
+            elapsedTime += (endTime - startTime) / 1_000_000;
             System.out.println(elapsedTime + " мс");
 
         } catch (IOException | InterruptedException e) {
