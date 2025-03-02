@@ -14,44 +14,54 @@ import java.io.*;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Started work");
-        System.out.println(args[0]);
+        if (args.length == 0) {
+            System.err.println("Please provide a file path as an argument.");
+            return;
+        }
+
         String filepath = args[0];
+        boolean forceCreateAST = false;
+
+        for (String arg : args) {
+            if (arg.equals("-c")) {
+                forceCreateAST = true;
+                break;
+            }
+        }
+
+        File btcFile = new File(filepath + ".btc");
+
+        long startTime = System.nanoTime();
 
         try {
-            long elapsedTime = 0;
+            if (!forceCreateAST || !btcFile.exists()) {
+                // Читаем входной файл
+                CharStream charStream = CharStreams.fromFileName(filepath);
+                LMlangGrammarLexer lexer = new LMlangGrammarLexer(charStream);
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                LMlangGrammarParser parser = new LMlangGrammarParser(tokens);
 
-            // Читаем входной файл
-            CharStream charStream = CharStreams.fromFileName(filepath);
-            LMlangGrammarLexer lexer = new LMlangGrammarLexer(charStream);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            LMlangGrammarParser parser = new LMlangGrammarParser(tokens);
+                LMlangGrammarParser.ProgramContext parseTree = parser.program();
+                ASTBuilder builder = new ASTBuilder();
+                ASTNode ast = builder.visitProgram(parseTree);
 
-            // Засекаем время перед созданием AST
-            long startTime = System.nanoTime();
+                bytecodeHolder bch = new bytecodeHolder();
+                ast.BytecodeGeneration(bch, false);
 
-            LMlangGrammarParser.ProgramContext parseTree = parser.program();
-            ASTBuilder builder = new ASTBuilder();
-            ASTNode ast = builder.visitProgram(parseTree);
+                ObjectMapper mapper = new ObjectMapper();
+                String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bch);
 
-            elapsedTime = (System.nanoTime() - startTime) / 1_000_000;
-
-            bytecodeHolder bch = new bytecodeHolder();
-            ast.BytecodeGeneration(bch, false);
-
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(bch);
-
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath + ".btc"))) {
-                writer.write(json);
-                System.out.println("File saved successfully: " + filepath + ".btc");
-            } catch (IOException e) {
-                System.err.println("An error occurred while saving the file: " + e.getMessage());
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(btcFile))) {
+                    writer.write(json);
+                    // System.out.println("File saved successfully: " + btcFile.getAbsolutePath());
+                } catch (IOException e) {
+                    System.err.println("An error occurred while saving the file: " + e.getMessage());
+                }
             }
 
-            ProcessBuilder pb = new ProcessBuilder("D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\cmake-build-debug\\MyANTLRProject.exe", filepath + ".btc");
+            // Запуск внешнего процесса
+            ProcessBuilder pb = new ProcessBuilder("C:\\Users\\L1ght\\CLionProjects\\LMlang\\cmake-build-debug\\MyANTLRProject.exe", btcFile.getAbsolutePath());
             pb.redirectErrorStream(true);
-            startTime = System.nanoTime();
             Process process = pb.start();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -61,14 +71,14 @@ public class Main {
             }
 
             int exitCode = process.waitFor();
-
-            long endTime = System.nanoTime();
-
-            elapsedTime += (endTime - startTime) / 1_000_000;
-            System.out.println(elapsedTime + " мс");
+            System.out.println("Process exited with code: " + exitCode);
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            long endTime = System.nanoTime();
+            long elapsedTime = (endTime - startTime) / 1_000_000;
+            System.out.println("Total execution time: " + elapsedTime + " мс");
         }
     }
 }
