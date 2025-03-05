@@ -60,7 +60,7 @@ public class Main {
             }
 
             // Запуск внешнего процесса
-            ProcessBuilder pb = new ProcessBuilder("D:\\CLionProjects\\LMlang\\cmake-build-debug\\MyANTLRProject.exe", btcFile.getAbsolutePath());
+            ProcessBuilder pb = new ProcessBuilder("src\\main\\java\\resources\\LMLang.exe", btcFile.getAbsolutePath());
             pb.redirectErrorStream(true);
             Process process = pb.start();
 

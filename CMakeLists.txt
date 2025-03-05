@@ -43,6 +43,7 @@ llvm_map_components_to_libnames(
 
 set(SOURCES
         main.cpp
+        vm/vm.cpp
         codeRunner/CodeRunner.cpp
         Mapper/mapper.cpp
         bytecodeGenerator/bytecode.cpp
