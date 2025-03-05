@@ -64,6 +64,7 @@ class VM {
     const long long hotLoopThreshold = 450;          // Threshold for marking a loop as hot
     std::stack<llvm::APInt*> stackIR; // IR representation of the stack
 
+
     GC gc;
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;

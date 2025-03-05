@@ -1,4 +1,18 @@
 {
+  "stringTable" : {
+    "primes" : 7,
+    "tmp" : 4,
+    "i" : 3,
+    "index" : 8,
+    "j" : 5,
+    "main" : 9,
+    "primeCount" : 6,
+    "findPrimes" : 0,
+    "isPrime" : 2,
+    "n" : 1
+  },
+  "controlFlowCounter" : 22,
+  "controlCycleCounter" : 6,
   "bytecodes" : [ {
     "opCode" : "FuncDecl",
     "value" : 0,
@@ -636,18 +650,6 @@
     "withValue" : false,
     "withStringID" : false
   }, {
-    "opCode" : "StoreVar",
-    "value" : 0,
-    "stringID" : 4,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
-    "opCode" : "LoadVar",
-    "value" : 0,
-    "stringID" : 4,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
     "opCode" : "Push",
     "value" : 1,
     "stringID" : 0,
@@ -858,18 +860,6 @@
     "withValue" : false,
     "withStringID" : false
   }, {
-    "opCode" : "StoreVar",
-    "value" : 0,
-    "stringID" : 4,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
-    "opCode" : "LoadVar",
-    "value" : 0,
-    "stringID" : 4,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
     "opCode" : "Push",
     "value" : 1,
     "stringID" : 0,
@@ -1068,30 +1058,6 @@
     "withValue" : false,
     "withStringID" : true
   }, {
-    "opCode" : "LoadVar",
-    "value" : 0,
-    "stringID" : 7,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
-    "opCode" : "Push",
-    "value" : 0,
-    "stringID" : 0,
-    "withValue" : true,
-    "withStringID" : false
-  }, {
-    "opCode" : "LoadArray",
-    "value" : 0,
-    "stringID" : 0,
-    "withValue" : false,
-    "withStringID" : false
-  }, {
-    "opCode" : "Print",
-    "value" : 0,
-    "stringID" : 0,
-    "withValue" : false,
-    "withStringID" : false
-  }, {
     "opCode" : "ForBegin",
     "value" : 5,
     "stringID" : 0,
@@ -1157,18 +1123,6 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
-  }, {
-    "opCode" : "StoreVar",
-    "value" : 0,
-    "stringID" : 4,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
-    "opCode" : "LoadVar",
-    "value" : 0,
-    "stringID" : 4,
-    "withValue" : false,
-    "withStringID" : true
   }, {
     "opCode" : "Push",
     "value" : 0,
@@ -1301,19 +1255,5 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
-  } ],
-  "stringTable" : {
-    "primes" : 7,
-    "tmp" : 4,
-    "i" : 3,
-    "index" : 8,
-    "j" : 5,
-    "main" : 9,
-    "primeCount" : 6,
-    "findPrimes" : 0,
-    "isPrime" : 2,
-    "n" : 1
-  },
-  "controlFlowCounter" : 22,
-  "controlCycleCounter" : 6
+  } ]
 }

@@ -1,13 +1,10 @@
 func int[] quickSort(int[] nums, int left, int right) {
-    int pivot = nums[right]; // Choose the pivot (last element)
+    int pivot = nums[right];
     int partitionIndex = left;
 
     for (int i = left; i < right; ++i) {
-        int tmp1 = nums[i];
 
-        if (tmp1 < pivot) {
-
-            // Swap manually using a temporary variable
+        if (nums[i] < pivot) {
             int tmp = nums[i];
             nums[i] = nums[partitionIndex];
             nums[partitionIndex] = tmp;
@@ -16,7 +13,6 @@ func int[] quickSort(int[] nums, int left, int right) {
         }
     }
 
-    // Swap manually to move pivot to correct position
     int tmp = nums[partitionIndex];
     nums[partitionIndex] = nums[right];
     nums[right] = tmp;

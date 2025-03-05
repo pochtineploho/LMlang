@@ -1,4 +1,30 @@
 {
+  "stringTable" : {
+    "ret" : 10,
+    "minDepth" : 12,
+    "item" : 2,
+    "MAX_NODES" : 6,
+    "itemCheck" : 5,
+    "stretchDepth" : 14,
+    "expected" : 21,
+    "index" : 3,
+    "i" : 16,
+    "main" : 7,
+    "j" : 20,
+    "check" : 17,
+    "n" : 11,
+    "iterations" : 19,
+    "maxDepth" : 13,
+    "posTree" : 8,
+    "depth" : 1,
+    "nodes" : 4,
+    "negTree" : 9,
+    "stretchTree" : 15,
+    "longLivedTree" : 18,
+    "bottomUpTree" : 0
+  },
+  "controlFlowCounter" : 22,
+  "controlCycleCounter" : 7,
   "bytecodes" : [ {
     "opCode" : "FuncDecl",
     "value" : 0,
@@ -2003,31 +2029,5 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
-  } ],
-  "stringTable" : {
-    "ret" : 10,
-    "minDepth" : 12,
-    "item" : 2,
-    "MAX_NODES" : 6,
-    "itemCheck" : 5,
-    "stretchDepth" : 14,
-    "expected" : 21,
-    "index" : 3,
-    "i" : 16,
-    "main" : 7,
-    "j" : 20,
-    "check" : 17,
-    "n" : 11,
-    "iterations" : 19,
-    "maxDepth" : 13,
-    "posTree" : 8,
-    "depth" : 1,
-    "nodes" : 4,
-    "negTree" : 9,
-    "stretchTree" : 15,
-    "longLivedTree" : 18,
-    "bottomUpTree" : 0
-  },
-  "controlFlowCounter" : 22,
-  "controlCycleCounter" : 7
+  } ]
 }

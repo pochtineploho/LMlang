@@ -23,7 +23,7 @@ public class Main {
         boolean forceCreateAST = false;
 
         for (String arg : args) {
-            if (arg.equals("-c")) {
+            if (arg.equals("c")) {
                 forceCreateAST = true;
                 break;
             }
@@ -35,6 +35,7 @@ public class Main {
 
         try {
             if (!forceCreateAST || !btcFile.exists()) {
+                
                 // Читаем входной файл
                 CharStream charStream = CharStreams.fromFileName(filepath);
                 LMlangGrammarLexer lexer = new LMlangGrammarLexer(charStream);

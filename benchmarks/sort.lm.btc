@@ -2,15 +2,14 @@
   "stringTable" : {
     "partitionIndex" : 5,
     "left" : 2,
-    "tmp" : 8,
+    "tmp" : 7,
     "pivot" : 4,
     "i" : 6,
-    "main" : 9,
+    "main" : 8,
     "right" : 1,
     "quickSort" : 0,
-    "tmp1" : 7,
     "nums" : 3,
-    "n" : 10
+    "n" : 9
   },
   "controlFlowCounter" : 10,
   "controlCycleCounter" : 2,
@@ -141,18 +140,6 @@
     "withValue" : false,
     "withStringID" : false
   }, {
-    "opCode" : "StoreVar",
-    "value" : 0,
-    "stringID" : 7,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
-    "opCode" : "LoadVar",
-    "value" : 0,
-    "stringID" : 7,
-    "withValue" : false,
-    "withStringID" : true
-  }, {
     "opCode" : "LoadVar",
     "value" : 0,
     "stringID" : 4,
@@ -191,7 +178,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -233,7 +220,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -359,7 +346,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -401,7 +388,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 8,
+    "stringID" : 7,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -629,7 +616,7 @@
   }, {
     "opCode" : "FuncDecl",
     "value" : 0,
-    "stringID" : 9,
+    "stringID" : 8,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -641,7 +628,7 @@
   }, {
     "opCode" : "StoreVar",
     "value" : 0,
-    "stringID" : 10,
+    "stringID" : 9,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -180677,7 +180664,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 10,
+    "stringID" : 9,
     "withValue" : false,
     "withStringID" : true
   }, {
@@ -180737,7 +180724,7 @@
   }, {
     "opCode" : "LoadVar",
     "value" : 0,
-    "stringID" : 10,
+    "stringID" : 9,
     "withValue" : false,
     "withStringID" : true
   }, {

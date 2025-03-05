@@ -1,4 +1,11 @@
 {
+  "stringTable" : {
+    "factorial" : 0,
+    "main" : 2,
+    "n" : 1
+  },
+  "controlFlowCounter" : 2,
+  "controlCycleCounter" : 0,
   "bytecodes" : [ {
     "opCode" : "FuncDecl",
     "value" : 0,
@@ -137,12 +144,5 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
-  } ],
-  "stringTable" : {
-    "factorial" : 0,
-    "main" : 2,
-    "n" : 1
-  },
-  "controlFlowCounter" : 2,
-  "controlCycleCounter" : 0
+  } ]
 }
