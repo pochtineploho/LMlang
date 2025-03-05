@@ -43,7 +43,7 @@ func int[] findPrimes(int n) {
 }
 
 func int main() {
-    int n = 10000;
+    int n = 100000;
     int[] primes = findPrimes(n);
 
     for (int i = 0; i < n; ++i) {
