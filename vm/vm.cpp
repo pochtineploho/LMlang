@@ -627,7 +627,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
     );
 
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(*context, "entry", function);
-    (*builder).SetInsertPoint(entryBlock);
+    builder->SetInsertPoint(entryBlock);
 
     std::vector<llvm::Value*> llvmStack;
 
@@ -654,16 +654,16 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
     }
 
     if (!commands.empty()) {
-        (*builder).CreateBr(blocks[beginning]);
+        builder->CreateBr(blocks[beginning]);
     } else {
-        (*builder).CreateRetVoid();
+        builder->CreateRetVoid();
         return;
     }
 
 
     for (size_t i = beginning; i < commands.size(); i++) {
         const Command& command = commands[i];
-        (*builder).SetInsertPoint(blocks[i]);
+        builder->SetInsertPoint(blocks[i]);
 
 
         bool hasTerminator = false;
@@ -677,7 +677,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvmStack.pop_back();
                     auto lhs = llvmStack.back();
                     llvmStack.pop_back();
-                    llvm::Value* result = (*builder).CreateAdd(lhs, rhs, "addtmp");
+                    llvm::Value* result = builder->CreateAdd(lhs, rhs, "addtmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -689,7 +689,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvmStack.pop_back();
                     llvm::Value* lhs = llvmStack.back();
                     llvmStack.pop_back();
-                    llvm::Value* result = (*builder).CreateSub(lhs, rhs, "subtmp");
+                    llvm::Value* result = builder->CreateSub(lhs, rhs, "subtmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -701,7 +701,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvmStack.pop_back();
                     llvm::Value* lhs = llvmStack.back();
                     llvmStack.pop_back();
-                    llvm::Value* result = (*builder).CreateMul(lhs, rhs, "multmp");
+                    llvm::Value* result = builder->CreateMul(lhs, rhs, "multmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -714,26 +714,26 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvm::Value* lhs = llvmStack.back();
                     llvmStack.pop_back();
 
-                    llvm::Value* isZero = (*builder).CreateICmpEQ(rhs, llvm::ConstantInt::get(rhs->getType(), 0), "isZero");
+                    llvm::Value* isZero = builder->CreateICmpEQ(rhs, llvm::ConstantInt::get(rhs->getType(), 0), "isZero");
                     llvm::BasicBlock* divideBlock = llvm::BasicBlock::Create(*context, "divide", function);
                     llvm::BasicBlock* errorBlock = llvm::BasicBlock::Create(*context, "error", function);
                     llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*context, "merge", function);
 
-                    (*builder).CreateCondBr(isZero, errorBlock, divideBlock);
+                    builder->CreateCondBr(isZero, errorBlock, divideBlock);
 
-                    (*builder).SetInsertPoint(errorBlock);
-                    (*builder).CreateCall(module->getOrInsertFunction(
+                    builder->SetInsertPoint(errorBlock);
+                    builder->CreateCall(module->getOrInsertFunction(
                             "puts",
                             llvm::FunctionType::get(llvm::Type::getInt64Ty(*context),
                                                     {llvm::Type::getInt8Ty(*context)}, true)
-                    ), (*builder).CreateGlobalString("Division by zero error!"));
-                    (*builder).CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0));
+                    ), builder->CreateGlobalString("Division by zero error!"));
+                    builder->CreateRet(llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 0));
 
-                    (*builder).SetInsertPoint(divideBlock);
-                    llvm::Value* result = (*builder).CreateSDiv(lhs, rhs, "divtmp");
-                    (*builder).CreateBr(mergeBlock);
+                    builder->SetInsertPoint(divideBlock);
+                    llvm::Value* result = builder->CreateSDiv(lhs, rhs, "divtmp");
+                    builder->CreateBr(mergeBlock);
 
-                    (*builder).SetInsertPoint(mergeBlock);
+                    builder->SetInsertPoint(mergeBlock);
                     llvmStack.push_back(result);
 
                     hasTerminator = true;
@@ -744,7 +744,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     if (!blocks.contains(target)) {
                         throw std::runtime_error("Invalid jump target");
                     }
-                    (*builder).CreateBr(blocks[target]);
+                    builder->CreateBr(blocks[target]);
                     hasTerminator = true;
                     break;
                 }
@@ -770,7 +770,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                         blocks[i + 1] = nextBlock;
                     }
 
-                    (*builder).CreateCondBr(condition, trueBlock, nextBlock);
+                    builder->CreateCondBr(condition, trueBlock, nextBlock);
                     hasTerminator = true;
                     break;
                 }
@@ -795,9 +795,9 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                         throw std::runtime_error("invalid block movement");
                     }
 
-                    condition = (*builder).CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0),
+                    condition = builder->CreateICmpEQ(condition, llvm::ConstantInt::get(condition->getType(), 0),
                                                         "condfalse");
-                    (*builder).CreateCondBr(condition, falseBlock, nextBlock);
+                    builder->CreateCondBr(condition, falseBlock, nextBlock);
                     hasTerminator = true;
                     break;
                 }
@@ -806,9 +806,9 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     if (!variablePointers.contains(varName) && !arrayPointers.contains(varName)) throw std::runtime_error("Variable not found: " + varName);
                     llvm::Value* value;
                     if(variablePointers.contains(varName)){
-                        value = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), variablePointers[varName]);
+                        value = builder->CreateLoad(llvm::Type::getInt64Ty(*context), variablePointers[varName]);
                     } else {
-                        value = (*builder).CreateLoad(llvm::PointerType::getUnqual(*context), arrayPointers[varName]);
+                        value = builder->CreateLoad(llvm::PointerType::getUnqual(*context), arrayPointers[varName]);
                     }
                     llvmStack.push_back(value);
                     break;
@@ -817,11 +817,10 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     if (llvmStack.empty()) throw std::runtime_error("Stack underflow on StoreVar");
                     llvm::Value* value = llvmStack.back();
                     llvmStack.pop_back();
-                    std::string varName = GetNameByIndex(command);
-                    if(arrayPointers.contains(varName)){
-                        (*builder).CreateStore(value, arrayPointers[varName]);
+                    if(std::string varName = GetNameByIndex(command); arrayPointers.contains(varName)){
+                        builder->CreateStore(value, arrayPointers[varName]);
                     } else {
-                        (*builder).CreateStore(value, variablePointers[varName]);
+                        builder->CreateStore(value, variablePointers[varName]);
                     }
                     break;
                 }
@@ -829,7 +828,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     break;
                 }
                 case Bytecode::Halt: {
-                    (*builder).CreateRetVoid();
+                    builder->CreateRetVoid();
                     hasTerminator = true;
                     return;
                 }
@@ -862,15 +861,15 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                         plus = 1;
                     }
                     // Создаем строку формата
-                    llvm::Value* formatStr = (*builder).CreateGlobalStringPtr(/*std::string((variablesStack.size()-1+plus)*4,' ')+*/"%d\n");
+                    llvm::Value* formatStr = builder->CreateGlobalStringPtr(/*std::string((variablesStack.size()-1+plus)*4,' ')+*/"%d\n");
 
                     // Приводим value к типу i32, если необходимо
                     if (value->getType() != llvm::Type::getInt64Ty(*context)) {
-                        value = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), value);
+                        value = builder->CreateLoad(llvm::Type::getInt64Ty(*context), value);
                     }
 
                     // Вызываем printf
-                    (*builder).CreateCall(printfFunc, {formatStr, value});
+                    builder->CreateCall(printfFunc, {formatStr, value});
                     break;
                 }
                 case Bytecode::Call: {
@@ -891,12 +890,12 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                         llvmStack.pop_back();
                     }
 
-                    llvm::Value* retVal = (*builder).CreateCall(calleeFunc, args);
+                    llvm::Value* retVal = builder->CreateCall(calleeFunc, args);
                     llvmStack.push_back(retVal);
                     break;
                 }
                 case Bytecode::Return: {
-                    (*builder).CreateBr(blocks[commands.size()-1]);
+                    builder->CreateBr(blocks[commands.size()-1]);
                     hasTerminator = true;
                     break;
                 }
@@ -908,7 +907,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvm::Value* arraySize = llvmStack.back();
                     llvmStack.pop_back();
 
-                    llvm::Value* array = (*builder).CreateAlloca(
+                    llvm::Value* array = builder->CreateAlloca(
                             llvm::Type::getInt64Ty(*context), arraySize, "array");
 
                     llvmStack.push_back(array);
@@ -924,10 +923,10 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvm::Value* array = llvmStack.back();
                     llvmStack.pop_back();
 
-                    llvm::Value* elementPtr = (*builder).CreateGEP(
+                    llvm::Value* elementPtr = builder->CreateGEP(
                             llvm::PointerType::getUnqual(*context), array, index, "elementPtr");
 
-                    llvm::Value* value = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), elementPtr);
+                    llvm::Value* value = builder->CreateLoad(llvm::Type::getInt64Ty(*context), elementPtr);
 
                     llvmStack.push_back(value);
                     break;
@@ -944,10 +943,10 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvm::Value* value = llvmStack.back();
                     llvmStack.pop_back();
 
-                    llvm::Value* elementPtr = (*builder).CreateGEP(
+                    llvm::Value* elementPtr = builder->CreateGEP(
                             llvm::PointerType::getUnqual(*context), array, index, "elementPtr");
 
-                    (*builder).CreateStore(value, elementPtr);
+                    builder->CreateStore(value, elementPtr);
                     break;
                 }
                 case Bytecode::And: {
@@ -960,7 +959,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvm::Value* lhs = llvmStack.back();
                     llvmStack.pop_back();
 
-                    llvm::Value* result = (*builder).CreateAnd(lhs, rhs, "andtmp");
+                    llvm::Value* result = builder->CreateAnd(lhs, rhs, "andtmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -974,7 +973,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvm::Value* lhs = llvmStack.back();
                     llvmStack.pop_back();
 
-                    llvm::Value* result = (*builder).CreateOr(lhs, rhs, "ortmp");
+                    llvm::Value* result = builder->CreateOr(lhs, rhs, "ortmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -986,9 +985,9 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     llvm::Value* value = llvmStack.back();
                     llvmStack.pop_back();
                     if (value->getType() != llvm::Type::getInt64Ty(*context)) {
-                        value = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), value);
+                        value = builder->CreateLoad(llvm::Type::getInt64Ty(*context), value);
                     }
-                    llvm::Value* result = (*builder).CreateICmpEQ(
+                    llvm::Value* result = builder->CreateICmpEQ(
                             value,
                             llvm::ConstantInt::get(value->getType(), 0),
                             "nottmp"
@@ -998,7 +997,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                 }
                 case Bytecode::Push: {
                     CheckType(command, Command::OnlyNum);
-                    llvmStack.push_back(llvm::ConstantInt::get((*builder).getInt64Ty(), command.number));
+                    llvmStack.push_back(llvm::ConstantInt::get(builder->getInt64Ty(), command.number));
                     break;
                 }
                 case Bytecode::Pop: {
@@ -1020,12 +1019,12 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     auto lhs = llvmStack.back();
                     llvmStack.pop_back();
                     if (lhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        lhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
+                        lhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
                     }
                     if (rhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        rhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
+                        rhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
                     }
-                    auto result = (*builder).CreateICmpEQ(lhs, rhs, "cmp");
+                    auto result = builder->CreateICmpEQ(lhs, rhs, "cmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -1039,12 +1038,12 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     auto lhs = llvmStack.back();
                     llvmStack.pop_back();
                     if (lhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        lhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
+                        lhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
                     }
                     if (rhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        rhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
+                        rhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
                     }
-                    auto result = (*builder).CreateICmpNE(lhs, rhs, "cmp");
+                    auto result = builder->CreateICmpNE(lhs, rhs, "cmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -1058,12 +1057,12 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     auto lhs = llvmStack.back();
                     llvmStack.pop_back();
                     if (lhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        lhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
+                        lhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
                     }
                     if (rhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        rhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
+                        rhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
                     }
-                    auto result = (*builder).CreateICmpSGT(lhs, rhs, "cmp");
+                    auto result = builder->CreateICmpSGT(lhs, rhs, "cmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -1077,12 +1076,12 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     auto lhs = llvmStack.back();
                     llvmStack.pop_back();
                     if (lhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        lhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
+                        lhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
                     }
                     if (rhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        rhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
+                        rhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
                     }
-                    auto result = (*builder).CreateICmpSGE(lhs, rhs, "cmp");
+                    auto result = builder->CreateICmpSGE(lhs, rhs, "cmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -1096,12 +1095,12 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     auto lhs = llvmStack.back();
                     llvmStack.pop_back();
                     if (lhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        lhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
+                        lhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
                     }
                     if (rhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        rhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
+                        rhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
                     }
-                    auto result = (*builder).CreateICmpSLT(lhs, rhs, "cmp");
+                    auto result = builder->CreateICmpSLT(lhs, rhs, "cmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -1115,12 +1114,12 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
                     auto lhs = llvmStack.back();
                     llvmStack.pop_back();
                     if (lhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        lhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
+                        lhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), lhs);
                     }
                     if (rhs->getType() != llvm::Type::getInt64Ty(*context)) {
-                        rhs = (*builder).CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
+                        rhs = builder->CreateLoad(llvm::Type::getInt64Ty(*context), rhs);
                     }
-                    auto result = (*builder).CreateICmpSLE(lhs, rhs, "cmp");
+                    auto result = builder->CreateICmpSLE(lhs, rhs, "cmp");
                     llvmStack.push_back(result);
                     break;
                 }
@@ -1137,14 +1136,14 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
 
         if (!hasTerminator) {
             if (i + 1 < commands.size()) {
-                (*builder).CreateBr(blocks[i + 1]);
+                builder->CreateBr(blocks[i + 1]);
             } else {
                 //(*builder).CreateRetVoid();
             }
         }
     }
 
-    (*builder).CreateRetVoid();
+    builder->CreateRetVoid();
     bool isBroken = verifyModule(*module, &llvm::errs());
     if(JITCounter == 2 || JITCounter == 1){
         //module->print(llvm::errs(), nullptr);
@@ -1240,7 +1239,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
 
         int64_t arraySize = arrayTable[name].getSExtValue();
         std::optional<llvm::APInt> array = FindInVariablesStack(name);
-        auto* array_ptr = reinterpret_cast<llvm::APInt*>((*array).getLimitedValue());
+        auto* array_ptr = reinterpret_cast<llvm::APInt*>(array->getLimitedValue());
         for (int i=0;i<arraySize;i++){
             auto* index_ptr = reinterpret_cast<llvm::APInt*>(&array_ptr[i]);
             llvm::APInt apInt(64, *value[i]);

@@ -23,7 +23,7 @@ public class Main {
         boolean forceCreateAST = false;
 
         for (String arg : args) {
-            if (arg.equals("c")) {
+            if (arg.equals("-c")) {
                 forceCreateAST = true;
                 break;
             }
@@ -34,8 +34,8 @@ public class Main {
         long startTime = System.nanoTime();
 
         try {
-            if (!forceCreateAST || !btcFile.exists()) {
-
+            if (forceCreateAST || !btcFile.exists()) {
+                
                 // Читаем входной файл
                 CharStream charStream = CharStreams.fromFileName(filepath);
                 LMlangGrammarLexer lexer = new LMlangGrammarLexer(charStream);
@@ -61,7 +61,7 @@ public class Main {
             }
 
             // Запуск внешнего процесса
-            ProcessBuilder pb = new ProcessBuilder("D:\\1_5sem\\PISVJAP\\LMLang\\LMlang\\cmake-build-debug\\LMLang.exe", btcFile.getAbsolutePath());
+            ProcessBuilder pb = new ProcessBuilder("src/main/resources/LMLang.exe", btcFile.getAbsolutePath());
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
