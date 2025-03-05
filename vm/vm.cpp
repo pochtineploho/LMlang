@@ -1145,9 +1145,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
 
     builder->CreateRetVoid();
     bool isBroken = verifyModule(*module, &llvm::errs());
-    if(JITCounter == 2 || JITCounter == 1){
-        //module->print(llvm::errs(), nullptr);
-    }
+    //module->print(llvm::errs(), nullptr);
 
     std::string errStr;
     optimizeModule(*module);

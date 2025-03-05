@@ -822,6 +822,24 @@
     "withValue" : false,
     "withStringID" : true
   }, {
+    "opCode" : "CreateArray",
+    "value" : 0,
+    "stringID" : 0,
+    "withValue" : false,
+    "withStringID" : false
+  }, {
+    "opCode" : "StoreVar",
+    "value" : 0,
+    "stringID" : 7,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
+    "opCode" : "LoadVar",
+    "value" : 0,
+    "stringID" : 1,
+    "withValue" : false,
+    "withStringID" : true
+  }, {
     "opCode" : "Call",
     "value" : 1,
     "stringID" : 0,
