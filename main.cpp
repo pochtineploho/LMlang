@@ -9,6 +9,7 @@ int main(int argc, const char** argv) {
         std::cout << "Specify input file" << std::endl;
         return 1;
     }
+    std::cout<<argv[1]<<'\n';
     std::ifstream input(argv[1]);
     if (!input.is_open()) {
         std::cerr << "File doesn't exist" << std::endl;
