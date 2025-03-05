@@ -42,7 +42,6 @@ llvm_map_components_to_libnames(
 
 
 set(SOURCES
-        vm/vm.cpp
         main.cpp
         codeRunner/CodeRunner.cpp
         Mapper/mapper.cpp
