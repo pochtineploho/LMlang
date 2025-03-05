@@ -1,0 +1,24 @@
+package ru.itmo.lmlang.ast;
+
+import ru.itmo.lmlang.bytecode.*;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+public class ContinueNode implements ASTNode {
+
+    @Override
+    public String GetTypeName() {
+        return "ContinueNode";
+    }
+
+    @Override
+    public void Print(int indent) {
+        System.out.println(" ".repeat(indent + 2) + "ContinueNode");
+    }
+
+    @Override
+    public void BytecodeGeneration(BytecodeHolder bch, Boolean load){
+        bch.getBytecodes().add(new Bytecode(OperationCode.Jump, 0L, 0, false, false));
+    }
+}
+
