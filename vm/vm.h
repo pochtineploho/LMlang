@@ -66,7 +66,10 @@ class VM {
     std::unique_ptr<llvm::Module> module;
     std::unique_ptr<llvm::IRBuilder<>> builder;
     std::unordered_map<int, std::string> namesTable;
-    int JITCounter = 0;
+
+    int JITCounter;
+    int interpretedCycle;
+    llvm::ExecutionEngine* executionEngine = nullptr;
     std::stack<llvm::APInt> valueStack;
     std::stack<llvm::APInt> arraySizeStack;
     std::vector<std::unordered_map<std::string, llvm::APInt>> variablesStack;
@@ -100,6 +103,8 @@ public:
         llvm::InitializeNativeTargetAsmPrinter();
         llvm::InitializeNativeTargetAsmParser();
         llvm::sys::DynamicLibrary::LoadLibraryPermanently(nullptr);
+        JITCounter = 0;
+        interpretedCycle=0;
     }
 
     void LoadStringTable(const std::unordered_map<std::string, int>& stringTable);
@@ -119,5 +124,6 @@ public:
     void JITCompile(const std::vector<Command> &commands, size_t loopStart,
                         const std::unordered_set<std::string> &vars,
                         const std::unordered_set<std::string> &arrays,
-                        bool withLocal);
+                        bool withLocal,
+                        int cycleNumber);
 };
