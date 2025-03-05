@@ -14,9 +14,9 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(json)
 
-find_package(BDWgc 8.2.0 REQUIRED PATHS "C:\\Users\\Home\\Documents\\bdwgc-install\\")
+find_package(BDWgc 8.2.0 REQUIRED PATHS "D:/1_5sem/PISVJAP/boehmGC/bdwgcInstall")
 
-find_package(LLVM REQUIRED CONFIG PATHS "C:\\Users\\Home\\Documents\\clang+llvm-19.1.0-x86_64-pc-windows-msvc\\")
+find_package(LLVM REQUIRED CONFIG PATHS "D:/1_5sem/PISVJAP/LLVM/clang+llvm-19.1.0-x86_64-pc-windows-msvc/")
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
@@ -45,8 +45,9 @@ set(SOURCES
         main.cpp
         vm/vm.cpp
         codeRunner/CodeRunner.cpp
-        Mapper/mapper.cpp
-        bytecodeGenerator/bytecode.cpp
+        bytecode/mapper.cpp
+        bytecode/command.h
+        bytecode/bytecode.h
 )
 
 

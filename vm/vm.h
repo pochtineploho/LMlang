@@ -21,7 +21,6 @@
 #include <llvm/Support/Error.h>
 #include <llvm/Support/raw_ostream.h>
 #include "gc/gc.h"
-#include "../bytecodeGenerator/bytecode.h"
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/ExecutionEngine/MCJIT.h>
@@ -40,6 +39,10 @@
 #include <sstream> // для преобразования типов в строку, например, std::to_string, std::stoi, std::stof
 #include <cstdlib>
 #include <unordered_set>
+
+#include "../bytecode/command.h"
+
+class Command;
 
 /// Класс сборщика мусора на основе Boehm GC.
 class GC {

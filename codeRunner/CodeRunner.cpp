@@ -6,7 +6,7 @@
 #include "CodeRunner.h"
 
 void RunCode(std::ifstream& input) {
-    mapper mapper;
+    Mapper mapper;
     mapper.map(input);
     VM virtualMachine;
     virtualMachine.LoadStringTable(mapper.stringTable);

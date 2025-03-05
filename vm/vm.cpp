@@ -11,31 +11,31 @@
 
 void VM::CheckType(const Command& command, const Command::CommandType type) {
     if (command.type != type) {
-        throw std::runtime_error("Bytecode error on " + BytecodeToString(command.bytecode));
+        throw std::runtime_error("Bytecode error on " + BytecodeToString[command.bytecode]);
     }
 }
 
 void VM::CheckValueStack(const Command& command, const int size) {
     if (valueStack.size() < size) {
-        throw std::runtime_error("Value stack error on " + BytecodeToString(command.bytecode));
+        throw std::runtime_error("Value stack error on " + BytecodeToString[command.bytecode]);
     }
 }
 
 void VM::CheckFunctions(const Command& command, const std::string& function) {
     if (!functionTable.contains(function)) {
-        throw std::runtime_error(BytecodeToString(command.bytecode) + " function not found: " + function);
+        throw std::runtime_error(BytecodeToString[command.bytecode] + " function not found: " + function);
     }
 }
 
 void VM::CheckCallStack(const Command& command, const int size) {
     if (callStack.size() < size) {
-        throw std::runtime_error("Call stack error on " + BytecodeToString(command.bytecode));
+        throw std::runtime_error("Call stack error on " + BytecodeToString[command.bytecode]);
     }
 }
 
 void VM::CheckPointer(const Command& command, const llvm::APInt* ptr) {
     if (!ptr) {
-        throw std::runtime_error(BytecodeToString(command.bytecode) + ": null pointer error");
+        throw std::runtime_error(BytecodeToString[command.bytecode] + ": null pointer error");
     }
 }
 
@@ -44,7 +44,7 @@ std::string VM::GetNameByIndex(const Command& command) {
         return var_iter->second;
     }
     throw std::runtime_error(
-            "Variable error on" + BytecodeToString(command.bytecode) + " " + std::to_string(command.str_index));
+            "Variable error on" + BytecodeToString[command.bytecode] + " " + std::to_string(command.str_index));
 }
 
 std::optional<llvm::APInt> VM::FindInVariablesStack(const std::string& name) {
@@ -318,7 +318,7 @@ int VM::HandleCommand(const Command& command) {
                 valueStack.push(*foundValue);
             } else {
                 throw std::runtime_error(
-                        "Variable error on " + BytecodeToString(command.bytecode) + " " +
+                        "Variable error on " + BytecodeToString[command.bytecode] + " " +
                         std::to_string(command.str_index));
             }
             break;
@@ -392,11 +392,11 @@ int VM::HandleCommand(const Command& command) {
             valueStack.pop();
             arraySizeStack.push(memory);
             if (!memory.isIntN(sizeof(size_t) * 8)) {
-                throw std::runtime_error(BytecodeToString(command.bytecode) + ": array size is too large");
+                throw std::runtime_error(BytecodeToString[command.bytecode] + ": array size is too large");
             }
             void* allocated = gc.Allocate(memory.getLimitedValue() * 16 + 16);
             if (!allocated) {
-                throw std::runtime_error(BytecodeToString(command.bytecode) + ": allocation error");
+                throw std::runtime_error(BytecodeToString[command.bytecode] + ": allocation error");
             }
             llvm::APInt array_ptr(sizeof(uintptr_t) * 8, reinterpret_cast<uintptr_t>(allocated));
             valueStack.push(array_ptr);
@@ -526,7 +526,7 @@ int VM::HandleCommand(const Command& command) {
             CheckType(command, Command::Empty);
             CheckCallStack(command, 1);
             if (functionTable.empty()) {
-                throw std::runtime_error(BytecodeToString(command.bytecode) + ": call stack is empty");
+                throw std::runtime_error(BytecodeToString[command.bytecode] + ": call stack is empty");
             }
             pointer = callStack.top();
             callStack.pop();
@@ -1212,6 +1212,7 @@ void VM::JITCompile(const std::vector<Command>& commands, size_t loopStart,
         argPointers.push_back(proxyHostArrays[arr].data());
     }
     //std::cout<<"call"<<'\n';
+
     switch (argPointers.size()) { // да-да, не спрашивайте, оно так надо
         case 0: mainFunction(); break;
         case 1: mainFunction(argPointers[0]); break;

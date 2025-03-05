@@ -5,6 +5,6 @@
 
 #include <iostream>
 #include <sstream>
-#include "../Mapper/mapper.h"
+#include "../bytecode/mapper.h"
 
 void RunCode(std::ifstream& input);
