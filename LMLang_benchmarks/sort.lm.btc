@@ -1,4 +1,19 @@
 {
+  "stringTable" : {
+    "partitionIndex" : 5,
+    "left" : 2,
+    "tmp" : 8,
+    "pivot" : 4,
+    "i" : 6,
+    "main" : 9,
+    "right" : 1,
+    "quickSort" : 0,
+    "tmp1" : 7,
+    "nums" : 3,
+    "n" : 10
+  },
+  "controlFlowCounter" : 10,
+  "controlCycleCounter" : 2,
   "bytecodes" : [ {
     "opCode" : "FuncDecl",
     "value" : 0,
@@ -180809,20 +180824,5 @@
     "stringID" : 0,
     "withValue" : false,
     "withStringID" : false
-  } ],
-  "stringTable" : {
-    "partitionIndex" : 5,
-    "left" : 2,
-    "tmp" : 8,
-    "pivot" : 4,
-    "i" : 6,
-    "main" : 9,
-    "right" : 1,
-    "quickSort" : 0,
-    "tmp1" : 7,
-    "nums" : 3,
-    "n" : 10
-  },
-  "controlFlowCounter" : 10,
-  "controlCycleCounter" : 2
+  } ]
 }
