@@ -3,7 +3,4 @@ cmake-build-release
 lib/llvm
 .idea
 CMakeLists.txt
-grammar
 antlr4-runtime
-bytecodeGenerator/byteCodeGener.cpp
-bytecodeGenerator/byteCodeGener.h
